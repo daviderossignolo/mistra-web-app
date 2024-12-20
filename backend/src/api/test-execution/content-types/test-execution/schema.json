@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "test_executions",
+  "info": {
+    "singularName": "test-execution",
+    "pluralName": "test-executions",
+    "displayName": "TestExecution",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "id_textexecution": {
+      "type": "uid"
+    },
+    "execution_time": {
+      "type": "decimal"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "test": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::test.test",
+      "inversedBy": "test_executions"
+    },
+    "score": {
+      "type": "integer"
+    },
+    "IP": {
+      "type": "string",
+      "regex": "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+    },
+    "revision_date": {
+      "type": "date"
+    },
+    "note": {
+      "type": "text"
+    },
+    "sex": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::sex.sex"
+    }
+  }
+}

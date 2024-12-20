@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tests",
+  "info": {
+    "singularName": "test",
+    "pluralName": "tests",
+    "displayName": "Test",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "id_test": {
+      "type": "uid"
+    },
+    "name_test": {
+      "type": "string"
+    },
+    "description_test": {
+      "type": "string"
+    },
+    "test_executions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::test-execution.test-execution",
+      "mappedBy": "test"
+    }
+  }
+}

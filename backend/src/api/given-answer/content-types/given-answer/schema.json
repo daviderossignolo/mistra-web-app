@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "given_answers",
+  "info": {
+    "singularName": "given-answer",
+    "pluralName": "given-answers",
+    "displayName": "GivenAnswer"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "id_test_execution": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::test-execution.test-execution"
+    },
+    "id_answer": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::answer.answer"
+    }
+  }
+}

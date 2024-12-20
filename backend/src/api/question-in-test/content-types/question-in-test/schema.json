@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "question_in_tests",
+  "info": {
+    "singularName": "question-in-test",
+    "pluralName": "question-in-tests",
+    "displayName": "QuestionInTest"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "id_question": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::question.question"
+    },
+    "id_test": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::test.test"
+    }
+  }
+}
