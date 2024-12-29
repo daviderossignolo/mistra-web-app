@@ -1,0 +1,140 @@
+/* Base styling per la navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #2b547e; /* colore principale */
+  padding: 10px 20px;
+}
+
+.navbar-logo img {
+  height: 50px; /* Adatta la dimensione del logo */
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li a {
+  text-decoration: none;
+  color: white; /* Colore base */
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.navbar-links li a:hover {
+  color: #8ca9c4; /* Colore al passaggio del mouse */
+}
+
+/* CustomLayout.css */
+.mesh-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.image-container {
+  margin-bottom: 20px;
+}
+
+.logo-image {
+  width: 265px;
+  height: 258px;
+  object-fit: cover;
+  border-radius: 8px; /* Aggiungi angoli arrotondati se necessario */
+}
+
+.rich-text-container {
+  text-align: center;
+}
+
+.title {
+  font-size: 40px;
+  font-family: 'Marzo W00 Regular', fantasy;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.text-green {
+  color: #3cba25;
+}
+
+.text-yellow {
+  color: #f7d631;
+}
+
+.text-orange {
+  color: #f77a0c;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.text-red {
+  color: #e80c0c;
+}
+
+.text-pink {
+  color: #f0b6c6;
+}
+
+.text-blue {
+  color: #11bcf0;
+}
+/* HeaderSection.css */
+.header-section {
+  background-color: #336699; /* Colore blu di sfondo */
+  padding: 20px 0;
+  text-align: center;
+  color: white;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.logo {
+  width: 80px;
+  height: auto;
+}
+
+.left-logo {
+  margin-right: 20px;
+}
+
+.right-logo {
+  margin-left: 20px;
+}
+
+.central-content {
+  text-align: center;
+}
+
+.central-logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.subtitle {
+  font-size: 18px;
+  line-height: 1.5;
+}
