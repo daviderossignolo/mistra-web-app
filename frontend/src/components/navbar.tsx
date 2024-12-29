@@ -1,67 +1,125 @@
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import type React from "react";
+import { useEffect, useState } from "react";
 import './navbar.css';
 
-// Define an interface for the Navbar links
-interface NavbarLink {
+interface MenuLink {
   id: number;
-  label: string;
+  name: string;
   url: string;
+  description: string;
 }
 
-// Define a type for the response we expect from Strapi
-interface StrapiResponse<T> {
-  data: Array<{
-    id: number;
-    attributes: T;
-  }>;
+interface DropdownSection {
+  id: number;
+  heading: string;
+  links: MenuLink[];
 }
 
-// Build the Navbar component
-const Navbar: React.FC = () => {
-  // State to hold fetched links
-  const [links, setLinks] = useState<NavbarLink[]>([]);
+interface DropdownMenu {
+  __component: "menu.dropdown";
+  id: number;
+  title: string;
+  url: string;
+  sections: DropdownSection[];
+}
 
-  // Fetch data from the Strapi API
+interface MenuLinkItem {
+  __component: "menu.menu-link";
+  id: number;
+  title: string;
+  url: string | null;
+}
+
+type MainMenuItem = DropdownMenu | MenuLinkItem;
+
+interface MenuData {
+  id: number;
+  documentId: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  MainMenuItems: MainMenuItem[];
+}
+
+const MenuComponent: React.FC = () => {
+  const [menuData, setMenuData] = useState<MenuData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMenuData = async () => {
+      const url = "http://localhost:1337/api/main-menu?populate%5B0%5D=MainMenuItems&populate%5B1%5D=MainMenuItems.sections&populate%5B2%5D=MainMenuItems.sections.links";
       try {
-        const response = await fetch("http://localhost:1337/api/navbar-links", {
-          headers: {
-            Authorization: "Bearer c4afd260834df2386d0ea4c9d0f85ee2a3c0b134fbd27a2a8c26dd41cc6ee169916bcd5ccbbdfbca8d0eeafb9eae7e1fe9a9c1c361c2467c510e01e5cf1e104b5ee2372e780e5889cf9db74cb0a3695b4eddcc013db479eddb1f3528a9c0039cdec8c45174f85f79deee356d8b2bc63a290a3eda9462df6a5ac16617e8b0089c", // Set the token in the headers
-          },
-        });
-        const result = await response.json();
+        const response = await fetch(url);
 
-        // Map through Strapi response to normalize data
-        const fetchedLinks = result.data.map((item: { id: number; label: string; url: string }) => ({
-          id: item.id,
-          label: item.label,
-          url: item.url,
-        }));
-        setLinks(fetchedLinks); // Update the state
-      } catch (error) {
-        console.error('Error fetching navbar links:', error);
+        if (!response.ok) {
+          throw new Error(`Errore nella richiesta: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setMenuData(data.data); // Salva i dati nel stato
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      } catch (error: any) {
+        setError(error.message || "Si è verificato un errore durante il fetch.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchData();
+    fetchMenuData();
   }, []);
 
+  if (loading) return <div>Caricamento...</div>;
+  if (error) return <div>Errore: {error}</div>;
+
+  // Funzione per creare il menu
+  const renderMenu = (items: MainMenuItem[]) => {
   return (
-    <nav className="navbar">
-      <div className="navbar-logo">
-        <img src="https://static.wixstatic.com/media/6cd85c_fb7295de814747b7890cb709a6d17e96~mv2.jpg/v1/fill/w_265,h_258,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/MISTRA%252520LOGO_edited_edited.jpg" alt="Logo Centro MISTRA"/>
-      </div>
-      <ul className="navbar-links">
-        {links.map((link) => (
-          <li key={link.id}>
-            <a href={link.url}>{link.label}</a>
-          </li>
-        ))}
-      </ul>
+    <ul className="menu-list">
+      {items.map((item) => {
+        if (item.__component === "menu.menu-link") {
+          return (
+            <li key={item.id}>
+              {item.url ? (
+                <a href={item.url}>{item.title}</a>
+              ) : (
+                <span>{item.title}</span>
+              )}
+            </li>
+          );
+        }  
+        if (item.__component === "menu.dropdown") {
+          console.log(item);
+          return (
+            <li key={item.id} className="dropdown">
+              <a href={item.url}>{item.title}</a>
+              <div className="dropdown-content">
+                {item.sections.map((section) => (
+                  <div key={section.id}>
+                    <ul>
+                      {section.links.map((link) => (
+                        <li key={link.id}>
+                          <a href={link.url}>{link.name}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </li>
+          );
+        }
+        return null;
+      })}
+    </ul>
+  );
+};
+
+  return (
+    <nav>
+      {menuData ? renderMenu(menuData.MainMenuItems) : <div>Menu non disponibile</div>}
     </nav>
   );
 };
 
-export default Navbar;
+export default MenuComponent;

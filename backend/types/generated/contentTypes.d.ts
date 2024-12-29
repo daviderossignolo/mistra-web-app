@@ -501,13 +501,12 @@ export interface ApiGivenAnswerGivenAnswer extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiNavbarLinkNavbarLink extends Struct.CollectionTypeSchema {
-  collectionName: 'navbar_links';
+export interface ApiMainMenuMainMenu extends Struct.SingleTypeSchema {
+  collectionName: 'main_menus';
   info: {
-    description: '';
-    displayName: 'Navbar-links';
-    pluralName: 'navbar-links';
-    singularName: 'navbar-link';
+    displayName: 'MainMenu';
+    pluralName: 'main-menus';
+    singularName: 'main-menu';
   };
   options: {
     draftAndPublish: true;
@@ -516,19 +515,19 @@ export interface ApiNavbarLinkNavbarLink extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    label: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::navbar-link.navbar-link'
+      'api::main-menu.main-menu'
     > &
       Schema.Attribute.Private;
+    MainMenuItems: Schema.Attribute.DynamicZone<
+      ['menu.menu-link', 'menu.menu-button', 'menu.dropdown']
+    >;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'label'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    url: Schema.Attribute.String;
   };
 }
 
@@ -595,6 +594,36 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     text: Schema.Attribute.Text;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSectionSection extends Struct.CollectionTypeSchema {
+  collectionName: 'sections';
+  info: {
+    description: '';
+    displayName: 'section';
+    pluralName: 'sections';
+    singularName: 'section';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    heading: Schema.Attribute.String;
+    links: Schema.Attribute.Component<'menu.link', true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::section.section'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1210,9 +1239,10 @@ declare module '@strapi/strapi' {
       'api::article.article': ApiArticleArticle;
       'api::category.category': ApiCategoryCategory;
       'api::given-answer.given-answer': ApiGivenAnswerGivenAnswer;
-      'api::navbar-link.navbar-link': ApiNavbarLinkNavbarLink;
+      'api::main-menu.main-menu': ApiMainMenuMainMenu;
       'api::question-in-test.question-in-test': ApiQuestionInTestQuestionInTest;
       'api::question.question': ApiQuestionQuestion;
+      'api::section.section': ApiSectionSection;
       'api::sex.sex': ApiSexSex;
       'api::test-execution.test-execution': ApiTestExecutionTestExecution;
       'api::test.test': ApiTestTest;
