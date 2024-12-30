@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import './navbar.css';
 
 interface MenuLink {
@@ -45,6 +46,7 @@ const MenuComponent: React.FC = () => {
   const [menuData, setMenuData] = useState<MenuData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchMenuData = async () => {
@@ -69,51 +71,60 @@ const MenuComponent: React.FC = () => {
     fetchMenuData();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   if (loading) return <div>Caricamento...</div>;
   if (error) return <div>Errore: {error}</div>;
 
   // Funzione per creare il menu
   const renderMenu = (items: MainMenuItem[]) => {
-  return (
-    <ul className="menu-list">
-      {items.map((item) => {
-        if (item.__component === "menu.menu-link") {
-          return (
-            <li key={item.id}>
-              {item.url ? (
+    return (
+      <ul className="menu-list">
+        {items.map((item) => {
+          if (item.__component === "menu.menu-link") {
+            if (item.title === "Test" && !isAuthenticated) {
+              return null;
+            }
+            return (
+              <li key={item.id}>
+                {item.url ? (
+                  <Link to={item.url}>{item.title}</Link>
+                ) : (
+                  <span>{item.title}</span>
+                )}
+              </li>
+            );
+          }
+          if (item.__component === "menu.dropdown") {
+            return (
+              <li key={item.id} className="dropdown">
                 <a href={item.url}>{item.title}</a>
-              ) : (
-                <span>{item.title}</span>
-              )}
-            </li>
-          );
-        }  
-        if (item.__component === "menu.dropdown") {
-          console.log(item);
-          return (
-            <li key={item.id} className="dropdown">
-              <a href={item.url}>{item.title}</a>
-              <div className="dropdown-content">
-                {item.sections.map((section) => (
-                  <div key={section.id}>
-                    <ul>
-                      {section.links.map((link) => (
-                        <li key={link.id}>
-                          <a href={link.url}>{link.name}</a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </li>
-          );
-        }
-        return null;
-      })}
-    </ul>
-  );
-};
+                <div className="dropdown-content">
+                  {item.sections.map((section) => (
+                    <div key={section.id}>
+                      <ul>
+                        {section.links.map((link) => (
+                          <li key={link.id}>
+                            <a href={link.url}>{link.name}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </li>
+            );
+          }
+          return null;
+        })}
+      </ul>
+    );
+  };
 
   return (
     <nav>

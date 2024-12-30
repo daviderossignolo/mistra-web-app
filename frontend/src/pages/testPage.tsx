@@ -1,7 +1,21 @@
-import React from 'react'
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function TestPage() {
+const TestPage: React.FC = () => {
+  const history = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      history('/login');
+    }
+  }, [history]);
+
   return (
-    <div>pagina dei test</div>
-  )
-}
+    <div>
+      <h2>Ecco qua i miei contenuti nascosti</h2>
+    </div>
+  );
+};
+
+export default TestPage;
