@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('test@example.com');
-  const [password, setPassword] = useState('test');
+  const [password, setPassword] = useState('test01');
   const [error, setError] = useState('');
   // eslint-disable-next-line
   const navigate = useNavigate();
