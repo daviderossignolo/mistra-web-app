@@ -3,6 +3,7 @@ import Navbar from "./components/navbar";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import TestPage from "./pages/testPage";
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/test" element={<TestPage />} />
+          <Route path="/test" element={<PrivateRoute element={TestPage} />} />
         </Routes>
       </div>
     </Router>
