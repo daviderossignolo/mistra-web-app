@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_page_block_video_blocks",
+  "info": {
+    "displayName": "Video",
+    "icon": "television",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "url": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  }
+}

@@ -11,16 +11,16 @@ nav {
   margin: 0;
 }
 
-li {
+.navbar li {
   margin-right: 20px;
   position: relative;
 }
 
-li:hover {
+.navabr li:hover {
   background-color: #003449;
 }
 
-a {
+.nav-link a {
   color: white;
   text-decoration: none;
   font-weight: bold;

@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_page_block_call_to_action_blocks",
+  "info": {
+    "displayName": "CallToAction",
+    "icon": "cursor",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "buttonTitle": {
+      "type": "string"
+    },
+    "buttonLink": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_page_block_map_blocks",
+  "info": {
+    "displayName": "Map",
+    "icon": "pinMap",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "address": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "decimal"
+    },
+    "longitude": {
+      "type": "decimal"
+    }
+  }
+}

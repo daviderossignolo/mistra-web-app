@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_page_block_carousel_blocks",
+  "info": {
+    "displayName": "Carousel",
+    "icon": "landscape",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

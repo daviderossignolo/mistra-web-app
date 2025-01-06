@@ -92,7 +92,7 @@ const MenuComponent: React.FC = () => {
               return null;
             }
             return (
-              <li key={item.id}>
+              <li className="nav-link" key={item.id}>
                 {item.url ? (
                   <Link to={item.url}>{item.title}</Link>
                 ) : (
@@ -103,14 +103,14 @@ const MenuComponent: React.FC = () => {
           }
           if (item.__component === "menu.dropdown") {
             return (
-              <li key={item.id} className="dropdown">
+              <li key={item.id} className="nav-link dropdown">
                 <a href={item.url}>{item.title}</a>
                 <div className="dropdown-content">
                   {item.sections.map((section) => (
                     <div key={section.id}>
                       <ul>
                         {section.links.map((link) => (
-                          <li key={link.id}>
+                          <li className="dropdown" key={link.id}>
                             <a href={link.url}>{link.name}</a>
                           </li>
                         ))}
