@@ -19,9 +19,9 @@
     },
     "questions": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::question.question",
-      "mappedBy": "id_categories"
+      "mappedBy": "id_category"
     }
   }
 }

@@ -15,9 +15,6 @@
     "id_textexecution": {
       "type": "uid"
     },
-    "execution_time": {
-      "type": "decimal"
-    },
     "age": {
       "type": "integer"
     },
@@ -44,6 +41,9 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::sex.sex"
+    },
+    "execution_time": {
+      "type": "datetime"
     }
   }
 }
