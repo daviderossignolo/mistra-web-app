@@ -39,11 +39,18 @@
     },
     "sex": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::sex.sex"
+      "relation": "manyToOne",
+      "target": "api::sex.sex",
+      "inversedBy": "test_executions"
     },
     "execution_time": {
       "type": "datetime"
+    },
+    "given_answers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::given-answer.given-answer",
+      "mappedBy": "id_test_execution"
     }
   }
 }

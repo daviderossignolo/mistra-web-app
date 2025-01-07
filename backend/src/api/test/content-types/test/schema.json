@@ -26,6 +26,12 @@
       "relation": "oneToMany",
       "target": "api::test-execution.test-execution",
       "mappedBy": "test"
+    },
+    "question_in_tests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::question-in-test.question-in-test",
+      "mappedBy": "id_test"
     }
   }
 }

@@ -29,6 +29,12 @@
       "relation": "manyToOne",
       "target": "api::question.question",
       "inversedBy": "answers"
+    },
+    "given_answers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::given-answer.given-answer",
+      "mappedBy": "id_answer"
     }
   }
 }

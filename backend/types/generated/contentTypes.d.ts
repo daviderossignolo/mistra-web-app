@@ -385,6 +385,10 @@ export interface ApiAnswerAnswer extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    given_answers: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::given-answer.given-answer'
+    >;
     id_answer: Schema.Attribute.UID;
     id_question: Schema.Attribute.Relation<
       'manyToOne',
@@ -408,6 +412,7 @@ export interface ApiAnswerAnswer extends Struct.CollectionTypeSchema {
 export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
+    description: '';
     displayName: 'Category';
     pluralName: 'categories';
     singularName: 'category';
@@ -438,6 +443,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
 export interface ApiGivenAnswerGivenAnswer extends Struct.CollectionTypeSchema {
   collectionName: 'given_answers';
   info: {
+    description: '';
     displayName: 'GivenAnswer';
     pluralName: 'given-answers';
     singularName: 'given-answer';
@@ -449,9 +455,9 @@ export interface ApiGivenAnswerGivenAnswer extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    id_answer: Schema.Attribute.Relation<'oneToOne', 'api::answer.answer'>;
+    id_answer: Schema.Attribute.Relation<'manyToOne', 'api::answer.answer'>;
     id_test_execution: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToOne',
       'api::test-execution.test-execution'
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -538,6 +544,7 @@ export interface ApiQuestionInTestQuestionInTest
   extends Struct.CollectionTypeSchema {
   collectionName: 'question_in_tests';
   info: {
+    description: '';
     displayName: 'QuestionInTest';
     pluralName: 'question-in-tests';
     singularName: 'question-in-test';
@@ -550,10 +557,10 @@ export interface ApiQuestionInTestQuestionInTest
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     id_question: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToOne',
       'api::question.question'
     >;
-    id_test: Schema.Attribute.Relation<'oneToOne', 'api::test.test'>;
+    id_test: Schema.Attribute.Relation<'manyToOne', 'api::test.test'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -596,6 +603,10 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    question_in_tests: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::question-in-test.question-in-test'
+    >;
     text: Schema.Attribute.Text;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -636,6 +647,7 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
 export interface ApiSexSex extends Struct.CollectionTypeSchema {
   collectionName: 'sexes';
   info: {
+    description: '';
     displayName: 'sex';
     pluralName: 'sexes';
     singularName: 'sex';
@@ -653,6 +665,10 @@ export interface ApiSexSex extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     sex_id: Schema.Attribute.UID;
+    test_executions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::test-execution.test-execution'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -677,6 +693,10 @@ export interface ApiTestExecutionTestExecution
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     execution_time: Schema.Attribute.DateTime;
+    given_answers: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::given-answer.given-answer'
+    >;
     id_textexecution: Schema.Attribute.UID;
     IP: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -689,7 +709,7 @@ export interface ApiTestExecutionTestExecution
     publishedAt: Schema.Attribute.DateTime;
     revision_date: Schema.Attribute.Date;
     score: Schema.Attribute.Integer;
-    sex: Schema.Attribute.Relation<'oneToOne', 'api::sex.sex'>;
+    sex: Schema.Attribute.Relation<'manyToOne', 'api::sex.sex'>;
     test: Schema.Attribute.Relation<'manyToOne', 'api::test.test'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -719,6 +739,10 @@ export interface ApiTestTest extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     name_test: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    question_in_tests: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::question-in-test.question-in-test'
+    >;
     test_executions: Schema.Attribute.Relation<
       'oneToMany',
       'api::test-execution.test-execution'
