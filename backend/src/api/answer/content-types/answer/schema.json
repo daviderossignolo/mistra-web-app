@@ -4,7 +4,8 @@
   "info": {
     "singularName": "answer",
     "pluralName": "answers",
-    "displayName": "Answer"
+    "displayName": "Answer",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -23,11 +24,17 @@
     "correction": {
       "type": "text"
     },
-    "question": {
+    "id_question": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::question.question",
       "inversedBy": "answers"
+    },
+    "given_answers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::given-answer.given-answer",
+      "mappedBy": "id_answer"
     }
   }
 }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "category",
     "pluralName": "categories",
-    "displayName": "Category"
+    "displayName": "Category",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -19,9 +20,9 @@
     },
     "questions": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::question.question",
-      "mappedBy": "id_categories"
+      "mappedBy": "id_category"
     }
   }
 }

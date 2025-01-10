@@ -4,7 +4,8 @@
   "info": {
     "singularName": "given-answer",
     "pluralName": "given-answers",
-    "displayName": "GivenAnswer"
+    "displayName": "GivenAnswer",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -13,13 +14,15 @@
   "attributes": {
     "id_test_execution": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::test-execution.test-execution"
+      "relation": "manyToOne",
+      "target": "api::test-execution.test-execution",
+      "inversedBy": "given_answers"
     },
     "id_answer": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::answer.answer"
+      "relation": "manyToOne",
+      "target": "api::answer.answer",
+      "inversedBy": "given_answers"
     }
   }
 }
