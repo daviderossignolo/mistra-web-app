@@ -106,8 +106,50 @@ export interface PageBlockMapBlock extends Struct.ComponentSchema {
   };
   attributes: {
     address: Schema.Attribute.String;
+    cap: Schema.Attribute.String;
+    city: Schema.Attribute.String;
+    description: Schema.Attribute.Blocks;
     latitude: Schema.Attribute.Decimal;
     longitude: Schema.Attribute.Decimal;
+  };
+}
+
+export interface PageBlockOpeningHours extends Struct.ComponentSchema {
+  collectionName: 'components_page_block_opening_hours';
+  info: {
+    description: '';
+    displayName: 'OpeningHours';
+    icon: 'clock';
+  };
+  attributes: {
+    hours: Schema.Attribute.Component<'page-block.orari', true>;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface PageBlockOrari extends Struct.ComponentSchema {
+  collectionName: 'components_page_block_oraris';
+  info: {
+    displayName: 'Orari';
+    icon: 'clock';
+  };
+  attributes: {
+    afternoonClosing: Schema.Attribute.Time;
+    afternoonOpening: Schema.Attribute.Time;
+    Day: Schema.Attribute.Enumeration<
+      [
+        'Lunedi',
+        'Marted\u00EC',
+        'Mercoled\u00EC',
+        'Gioved\u00EC',
+        'Venerd\u00EC',
+        'Sabato',
+        'Domenica',
+      ]
+    >;
+    morningClosing: Schema.Attribute.Time;
+    morningOpening: Schema.Attribute.Time;
+    note: Schema.Attribute.String;
   };
 }
 
@@ -147,6 +189,8 @@ declare module '@strapi/strapi' {
       'page-block.carousel-block': PageBlockCarouselBlock;
       'page-block.image-block': PageBlockImageBlock;
       'page-block.map-block': PageBlockMapBlock;
+      'page-block.opening-hours': PageBlockOpeningHours;
+      'page-block.orari': PageBlockOrari;
       'page-block.text-block': PageBlockTextBlock;
       'page-block.video-block': PageBlockVideoBlock;
     }

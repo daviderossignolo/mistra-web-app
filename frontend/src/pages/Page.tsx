@@ -1,12 +1,10 @@
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import PageRenderer from '../components/PageRenderer';
+import ContactPage from './ContactPage';
 
-//
 
 type PageData = {
-
     title: string;
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     pageContent: any[];
@@ -28,7 +26,7 @@ const Page: React.FC<PageProps> = ({ slug }) => {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `http://localhost:1337/api/pages?filters[slug][$eq]=${slug}&populate=pageContent`
+          `http://localhost:1337/api/pages?filters[slug][$eq]=${slug}&populate=*`
         );
         if (!response.ok) {
           throw new Error('Errore durante il caricamento dei dati');
@@ -55,6 +53,10 @@ const Page: React.FC<PageProps> = ({ slug }) => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!pageData) return <p>No page data found</p>;
+
+  // if (slug === 'contatti') {
+  //   return <ContactPage pageData={pageData} />;
+  // }
 
   return (
     <div>

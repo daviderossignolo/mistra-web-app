@@ -529,6 +529,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'page-block.image-block',
         'page-block.carousel-block',
         'page-block.call-to-action-block',
+        'page-block.opening-hours',
       ]
     >;
     publishedAt: Schema.Attribute.DateTime;
