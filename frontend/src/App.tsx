@@ -42,6 +42,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} /> {/* Controllare la visualizzazione delle pagine protette dal login  */}
           <Route path="/test" element={<PrivateRoute element={TestPage} />} />
+          <Route path="/contatti" element={<Page slug="contatti" />} />
           {slugs.map((slug: string) => (
             <Route
               key={slug}

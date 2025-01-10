@@ -27,7 +27,8 @@
         "page-block.map-block",
         "page-block.image-block",
         "page-block.carousel-block",
-        "page-block.call-to-action-block"
+        "page-block.call-to-action-block",
+        "page-block.opening-hours"
       ]
     }
   }

@@ -1,0 +1,24 @@
+.contact-page-content h2 {
+  text-align: center;
+  color: red;
+  font-weight: bold;
+}
+
+.block {
+    padding: 20px;
+}
+
+.block-gray {
+    background-color: #f0f0f0;
+}
+
+.contact-page-content .block {
+    margin-bottom: 20px;
+}
+
+.contact-map-block h4 {
+    text-align: left;
+    color: #003449;
+    font-weight: bold;
+    font-size: 35px;
+}

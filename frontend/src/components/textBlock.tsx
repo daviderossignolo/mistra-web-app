@@ -1,6 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { jsonToMarkdown } from "../utils";
 
 type JsonNode = {
     type: string
@@ -8,49 +9,14 @@ type JsonNode = {
     level: number
 }
 
-// Funzione che permette di convertire un JSON in un markdown per la visualizzazione attraverso react-markdown che renderizza il contenuto
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const jsonToMarkdown = (nodes: any[]) => {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const convertNode = (node: { type: any; level: number; children: any[]; text: string; bold: any; underline: any; url: any; format: string; }): string => {
-    switch (node.type) {
-      case "heading":
-        return `${"#".repeat(node.level)} ${node.children.map(convertNode).join("")}\n\n`;
-      case "paragraph":
-        return `${node.children.map(convertNode).join("")}\n\n`;
-      case "text": {
-        let text = node.text || "";
-        if (node.bold) text = `**${text}**`;
-        if (node.underline) text = `${text}`;
-        return text;
-      }
-      case "link": {
-        const linkContent: string = node.children.map(convertNode).join("");
-        return `[${linkContent}](${node.url})`;
-      }
-      case "list": {
-        const marker = node.format === "ordered" ? "1." : "-";
-        return `${// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-            node.children.map((child: any) => `${marker} ${convertNode(child)}`).join("\n")}\n\n`;
-    }
-      case "list-item":
-        return node.children.map(convertNode).join("");
-      default:
-        return "";
-    }
-  };
-
-  return nodes.map(convertNode).join("");
-};
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const TextBlock = ({ content }: { content: any }) => {
-    const markdownContent = jsonToMarkdown(content);
-    return (
-        <div>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdownContent}</ReactMarkdown>
-        </div>
-    );
+const TextBlock = ({ content, className }: { content: any, className?: string }) => {
+  const markdownContent = jsonToMarkdown(content);
+  return (
+    <div className={className}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdownContent}</ReactMarkdown>
+    </div>
+  );
 };
 
 export default TextBlock;

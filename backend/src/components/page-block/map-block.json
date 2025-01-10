@@ -15,6 +15,15 @@
     },
     "longitude": {
       "type": "decimal"
+    },
+    "city": {
+      "type": "string"
+    },
+    "cap": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
     }
   }
 }
