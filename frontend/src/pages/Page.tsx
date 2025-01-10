@@ -54,9 +54,9 @@ const Page: React.FC<PageProps> = ({ slug }) => {
   if (error) return <p>Error: {error}</p>;
   if (!pageData) return <p>No page data found</p>;
 
-  if (slug === 'contatti') {
-    return <ContactPage pageData={pageData} />;
-  }
+  // if (slug === 'contatti') {
+  //   return <ContactPage pageData={pageData} />;
+  // }
 
   return (
     <div>
