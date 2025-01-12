@@ -46,6 +46,10 @@ const MenuComponent: React.FC = () => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false); // Mobile menu state
+	const [activeDropdowns, setActiveDropdowns] = useState<Set<number>>(
+		new Set(),
+	); // Track active dropdowns in mobile view
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -81,12 +85,28 @@ const MenuComponent: React.FC = () => {
 		}
 	}, []);
 
+	const toggleDropdown = (id: number) => {
+		setActiveDropdowns((prev) => {
+			const newSet = new Set(prev);
+			if (newSet.has(id)) {
+				newSet.delete(id);
+			} else {
+				newSet.add(id);
+			}
+			return newSet;
+		});
+	};
+
 	if (loading) return <div className="p-4 text-center">Caricamento...</div>;
 	if (error) return <div className="p-4 text-red-500">Errore: {error}</div>;
 
-	const renderMenu = (items: MainMenuItem[]) => {
+	const renderMenu = (items: MainMenuItem[], isMobile = false) => {
 		return (
-			<ul className="flex items-center justify-center space-x-4 w-full">
+			<ul
+				className={`${
+					isMobile ? "flex flex-col space-y-2" : "flex items-center space-x-4"
+				}`}
+			>
 				{items.map((item) => {
 					if (item.__component === "menu.menu-link") {
 						if (item.title === "Test" && !isAuthenticated) {
@@ -110,16 +130,56 @@ const MenuComponent: React.FC = () => {
 					if (item.__component === "menu.dropdown") {
 						return (
 							<li key={item.id} className="relative group">
-								<a
-									href={item.url}
-									className="text-gray-700 hover:text-blue-600 py-2 transition-colors duration-200"
+								{/* Dropdown Title */}
+								<div
+									className={`text-gray-700 hover:text-blue-600 py-2 transition-colors duration-200 ${
+										isMobile
+											? "flex justify-between items-center cursor-pointer"
+											: ""
+									}`}
+									onClick={() => isMobile && toggleDropdown(item.id)}
+									onKeyUp={(e) =>
+										e.key === "Enter" && isMobile && toggleDropdown(item.id)
+									}
 								>
-									{item.title}
-								</a>
-								<div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-									{item.sections.map((section) => (
-										<div key={section.id} className="py-2">
-											<ul>
+									<a href={item.url}>{item.title}</a>
+									{isMobile && (
+										<span>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												className={`h-5 w-5 transition-transform ${
+													activeDropdowns.has(item.id)
+														? "rotate-180"
+														: "rotate-0"
+												}`}
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<title>Dropdown</title>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M19 9l-7 7-7-7"
+												/>
+											</svg>
+										</span>
+									)}
+								</div>
+								{/* Dropdown Content */}
+								<div
+									className={`${
+										isMobile
+											? activeDropdowns.has(item.id)
+												? "block"
+												: "hidden"
+											: "absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+									}`}
+								>
+									<ul className={`${isMobile ? "pl-4 space-y-2" : ""}`}>
+										{item.sections.map((section) => (
+											<div key={section.id}>
 												{section.links.map((link) => (
 													<li key={link.id}>
 														<a
@@ -130,9 +190,9 @@ const MenuComponent: React.FC = () => {
 														</a>
 													</li>
 												))}
-											</ul>
-										</div>
-									))}
+											</div>
+										))}
+									</ul>
 								</div>
 							</li>
 						);
@@ -146,13 +206,43 @@ const MenuComponent: React.FC = () => {
 	return (
 		<nav className="bg-white shadow-md">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="flex justify-center h-16">
-					{menuData ? (
-						renderMenu(menuData.MainMenuItems)
-					) : (
-						<div className="p-4 text-gray-500">Menu non disponibile</div>
-					)}
+				<div className="flex items-center justify-between h-16">
+					<div className="sm:hidden">
+						<button
+							type="button"
+							onClick={() => setIsMenuOpen(!isMenuOpen)}
+							className="text-gray-700 focus:outline-none"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<title>Menu</title>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M4 6h16M4 12h16M4 18h16"
+								/>
+							</svg>
+						</button>
+					</div>
+					<div className="hidden sm:flex justify-center flex-1">
+						{menuData ? renderMenu(menuData.MainMenuItems) : null}
+					</div>
 				</div>
+
+				{/* Mobile Dropdown Menu */}
+				{isMenuOpen && (
+					<div className="sm:hidden">
+						<div className="py-4">
+							{menuData ? renderMenu(menuData.MainMenuItems, true) : null}
+						</div>
+					</div>
+				)}
 			</div>
 		</nav>
 	);
