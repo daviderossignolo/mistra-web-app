@@ -8,7 +8,7 @@ module.exports = {
         "navbar-hover": '#003449' 
       },
       fontFamily: {
-        'poppins': ['Poppins', 'sans-serif'],
+        'poppins': ['Poppins-ExtraLight', 'Poppins', 'sans-serif'],
       },
     },
   },

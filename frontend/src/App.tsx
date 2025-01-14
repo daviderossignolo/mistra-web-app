@@ -7,6 +7,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import TestPage from "./pages/testPage";
 import ContactPage from "./pages/ContactPage";
 import Homepage from "./pages/Homepage";
+import Footer from "./components/footer";
 
 function App() {
 	const [slugs, setRoutes] = useState<string[]>([]); // Stato per memorizzare i dati delle pagine
@@ -56,6 +57,7 @@ function App() {
 						/>
 					))}
 				</Routes>
+				<Footer />
 			</div>
 		</Router>
 	);

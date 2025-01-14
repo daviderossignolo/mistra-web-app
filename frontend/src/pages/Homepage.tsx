@@ -48,14 +48,14 @@ const Homepage: React.FC = () => {
 					return (
 						<div
 							key={block.id}
-							className="w-full max-w-3xl mx-auto flex flex-col items-center gap-8"
+							className="w-full max-w-3xl mx-auto flex flex-col gap-4"
 						>
-							<div className="bg-blue-600 px-8 py-4 rounded-lg">
-								<h2 className="text-white font-extralight font-poppins m-0">
+							<div className="w-full bg-navbar-hover px-4 py-4">
+								<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
 									{pageData.title}
 								</h2>
 							</div>
-							<div className="w-full text-left text-lg font-poppins font-extralight text-black">
+							<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
 								<TextBlock content={block.content} />
 							</div>
 						</div>
