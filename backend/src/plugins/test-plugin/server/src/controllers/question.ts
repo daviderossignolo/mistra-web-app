@@ -93,7 +93,7 @@ export default {
   	async modifyQuestion(ctx: Context) {
 		try {
 		  const { documentId } = ctx.query;
-		  const response = await axios.get(`http://localhost:1337/api/questions/${documentId}`);
+		  const response = await axios.get(`http://localhost:1337/api/questions/${documentId}?populate=*`);
 		  const data = response.data.data;
 	  
 		  // Assicurati che `answers` sia sempre un array
@@ -107,7 +107,7 @@ export default {
 			  </head>
 			  <body>
 				<h1>Modifica Question</h1>
-				<form method="POST" action="http://localhost:1337/api/test-plugin/update-question" enctype="application/json">
+				<form action="http://localhost:1337/api/test-plugin/submit-modify-question/?documentId=${documentId}" method="POST">
 				  <label for="name">Name:</label>
 				  <input type="text" name="name" id="name" value="${data.name || ''}" required><br>
 				  <label for="text">Text:</label>
