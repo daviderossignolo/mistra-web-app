@@ -4,6 +4,7 @@ import { Initializer } from './components/Initializer';
 import { PluginIcon } from './components/PluginIcon';
 
 export default {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   register(app: any) {
     app.addMenuLink({
       to: `plugins/${PLUGIN_ID}`,
