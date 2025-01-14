@@ -41,6 +41,11 @@ interface MenuData {
 	MainMenuItems: MainMenuItem[];
 }
 
+/**
+ * TO DO: style the navbar.
+ *
+ */
+
 const MenuComponent: React.FC = () => {
 	const [menuData, setMenuData] = useState<MenuData | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
@@ -117,12 +122,14 @@ const MenuComponent: React.FC = () => {
 								{item.url ? (
 									<Link
 										to={item.url}
-										className="text-gray-700 hover:text-blue-600 py-2 transition-colors duration-200"
+										className="text-white py-2 px-4 transition-colors duration-200 hover:bg-navbar-hover rounded"
 									>
 										{item.title}
 									</Link>
 								) : (
-									<span className="text-gray-700">{item.title}</span>
+									<span className="text-white px-4 hover_bg-navbar-hover rounded">
+										{item.title}
+									</span>
 								)}
 							</li>
 						);
@@ -132,7 +139,7 @@ const MenuComponent: React.FC = () => {
 							<li key={item.id} className="relative group">
 								{/* Dropdown Title */}
 								<div
-									className={`text-gray-700 hover:text-blue-600 py-2 transition-colors duration-200 ${
+									className={`text-white px-4 py-2 transition-colors duration-200 hover:bg-navbar-hover rounded ${
 										isMobile
 											? "flex justify-between items-center cursor-pointer"
 											: ""
@@ -174,7 +181,7 @@ const MenuComponent: React.FC = () => {
 											? activeDropdowns.has(item.id)
 												? "block"
 												: "hidden"
-											: "absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+											: "absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-navbar rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
 									}`}
 								>
 									<ul className={`${isMobile ? "pl-4 space-y-2" : ""}`}>
@@ -184,7 +191,7 @@ const MenuComponent: React.FC = () => {
 													<li key={link.id}>
 														<a
 															href={link.url}
-															className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+															className="block px-4 py-2 text-sm text-white hover:bg-navbar-hover"
 														>
 															{link.name}
 														</a>
@@ -204,7 +211,7 @@ const MenuComponent: React.FC = () => {
 	};
 
 	return (
-		<nav className="bg-white shadow-md">
+		<nav className="bg-navbar shadow-md">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex items-center justify-between h-16">
 					<div className="sm:hidden">
