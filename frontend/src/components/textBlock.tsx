@@ -2,21 +2,38 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { jsonToMarkdown } from "../utils";
+import rehypeRaw from "rehype-raw";
 
 type JsonNode = {
-    type: string
-    children: { type: string, text: string }[]
-    level: number
-}
+	type: string;
+	children: { type: string; text: string }[];
+	level: number;
+};
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const TextBlock = ({ content, className }: { content: any, className?: string }) => {
-  const markdownContent = jsonToMarkdown(content);
-  return (
-    <div className={className}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdownContent}</ReactMarkdown>
-    </div>
-  );
+const TextBlock = ({
+	content,
+	className,
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+}: { content: any; className?: string }) => {
+	console.log("Content:", content);
+	const markdownContent = jsonToMarkdown(content);
+	console.log("Markdown content:", markdownContent);
+	return (
+		<div className={className}>
+			<ReactMarkdown
+				className="markdown"
+				remarkPlugins={[remarkGfm]}
+				rehypePlugins={[rehypeRaw]}
+				components={{
+					u: ({ node, children }) => (
+						<span style={{ textDecoration: "underline" }}>{children}</span>
+					),
+				}}
+			>
+				{markdownContent}
+			</ReactMarkdown>
+		</div>
+	);
 };
 
 export default TextBlock;
