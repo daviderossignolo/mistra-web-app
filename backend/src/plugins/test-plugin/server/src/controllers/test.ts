@@ -11,6 +11,8 @@ export default {
             <ul id="answers-list">
                 ${(await this.getTestsHTML())}
             </ul>
+            <br>
+            <a href="http://localhost:1337/api/test-plugin/display-question">Crea Question</a>
         </body>
         </html>
     `;
