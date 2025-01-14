@@ -7,6 +7,9 @@ module.exports = {
         navbar: '#2B6CA3',
         "navbar-hover": '#003449' 
       },
+      fontFamily: {
+        'poppins': ['Poppins', 'sans-serif'],
+      },
     },
   },
   plugins: [],
