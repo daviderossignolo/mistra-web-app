@@ -39,6 +39,19 @@ export interface HeaderContent extends Struct.ComponentSchema {
   };
 }
 
+export interface InfectionPageSection extends Struct.ComponentSchema {
+  collectionName: 'components_infection_page_sections';
+  info: {
+    displayName: 'section';
+    icon: 'bulletList';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    icon: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface MenuDropdown extends Struct.ComponentSchema {
   collectionName: 'components_menu_dropdowns';
   info: {
@@ -223,6 +236,7 @@ declare module '@strapi/strapi' {
       'about.department': AboutDepartment;
       'about.member': AboutMember;
       'header.content': HeaderContent;
+      'infection-page.section': InfectionPageSection;
       'menu.dropdown': MenuDropdown;
       'menu.link': MenuLink;
       'menu.menu-button': MenuMenuButton;

@@ -536,6 +536,37 @@ export interface ApiHeaderHeader extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiInfectionPageInfectionPage
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'infection_pages';
+  info: {
+    displayName: 'infectionPages';
+    pluralName: 'infection-pages';
+    singularName: 'infection-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    content: Schema.Attribute.Component<'infection-page.section', true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::infection-page.infection-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiMainMenuMainMenu extends Struct.SingleTypeSchema {
   collectionName: 'main_menus';
   info: {
@@ -1331,6 +1362,7 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::given-answer.given-answer': ApiGivenAnswerGivenAnswer;
       'api::header.header': ApiHeaderHeader;
+      'api::infection-page.infection-page': ApiInfectionPageInfectionPage;
       'api::main-menu.main-menu': ApiMainMenuMainMenu;
       'api::page.page': ApiPagePage;
       'api::question-in-test.question-in-test': ApiQuestionInTestQuestionInTest;

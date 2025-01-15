@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "infection_pages",
+  "info": {
+    "singularName": "infection-page",
+    "pluralName": "infection-pages",
+    "displayName": "infectionPages"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "content": {
+      "displayName": "section",
+      "type": "component",
+      "repeatable": true,
+      "component": "infection-page.section"
+    }
+  }
+}
