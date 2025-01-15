@@ -1,5 +1,30 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface AboutDepartment extends Struct.ComponentSchema {
+  collectionName: 'components_about_departments';
+  info: {
+    displayName: 'department';
+    icon: 'house';
+  };
+  attributes: {
+    team_member: Schema.Attribute.Component<'about.member', true>;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface AboutMember extends Struct.ComponentSchema {
+  collectionName: 'components_about_members';
+  info: {
+    displayName: 'member';
+    icon: 'user';
+  };
+  attributes: {
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    name: Schema.Attribute.String;
+    profession: Schema.Attribute.String;
+  };
+}
+
 export interface HeaderContent extends Struct.ComponentSchema {
   collectionName: 'components_header_contents';
   info: {
@@ -195,6 +220,8 @@ export interface PageBlockVideoBlock extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'about.department': AboutDepartment;
+      'about.member': AboutMember;
       'header.content': HeaderContent;
       'menu.dropdown': MenuDropdown;
       'menu.link': MenuLink;

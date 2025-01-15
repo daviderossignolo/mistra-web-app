@@ -9,6 +9,7 @@ import ContactPage from "./pages/ContactPage";
 import Homepage from "./pages/Homepage";
 import Footer from "./components/footer";
 import Header from "./components/header";
+import About from "./pages/About";
 
 function App() {
 	const [slugs, setRoutes] = useState<string[]>([]); // Stato per memorizzare i dati delle pagine
@@ -50,6 +51,7 @@ function App() {
 					<Route path="/contatti" element={<ContactPage slug="contatti" />} />
 					<Route path="/" element={<Homepage />} />
 					<Route path="/home" element={<Homepage />} />
+					<Route path="/chi-siamo" element={<About />} />
 					{slugs.map((slug: string) => (
 						<Route
 							key={slug}

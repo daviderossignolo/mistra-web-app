@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_about_departments",
+  "info": {
+    "displayName": "department",
+    "icon": "house"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "team_member": {
+      "displayName": "member",
+      "type": "component",
+      "repeatable": true,
+      "component": "about.member"
+    }
+  }
+}

@@ -37,7 +37,6 @@ const Header: React.FC = () => {
 				}
 
 				const data = await response.json();
-				console.log("Header Data:", data);
 				setHeaderData(data.data);
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (error: any) {
@@ -58,17 +57,18 @@ const Header: React.FC = () => {
 	const header_title = headerData?.title;
 	const main_image = `http://localhost:1337${headerData?.content.main_image.url}`;
 	const main_altertext = headerData?.content.main_image.alternativeText;
+
+	// Funzione che formatta il markdown per la visualizzazione degli a capo
 	const formatMarkdownContent = (content: string) => {
 		const lines = content
 			.split("\n")
 			.map((line) => line.trim())
 			.filter(Boolean);
 
-		console.log("Lines:", lines);
-
 		return `${lines[0]}\n\n${lines.slice(1).join("\n\n")}`;
 	};
 
+	// Contenuto markdown da visualizzare
 	const parsedMarkdown = headerData?.content.text_content
 		? formatMarkdownContent(headerData.content.text_content)
 		: "";
