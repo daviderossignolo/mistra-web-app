@@ -15,9 +15,7 @@ const TextBlock = ({
 	className,
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 }: { content: any; className?: string }) => {
-	console.log("Content:", content);
 	const markdownContent = jsonToMarkdown(content);
-	console.log("Markdown content:", markdownContent);
 	return (
 		<div className={className}>
 			<ReactMarkdown

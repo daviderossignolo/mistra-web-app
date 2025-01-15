@@ -8,6 +8,7 @@ import TestPage from "./pages/testPage";
 import ContactPage from "./pages/ContactPage";
 import Homepage from "./pages/Homepage";
 import Footer from "./components/footer";
+import Header from "./components/header";
 
 function App() {
 	const [slugs, setRoutes] = useState<string[]>([]); // Stato per memorizzare i dati delle pagine
@@ -21,7 +22,6 @@ function App() {
 				const pageData = data.data;
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 				const slugs: string[] = pageData.map((page: any) => page.slug);
-				console.log("Slugs:", slugs);
 				setRoutes(slugs);
 			} catch (error) {
 				console.error("Errore durante il fetch delle pagine:", error);
@@ -41,6 +41,7 @@ function App() {
 	return (
 		<Router>
 			<div className="App">
+				<Header />
 				<MenuComponent />
 				<Routes>
 					<Route path="/login" element={<Login />} />{" "}

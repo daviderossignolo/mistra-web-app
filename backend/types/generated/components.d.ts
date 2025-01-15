@@ -1,5 +1,19 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface HeaderContent extends Struct.ComponentSchema {
+  collectionName: 'components_header_contents';
+  info: {
+    displayName: 'content';
+    icon: 'apps';
+  };
+  attributes: {
+    main_image: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    text_content: Schema.Attribute.RichText;
+  };
+}
+
 export interface MenuDropdown extends Struct.ComponentSchema {
   collectionName: 'components_menu_dropdowns';
   info: {
@@ -181,6 +195,7 @@ export interface PageBlockVideoBlock extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'header.content': HeaderContent;
       'menu.dropdown': MenuDropdown;
       'menu.link': MenuLink;
       'menu.menu-button': MenuMenuButton;
