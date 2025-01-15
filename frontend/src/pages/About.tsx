@@ -146,7 +146,7 @@ const TeamMemberCard = ({
 	<div className="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4">
 		<img
 			src={`http://localhost:1337${image?.url}`}
-			alt={image?.alternativeText || name}
+			alt={image?.alternativeText}
 			className="w-24 h-24 rounded-full object-cover mb-4"
 		/>
 		<h4 className="font-bold text-lg text-navbar-hover font-poppins">{name}</h4>
