@@ -4,7 +4,8 @@
   "info": {
     "singularName": "infection-page",
     "pluralName": "infection-pages",
-    "displayName": "infectionPages"
+    "displayName": "infectionPages",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -18,7 +19,7 @@
       "type": "uid",
       "targetField": "title"
     },
-    "content": {
+    "sections": {
       "displayName": "section",
       "type": "component",
       "repeatable": true,

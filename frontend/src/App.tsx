@@ -10,17 +10,28 @@ import Homepage from "./pages/Homepage";
 import Footer from "./components/footer";
 import Header from "./components/header";
 import About from "./pages/About";
+import InfectionPage from "./pages/InfectionPage";
+import InfectionList from "./pages/InfectionListPage";
 
 function App() {
-	const [slugs, setRoutes] = useState<string[]>([]); // Stato per memorizzare i dati delle pagine
-	const [loading, setLoading] = useState<boolean>(true); // Stato di caricamento
-
+	const [slugs, setRoutes] = useState<string[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [infectionSlugs, setInfectionSlugs] = useState<string[]>([]);
 	useEffect(() => {
 		const fetchPages = async () => {
 			try {
 				const response = await fetch("http://localhost:1337/api/pages");
+				const infectionResponse = await fetch(
+					"http://localhost:1337/api/infection-pages",
+				);
 				const data = await response.json();
 				const pageData = data.data;
+				const infectionData = await infectionResponse.json();
+				const infectionSlugs: string[] = infectionData.data.map(
+					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+					(page: any) => page.slug,
+				);
+				setInfectionSlugs(infectionSlugs);
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 				const slugs: string[] = pageData.map((page: any) => page.slug);
 				setRoutes(slugs);
@@ -52,13 +63,21 @@ function App() {
 					<Route path="/" element={<Homepage />} />
 					<Route path="/home" element={<Homepage />} />
 					<Route path="/chi-siamo" element={<About />} />
-					{slugs.map((slug: string) => (
+					<Route path="/infezioni" element={<InfectionList />} />
+					{infectionSlugs.map((slug: string) => (
+						<Route
+							key={slug}
+							path={`/${slug}`}
+							element={<InfectionPage slug={slug} />}
+						/>
+					))}
+					{/* {slugs.map((slug: string) => (
 						<Route
 							key={slug}
 							path={`/${slug}`}
 							element={<Page slug={slug} />}
 						/>
-					))}
+					))} */}
 				</Routes>
 				<Footer />
 			</div>

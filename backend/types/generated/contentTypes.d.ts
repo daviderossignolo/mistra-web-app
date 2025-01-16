@@ -536,10 +536,38 @@ export interface ApiHeaderHeader extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiHomeHome extends Struct.SingleTypeSchema {
+  collectionName: 'homes';
+  info: {
+    displayName: 'Home';
+    pluralName: 'homes';
+    singularName: 'home';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::home.home'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiInfectionPageInfectionPage
   extends Struct.CollectionTypeSchema {
   collectionName: 'infection_pages';
   info: {
+    description: '';
     displayName: 'infectionPages';
     pluralName: 'infection-pages';
     singularName: 'infection-page';
@@ -548,7 +576,6 @@ export interface ApiInfectionPageInfectionPage
     draftAndPublish: true;
   };
   attributes: {
-    content: Schema.Attribute.Component<'infection-page.section', true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -559,6 +586,7 @@ export interface ApiInfectionPageInfectionPage
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    sections: Schema.Attribute.Component<'infection-page.section', true>;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -1362,6 +1390,7 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::given-answer.given-answer': ApiGivenAnswerGivenAnswer;
       'api::header.header': ApiHeaderHeader;
+      'api::home.home': ApiHomeHome;
       'api::infection-page.infection-page': ApiInfectionPageInfectionPage;
       'api::main-menu.main-menu': ApiMainMenuMainMenu;
       'api::page.page': ApiPagePage;

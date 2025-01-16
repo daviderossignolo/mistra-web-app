@@ -79,22 +79,22 @@ const Header: React.FC = () => {
 	return (
 		<header className="w-full bg-navbar shadow-md">
 			{/* Barra in alto iniziale dell'header */}
-			<div className="container mx-auto px-4 py-2 relative">
+			<div className="container mx-auto py-2 relative flex flex-col items-center md:flex-row md:justify-between">
 				{/* Immagini laterali, loghi ospedale */}
 				<img
 					src={lateral_logos}
 					alt={lateral_logos_altertext}
-					className="absolute top-4 left-4 md:left-40 h-12 w-12 object-contain rounded-full"
-				/>
-				<img
-					src={lateral_logos}
-					alt={lateral_logos_altertext}
-					className="absolute top-4 right-4 md:right-40 h-12 w-12 object-contain rounded-full"
+					className="h-8 w-8 md:h-12 md:w-12 object-contain rounded-full"
 				/>
 				{/* Titolo */}
 				<h1 className="text-center text-lg md:text-2xl font-bold py-4 text-white px-16">
 					{header_title}
 				</h1>
+				<img
+					src={lateral_logos}
+					alt={lateral_logos_altertext}
+					className="h-8 w-8 md:h-12 md:w-12 object-contain rounded-full"
+				/>
 			</div>
 			{/* Sezione con immagine e titolo */}
 			<div className="container mx-auto px-4 py-6">
