@@ -1,6 +1,7 @@
 import type { Context } from 'koa';
 const { v4: uuidv4 } = require('uuid');
 import questionService from '../services/question';
+import categoryService from '../services/category';
 import axios from 'axios';
 
 export default {
@@ -54,6 +55,7 @@ export default {
 
 			const getQuestionsHTML = await questionService.getQuestionsHTML();
 			const getAnswersHTML = await questionService.getAnswersHTML();
+			const getCategoriesHTML = await categoryService.getCategoriesHTML();
 			
     		ctx.body = `
         		<html>
@@ -64,6 +66,8 @@ export default {
         	    	    <h1>Creazione Question</h1>
         	    	    <h3>Answers disponibili</h3>
         	    	    <ul>${getAnswersHTML}</ul>
+						<h3>Categorie disponibili</h3>
+        	    	    <ul>${getCategoriesHTML}</ul>
 						<h3>Question esistenti</h3>
 						<ul>${getQuestionsHTML}</ul>
         	    	</body>

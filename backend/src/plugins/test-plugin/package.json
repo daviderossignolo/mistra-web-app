@@ -36,21 +36,22 @@
     "react-intl": "^7.1.0"
   },
   "devDependencies": {
-    "@strapi/strapi": "^5.7.0",
     "@strapi/sdk-plugin": "^5.3.0",
+    "@strapi/strapi": "^5.7.0",
+    "@strapi/typescript-utils": "^5.7.0",
+    "@types/google.maps": "^3.58.1",
+    "@types/react": "^19.0.3",
+    "@types/react-dom": "^19.0.2",
     "prettier": "^3.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.1",
     "styled-components": "^6.1.14",
-    "@types/react": "^19.0.3",
-    "@types/react-dom": "^19.0.2",
-    "@strapi/typescript-utils": "^5.7.0",
     "typescript": "^5.7.2"
   },
   "peerDependencies": {
-    "@strapi/strapi": "^5.7.0",
     "@strapi/sdk-plugin": "^5.3.0",
+    "@strapi/strapi": "^5.7.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.1",
