@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_contact_introductions",
+  "info": {
+    "displayName": "introduction",
+    "icon": "filter"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "blocks"
+    }
+  }
+}

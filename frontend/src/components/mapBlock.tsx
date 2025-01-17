@@ -1,90 +1,83 @@
-import type React from "react"; 
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { jsonToMarkdown } from "../utils";
+import type React from "react";
+import {
+	GoogleMap,
+	InfoWindow,
+	LoadScript,
+	Marker,
+} from "@react-google-maps/api";
+import { useState } from "react";
 
 type MapBlockProps = {
-  address: string;
-  latitude: number;
-  longitude: number;
-  city: string;
-  cap: string;
-  description: {
-    level: number;
-    type: string;
-    children: { type: string; text: string }[];
-  }[];
+	latitude: number;
+	longitude: number;
 };
 
 const containerStyle = {
-  width: "50%",
-  height: "400px",
+	width: "100%",
+	height: "400px",
 };
 
-const styles = {
-  wrapper: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "20px",
-    margin: "20px",
-    padding: "20px",
-    paddingLeft: "100px",
-    paddingRight: "100px",
-    borderRadius: "8px",
-  },
-  textSection: {
-    flex: 2,
-    // padding: "10px",
-    // fontSize: "16px",
-    // lineHeight: "1.5",
-    // color: "#333",
-  },
-  mapSection: {
-    flex: 3,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  mapHeader: {
-    backgroundColor: "#003449", // Colore blu scuro
-    color: "#fff",
-    textAlign: "center",
-    padding: "10px",
-    borderRadius: "8px 8px 0 0",
-    width: "50%",
-  },
+const MapBlock: React.FC<MapBlockProps> = ({ latitude, longitude }) => {
+	const [selectedMarker, setSelectedMarker] = useState<{
+		lat: number;
+		lng: number;
+	} | null>(null);
+
+	const center = {
+		lat: latitude,
+		lng: longitude,
+	};
+	const apiKey = process.env.REACT_APP_MAPS_API_KEY;
+
+	if (!apiKey) {
+		return <p>Error: Google Maps API key is not provided.</p>;
+	}
+
+	const handleMarkerClick = () => {
+		setSelectedMarker(center);
+	};
+
+	const closeInfoWindow = () => {
+		setSelectedMarker(null);
+	};
+
+	return (
+		<div className="flex items-start gap-5 m-5 p-5 rounded-lg">
+			<div className="flex-3 flex flex-col items-center w-full">
+				<div className="bg-navbar-hover text-white text-center p-2 rounded-t-lg w-full">
+					Il Centro MISTRA si trova qui
+				</div>
+				<LoadScript googleMapsApiKey={apiKey}>
+					<GoogleMap
+						mapContainerStyle={containerStyle}
+						center={center}
+						zoom={15}
+					>
+						<Marker position={center} onClick={handleMarkerClick} />
+
+						{selectedMarker && (
+							<InfoWindow
+								position={selectedMarker}
+								onCloseClick={closeInfoWindow}
+							>
+								<div>
+									<p className="font-bold">AOUI Verona</p>
+									<a
+										href={`https://www.google.com/maps/dir/?api=1&destination=${selectedMarker.lat},${selectedMarker.lng}`}
+										target="_blank"
+										rel="noopener noreferrer"
+										style={{ color: "blue", textDecoration: "underline" }}
+									>
+										Come arrivare
+									</a>
+								</div>
+							</InfoWindow>
+						)}
+					</GoogleMap>
+				</LoadScript>
+			</div>
+		</div>
+	);
 };
-
-const MapBlock: React.FC<MapBlockProps> = ({ latitude, longitude, description }) => {
-  const center = {
-    lat: latitude,
-    lng: longitude,
-  };
-  const content = jsonToMarkdown(description);
-  const apiKey = process.env.REACT_APP_MAPS_API_KEY;
-
-  if (!apiKey) {
-    return <p>Error: Google Maps API key is not provided.</p>;
-  }
-
-  return (
-    <div style={styles.wrapper}>
-      <div style={styles.textSection}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-      </div>
-      <div style={styles.mapSection as React.CSSProperties}>
-        <div style={styles.mapHeader as React.CSSProperties}>Il Centro MISTRA si trova qui</div>
-        <LoadScript googleMapsApiKey={apiKey}>
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={15}>
-          <Marker position={center} />
-        </GoogleMap>
-      </LoadScript>
-      </div>
-    </div>
-  );
-};
-
-
 
 export default MapBlock;

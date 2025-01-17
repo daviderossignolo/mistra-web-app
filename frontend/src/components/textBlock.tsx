@@ -4,19 +4,12 @@ import remarkGfm from "remark-gfm";
 import { jsonToMarkdown } from "../utils";
 import rehypeRaw from "rehype-raw";
 
-type JsonNode = {
-	type: string;
-	children: { type: string; text: string }[];
-	level: number;
-};
-
 const TextBlock = ({
 	content,
 	className,
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 }: { content: any; className?: string }) => {
 	const markdownContent = jsonToMarkdown(content);
-	console.log(markdownContent);
 	return (
 		<div className={className}>
 			<ReactMarkdown
@@ -26,6 +19,9 @@ const TextBlock = ({
 				components={{
 					u: ({ node, children }) => (
 						<span style={{ textDecoration: "underline" }}>{children}</span>
+					),
+					h5: ({ node, children }) => (
+						<h5 style={{ fontSize: "20px" }}>{children}</h5>
 					),
 				}}
 			>

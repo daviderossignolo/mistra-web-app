@@ -78,7 +78,6 @@ const About: React.FC = () => {
 
 		return (
 			<div>
-				{/* Render del blocco introduzione */}
 				<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
 					<div className="w-full bg-navbar-hover px-4 py-4">
 						<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
@@ -89,8 +88,6 @@ const About: React.FC = () => {
 						<TextBlock content={introduction} />
 					</div>
 				</div>
-
-				{/* Render della sezione riguardante il team */}
 				<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
 					<div className="w-full bg-navbar-hover px-4 py-4">
 						<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">

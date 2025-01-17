@@ -470,6 +470,41 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiContactContact extends Struct.SingleTypeSchema {
+  collectionName: 'contacts';
+  info: {
+    description: '';
+    displayName: 'Contact';
+    pluralName: 'contacts';
+    singularName: 'contact';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    action: Schema.Attribute.Component<'contact.action', false>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    info: Schema.Attribute.Component<'contact.info', false>;
+    introduction: Schema.Attribute.Component<'contact.introduction', false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact.contact'
+    > &
+      Schema.Attribute.Private;
+    map: Schema.Attribute.Component<'contact.map', false>;
+    openingHours: Schema.Attribute.Component<'contact.opening-hours', false>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGivenAnswerGivenAnswer extends Struct.CollectionTypeSchema {
   collectionName: 'given_answers';
   info: {
@@ -625,13 +660,12 @@ export interface ApiMainMenuMainMenu extends Struct.SingleTypeSchema {
   };
 }
 
-export interface ApiPagePage extends Struct.CollectionTypeSchema {
-  collectionName: 'pages';
+export interface ApiNewsPageNewsPage extends Struct.CollectionTypeSchema {
+  collectionName: 'news_pages';
   info: {
-    description: '';
-    displayName: 'Pages';
-    pluralName: 'pages';
-    singularName: 'page';
+    displayName: 'NewsPages';
+    pluralName: 'news-pages';
+    singularName: 'news-page';
   };
   options: {
     draftAndPublish: true;
@@ -641,20 +675,13 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-page.news-page'
+    > &
       Schema.Attribute.Private;
-    pageContent: Schema.Attribute.DynamicZone<
-      [
-        'page-block.video-block',
-        'page-block.text-block',
-        'page-block.map-block',
-        'page-block.image-block',
-        'page-block.carousel-block',
-        'page-block.call-to-action-block',
-        'page-block.opening-hours',
-      ]
-    >;
     publishedAt: Schema.Attribute.DateTime;
+    section: Schema.Attribute.Component<'news-page.section', true>;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -761,6 +788,42 @@ export interface ApiSectionSection extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiServicesPageServicesPage
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'services_pages';
+  info: {
+    description: '';
+    displayName: 'ServicesPages';
+    pluralName: 'services-pages';
+    singularName: 'services-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::services-page.services-page'
+    > &
+      Schema.Attribute.Private;
+    main_image: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    moving_banner: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1388,15 +1451,17 @@ declare module '@strapi/strapi' {
       'api::about.about': ApiAboutAbout;
       'api::answer.answer': ApiAnswerAnswer;
       'api::category.category': ApiCategoryCategory;
+      'api::contact.contact': ApiContactContact;
       'api::given-answer.given-answer': ApiGivenAnswerGivenAnswer;
       'api::header.header': ApiHeaderHeader;
       'api::home.home': ApiHomeHome;
       'api::infection-page.infection-page': ApiInfectionPageInfectionPage;
       'api::main-menu.main-menu': ApiMainMenuMainMenu;
-      'api::page.page': ApiPagePage;
+      'api::news-page.news-page': ApiNewsPageNewsPage;
       'api::question-in-test.question-in-test': ApiQuestionInTestQuestionInTest;
       'api::question.question': ApiQuestionQuestion;
       'api::section.section': ApiSectionSection;
+      'api::services-page.services-page': ApiServicesPageServicesPage;
       'api::sex.sex': ApiSexSex;
       'api::test-execution.test-execution': ApiTestExecutionTestExecution;
       'api::test.test': ApiTestTest;

@@ -1,0 +1,37 @@
+{
+  "collectionName": "components_contact_hours",
+  "info": {
+    "displayName": "hours",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "morningOpening": {
+      "type": "time"
+    },
+    "morningClosing": {
+      "type": "time"
+    },
+    "afternoonOpening": {
+      "type": "time"
+    },
+    "afternoonClosing": {
+      "type": "time"
+    },
+    "note": {
+      "type": "string"
+    },
+    "day": {
+      "type": "enumeration",
+      "enum": [
+        "Lunedì",
+        "Martedì",
+        "Mercoledì",
+        "Giovedì",
+        "Venerdì",
+        "Sabato",
+        "Domenica"
+      ]
+    }
+  }
+}

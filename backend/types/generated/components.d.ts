@@ -25,6 +25,99 @@ export interface AboutMember extends Struct.ComponentSchema {
   };
 }
 
+export interface ContactAction extends Struct.ComponentSchema {
+  collectionName: 'components_contact_actions';
+  info: {
+    description: '';
+    displayName: 'Action';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    title: Schema.Attribute.String;
+    url: Schema.Attribute.String;
+  };
+}
+
+export interface ContactHours extends Struct.ComponentSchema {
+  collectionName: 'components_contact_hours';
+  info: {
+    description: '';
+    displayName: 'hours';
+  };
+  attributes: {
+    afternoonClosing: Schema.Attribute.Time;
+    afternoonOpening: Schema.Attribute.Time;
+    day: Schema.Attribute.Enumeration<
+      [
+        'Luned\u00EC',
+        'Marted\u00EC',
+        'Mercoled\u00EC',
+        'Gioved\u00EC',
+        'Venerd\u00EC',
+        'Sabato',
+        'Domenica',
+      ]
+    >;
+    morningClosing: Schema.Attribute.Time;
+    morningOpening: Schema.Attribute.Time;
+    note: Schema.Attribute.String;
+  };
+}
+
+export interface ContactInfo extends Struct.ComponentSchema {
+  collectionName: 'components_contact_infos';
+  info: {
+    displayName: 'info';
+    icon: 'apps';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface ContactIntroduction extends Struct.ComponentSchema {
+  collectionName: 'components_contact_introductions';
+  info: {
+    displayName: 'introduction';
+    icon: 'filter';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface ContactMap extends Struct.ComponentSchema {
+  collectionName: 'components_contact_maps';
+  info: {
+    displayName: 'map';
+    icon: 'pinMap';
+  };
+  attributes: {
+    address: Schema.Attribute.String;
+    cap: Schema.Attribute.String;
+    city: Schema.Attribute.String;
+    content: Schema.Attribute.Blocks;
+    latitude: Schema.Attribute.Decimal;
+    longitude: Schema.Attribute.Decimal;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface ContactOpeningHours extends Struct.ComponentSchema {
+  collectionName: 'components_contact_opening_hours';
+  info: {
+    description: '';
+    displayName: 'openingHours';
+  };
+  attributes: {
+    description: Schema.Attribute.Text;
+    hour: Schema.Attribute.Component<'contact.hours', true>;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface HeaderContent extends Struct.ComponentSchema {
   collectionName: 'components_header_contents';
   info: {
@@ -103,6 +196,18 @@ export interface MenuMenuLink extends Struct.ComponentSchema {
   attributes: {
     title: Schema.Attribute.String;
     url: Schema.Attribute.String;
+  };
+}
+
+export interface NewsPageSection extends Struct.ComponentSchema {
+  collectionName: 'components_news_page_sections';
+  info: {
+    displayName: 'section';
+    icon: 'apps';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -235,12 +340,19 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'about.department': AboutDepartment;
       'about.member': AboutMember;
+      'contact.action': ContactAction;
+      'contact.hours': ContactHours;
+      'contact.info': ContactInfo;
+      'contact.introduction': ContactIntroduction;
+      'contact.map': ContactMap;
+      'contact.opening-hours': ContactOpeningHours;
       'header.content': HeaderContent;
       'infection-page.section': InfectionPageSection;
       'menu.dropdown': MenuDropdown;
       'menu.link': MenuLink;
       'menu.menu-button': MenuMenuButton;
       'menu.menu-link': MenuMenuLink;
+      'news-page.section': NewsPageSection;
       'page-block.call-to-action-block': PageBlockCallToActionBlock;
       'page-block.carousel-block': PageBlockCarouselBlock;
       'page-block.image-block': PageBlockImageBlock;

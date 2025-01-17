@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_news_page_sections",
+  "info": {
+    "displayName": "section",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "blocks"
+    },
+    "title": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_contact_infos",
+  "info": {
+    "displayName": "info",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "blocks"
+    }
+  }
+}
