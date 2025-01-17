@@ -17,7 +17,13 @@ export default {
         .map(
           	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
           	(answer: any) =>
-            	`<li><strong>ID:</strong> ${answer.documentId}, <strong>Text:</strong> ${answer.text}, <strong>Score:</strong> ${answer.score} </li>`
+            	`<li>
+                    <strong>ID:</strong> ${answer.documentId} 
+                    <strong>Text:</strong> ${answer.text}
+                    <strong>Score:</strong> ${answer.score}
+                    <a href="/api/test-plugin/modify-answer/?documentId=${answer.documentId}">Modifica</a>
+                    <a href="/api/test-plugin/delete-answer/?documentId=${answer.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa answer?')">Elimina</a>
+                </li>`
         	).join('');
     	} catch (error) {
       		return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
