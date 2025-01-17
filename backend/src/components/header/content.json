@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_header_contents",
+  "info": {
+    "displayName": "content",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "main_image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "text_content": {
+      "type": "richtext"
+    }
+  }
+}

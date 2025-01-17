@@ -6,7 +6,7 @@ import TextBlock from "../components/textBlock";
 type PageData = {
 	title: string;
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	pageContent: any[];
+	content: any[];
 };
 
 const Homepage: React.FC = () => {
@@ -20,14 +20,14 @@ const Homepage: React.FC = () => {
 				setLoading(true);
 				setError(null);
 				const response = await fetch(
-					"http://localhost:1337/api/pages?filters[slug][$eq]=home&populate[pageContent][populate]=*",
+					"http://localhost:1337/api/home?populate=*",
 				);
 				if (!response.ok) {
 					throw new Error("Errore durante il caricamento dei dati");
 				}
 
 				const data = await response.json();
-				setPageData(data.data[0]);
+				setPageData(data.data);
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
 				setError(err.message);
@@ -41,29 +41,22 @@ const Homepage: React.FC = () => {
 
 	const renderBlocks = useMemo(() => {
 		if (!pageData) return null;
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		return pageData.pageContent.map((block: any) => {
-			switch (block.__component) {
-				case "page-block.text-block":
-					return (
-						<div
-							key={block.id}
-							className="w-full max-w-3xl mx-auto flex flex-col gap-4"
-						>
-							<div className="w-full bg-navbar-hover px-4 py-4">
-								<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
-									{pageData.title}
-								</h2>
-							</div>
-							<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
-								<TextBlock content={block.content} />
-							</div>
-						</div>
-					);
-				default:
-					return null;
-			}
-		});
+
+		const title = pageData.title;
+		const content = pageData.content;
+
+		return (
+			<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
+				<div className="w-full bg-navbar-hover px-4 py-4">
+					<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						{title}
+					</h2>
+				</div>
+				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
+					<TextBlock content={content} />
+				</div>
+			</div>
+		);
 	}, [pageData]);
 
 	if (loading) return <p className="text-center p-4">Loading...</p>;

@@ -5,23 +5,47 @@ import Login from "./pages/Login";
 import Page from "./pages/Page";
 import PrivateRoute from "./components/PrivateRoute";
 import TestPage from "./pages/testPage";
-import ContactPage from "./pages/ContactPage";
 import Homepage from "./pages/Homepage";
 import Footer from "./components/footer";
+import Header from "./components/header";
+import About from "./pages/About";
+import InfectionPage from "./pages/InfectionPage";
+import InfectionList from "./pages/InfectionListPage";
+import ServicePage from "./pages/ServicePage";
+import ServicesListPage from "./pages/ServicesListPage";
+import ContattiPage from "./pages/ContattiPage";
 
 function App() {
-	const [slugs, setRoutes] = useState<string[]>([]); // Stato per memorizzare i dati delle pagine
-	const [loading, setLoading] = useState<boolean>(true); // Stato di caricamento
-
+	const [slugs, setRoutes] = useState<string[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [infectionSlugs, setInfectionSlugs] = useState<string[]>([]);
+	const [serviceSlugs, setServiceSlugs] = useState<string[]>([]);
 	useEffect(() => {
 		const fetchPages = async () => {
 			try {
 				const response = await fetch("http://localhost:1337/api/pages");
+				const infectionResponse = await fetch(
+					"http://localhost:1337/api/infection-pages",
+				);
+				const serviceResponse = await fetch(
+					"http://localhost:1337/api/services-pages",
+				);
 				const data = await response.json();
 				const pageData = data.data;
+				const infectionData = await infectionResponse.json();
+				const infectionSlugs: string[] = infectionData.data.map(
+					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+					(page: any) => page.slug,
+				);
+				const serviceData = await serviceResponse.json();
+				const servicesSlugs: string[] = serviceData.data.map(
+					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+					(page: any) => page.slug,
+				);
+				setInfectionSlugs(infectionSlugs);
+				setServiceSlugs(servicesSlugs);
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 				const slugs: string[] = pageData.map((page: any) => page.slug);
-				console.log("Slugs:", slugs);
 				setRoutes(slugs);
 			} catch (error) {
 				console.error("Errore durante il fetch delle pagine:", error);
@@ -41,21 +65,39 @@ function App() {
 	return (
 		<Router>
 			<div className="App">
+				<Header />
 				<MenuComponent />
 				<Routes>
 					<Route path="/login" element={<Login />} />{" "}
 					{/* Controllare la visualizzazione delle pagine protette dal login  */}
 					<Route path="/test" element={<PrivateRoute element={TestPage} />} />
-					<Route path="/contatti" element={<ContactPage slug="contatti" />} />
+					<Route path="/contatti" element={<ContattiPage />} />
 					<Route path="/" element={<Homepage />} />
 					<Route path="/home" element={<Homepage />} />
-					{slugs.map((slug: string) => (
+					<Route path="/chi-siamo" element={<About />} />
+					<Route path="/infezioni" element={<InfectionList />} />
+					<Route path="/servizi" element={<ServicesListPage />} />
+					{infectionSlugs.map((slug: string) => (
+						<Route
+							key={slug}
+							path={`/${slug}`}
+							element={<InfectionPage slug={slug} />}
+						/>
+					))}
+					{serviceSlugs.map((slug: string) => (
+						<Route
+							key={slug}
+							path={`/${slug}`}
+							element={<ServicePage slug={slug} />}
+						/>
+					))}
+					{/* {slugs.map((slug: string) => (
 						<Route
 							key={slug}
 							path={`/${slug}`}
 							element={<Page slug={slug} />}
 						/>
-					))}
+					))} */}
 				</Routes>
 				<Footer />
 			</div>

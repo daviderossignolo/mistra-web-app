@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_contact_maps",
+  "info": {
+    "displayName": "map",
+    "icon": "pinMap"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "cap": {
+      "type": "string"
+    },
+    "content": {
+      "type": "blocks"
+    },
+    "latitude": {
+      "type": "decimal"
+    },
+    "longitude": {
+      "type": "decimal"
+    }
+  }
+}

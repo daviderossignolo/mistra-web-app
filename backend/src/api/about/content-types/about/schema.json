@@ -1,0 +1,35 @@
+{
+  "kind": "singleType",
+  "collectionName": "abouts",
+  "info": {
+    "singularName": "about",
+    "pluralName": "abouts",
+    "displayName": "About",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "introduction": {
+      "type": "blocks"
+    },
+    "team_section_title": {
+      "type": "string"
+    },
+    "department": {
+      "displayName": "department",
+      "type": "component",
+      "repeatable": true,
+      "component": "about.department"
+    }
+  }
+}
