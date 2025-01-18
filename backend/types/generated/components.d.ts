@@ -202,11 +202,13 @@ export interface MenuMenuLink extends Struct.ComponentSchema {
 export interface NewsPageSection extends Struct.ComponentSchema {
   collectionName: 'components_news_page_sections';
   info: {
+    description: '';
     displayName: 'section';
     icon: 'apps';
   };
   attributes: {
     content: Schema.Attribute.Blocks;
+    qrcode: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     title: Schema.Attribute.String;
   };
 }
@@ -335,6 +337,41 @@ export interface PageBlockVideoBlock extends Struct.ComponentSchema {
   };
 }
 
+export interface UsefulLinksLinks extends Struct.ComponentSchema {
+  collectionName: 'components_useful_links_links';
+  info: {
+    displayName: 'links';
+  };
+  attributes: {
+    description: Schema.Attribute.Text;
+    url: Schema.Attribute.String;
+  };
+}
+
+export interface UsefulLinksLinksSection extends Struct.ComponentSchema {
+  collectionName: 'components_useful_links_links_sections';
+  info: {
+    displayName: 'links-section';
+    icon: 'apps';
+  };
+  attributes: {
+    resource: Schema.Attribute.Component<'useful-links.video', true>;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface UsefulLinksVideo extends Struct.ComponentSchema {
+  collectionName: 'components_useful_links_videos';
+  info: {
+    description: '';
+    displayName: 'video';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    links: Schema.Attribute.Component<'useful-links.links', true>;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
@@ -361,6 +398,9 @@ declare module '@strapi/strapi' {
       'page-block.orari': PageBlockOrari;
       'page-block.text-block': PageBlockTextBlock;
       'page-block.video-block': PageBlockVideoBlock;
+      'useful-links.links': UsefulLinksLinks;
+      'useful-links.links-section': UsefulLinksLinksSection;
+      'useful-links.video': UsefulLinksVideo;
     }
   }
 }
