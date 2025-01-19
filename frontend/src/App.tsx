@@ -15,6 +15,7 @@ import ServicesListPage from "./pages/ServicesListPage";
 import ContattiPage from "./pages/ContattiPage";
 import NewsPage from "./pages/newsPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
+import EventsPage from "./pages/EventsPage";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -83,6 +84,7 @@ function App() {
 					<Route path="/infezioni" element={<InfectionList />} />
 					<Route path="/servizi" element={<ServicesListPage />} />
 					<Route path="/link-utili" element={<UsefulLinksPage />} />
+					<Route path="/eventi" element={<EventsPage />} />
 					{infectionSlugs.map((slug: string) => (
 						<Route
 							key={slug}
