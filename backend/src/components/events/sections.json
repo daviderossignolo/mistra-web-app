@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_events_sections",
+  "info": {
+    "displayName": "sections",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "section_block": {
+      "displayName": "section_block",
+      "type": "component",
+      "repeatable": true,
+      "component": "events.section-block"
+    }
+  }
+}

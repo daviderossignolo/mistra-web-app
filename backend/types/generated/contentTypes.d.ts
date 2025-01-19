@@ -505,6 +505,33 @@ export interface ApiContactContact extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiEventEvent extends Struct.SingleTypeSchema {
+  collectionName: 'events';
+  info: {
+    displayName: 'Events';
+    pluralName: 'events';
+    singularName: 'event';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::event.event'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    sections: Schema.Attribute.Component<'events.sections', true>;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGivenAnswerGivenAnswer extends Struct.CollectionTypeSchema {
   collectionName: 'given_answers';
   info: {
@@ -1487,6 +1514,7 @@ declare module '@strapi/strapi' {
       'api::answer.answer': ApiAnswerAnswer;
       'api::category.category': ApiCategoryCategory;
       'api::contact.contact': ApiContactContact;
+      'api::event.event': ApiEventEvent;
       'api::given-answer.given-answer': ApiGivenAnswerGivenAnswer;
       'api::header.header': ApiHeaderHeader;
       'api::home.home': ApiHomeHome;

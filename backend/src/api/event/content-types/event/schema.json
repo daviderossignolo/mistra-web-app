@@ -1,0 +1,28 @@
+{
+  "kind": "singleType",
+  "collectionName": "events",
+  "info": {
+    "singularName": "event",
+    "pluralName": "events",
+    "displayName": "Events"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "sections": {
+      "displayName": "sections",
+      "type": "component",
+      "repeatable": true,
+      "component": "events.sections"
+    }
+  }
+}
