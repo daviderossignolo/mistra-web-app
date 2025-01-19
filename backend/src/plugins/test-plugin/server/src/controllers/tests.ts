@@ -107,7 +107,7 @@ export default {
                             <label for="description_test" class="block text-lg text-gray-800 mb-2">Descrizione:</label>
                             <textarea name="description_test" id="description_test" required class="border border-gray-300 p-2 rounded-lg w-full mb-4">${data.description_test || ''}</textarea>
     
-                            <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Modifica Test</button>
+                            <button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Modifica Test</button>
                             <a href="http://localhost:1337/api/test-plugin/display-test" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione dei Test</a>
                         </form>
                     </div>

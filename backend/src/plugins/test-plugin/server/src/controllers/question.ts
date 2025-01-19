@@ -116,6 +116,7 @@ export default {
 							<label for="answer" class="block text-lg text-gray-800 mb-2">Answer ids:</label>
 							<input type="text" name="answer" id="answer" value="${answers.map(answer => answer.documentId).join(',')}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
 							<button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Modifica Question</button>
+                            <a href="/api/test-plugin/display-question" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione delle Question</a>
 						</form>
 					</div>
 				</body>

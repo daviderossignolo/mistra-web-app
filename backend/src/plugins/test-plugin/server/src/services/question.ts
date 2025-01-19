@@ -21,8 +21,8 @@ export default {
                     <strong>ID:</strong> ${answer.documentId} 
                     <strong>Text:</strong> ${answer.text}
                     <strong>Score:</strong> ${answer.score}
-                    <a href="/api/test-plugin/modify-answer/?documentId=${answer.documentId}">Modifica</a>
-                    <a href="/api/test-plugin/delete-answer/?documentId=${answer.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa answer?')">Elimina</a>
+                    <a href="/api/test-plugin/modify-answer/?documentId=${answer.documentId}" class="text-blue-500 hover:underline mt-4 inline-block">Modifica</a>
+                    <a href="/api/test-plugin/delete-answer/?documentId=${answer.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa answer?')" class="text-blue-500 hover:underline mt-4 inline-block">Elimina</a>
                 </li>`
         	).join('');
     	} catch (error) {
@@ -62,8 +62,8 @@ export default {
                                 <br>
                                 <strong>Answers:</strong>
                                 <ul>${answersHTML}</ul>
-                                <a href="/api/test-plugin/modify-question/?documentId=${question.documentId}">Modifica</a>
-                                <a href="/api/test-plugin/delete-question/?documentId=${question.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa question?')">Elimina</a>
+                                <a href="/api/test-plugin/modify-question/?documentId=${question.documentId}" class="text-blue-500 hover:underline mt-4 inline-block">Modifica</a>
+                                <a href="/api/test-plugin/delete-question/?documentId=${question.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa question?')" class="text-blue-500 hover:underline mt-4 inline-block">Elimina</a>
                             </li>
                         </ul>`;
                 })
