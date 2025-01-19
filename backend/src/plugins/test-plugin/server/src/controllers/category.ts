@@ -1,77 +1,162 @@
-import { Context } from 'koa';
-import { factories } from '@strapi/strapi';
+import type { Context } from 'koa';
+import axios from 'axios';
+import categoryService from '../services/category';
 const { v4: uuidv4 } = require('uuid');
-import axios from 'axios'; // Assicurati di avere axios installato con `yarn add axios`
 
 export default {
-  async createCategory(ctx) {
-    try {
-      const { name } = ctx.request.body;
-      // Calcola l'uuid
-      const id_category = uuidv4(); // Genera un UUID
-
-      // Crea la nuova category
-      await axios.post('http://localhost:1337/api/categories', {
-        data: {
-          id_category,
-          name,
-        },
-      });
-
-        ctx.body = `<!DOCTYPE html>
-              <html lang="en">
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Redirect</title>
-              </head>
-              <body>
-                <h1>Category creata con successo</h1>
-                <a href="http://localhost:1337/api/test-plugin/display-category">Indietro</a>
-              </body>
-              </html>`;
-      } catch (error) {
-          ctx.body = { error: error.message };
-      }
-  },
-
-    async categoryManagement(ctx) {
-        ctx.body = `
-          <html>
-            <head>
-                <title>Gestione Categories</title>
-            </head>
-            <body>
-                <h1>Categories esistenti</h1>
-                <ul id="categories-list">
-                    ${(await this.getCategoriesHTML())}
-                </ul>
-            </body>
-            </html>
-            <form method="POST" action="http://localhost:1337/api/test-plugin/create-category" enctype="application/json">
-            <label for="name">Name:</label>
-            <input type="text" name="name" id="name" required><br>
-            <button type="submit">Crea Category</button>
-            </form>
-            <a href="http://localhost:1337/api/test-plugin/display-answer">Torna alla creazione delle answer</a>
-        `;
-        ctx.type = 'html';
+    async createCategory(ctx: Context) {
+        try {
+            const { name } = ctx.request.body;
+            const id_category = uuidv4();
+    
+            await axios.post('http://localhost:1337/api/categories', {
+              data: {
+                id_category,
+                name,
+              },
+            });
+    
+            ctx.body = `
+                <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
+                        <title>Redirect</title>
+                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                    </head>
+                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+                        <div class="bg-white p-8 rounded-lg shadow-lg">
+                            <h1 class="text-2xl font-semibold text-green-600 mb-4">Categoria Creata con Successo!</h1>
+                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
+                        </div>
+                    </body>
+                </html>`;
+            ctx.type = 'html';
+        } catch (error) {
+            ctx.body = { error: error.message };
+        }
     },
+
+    async categoryManagement(ctx: Context) {
+        try {
+            const categoriesHTML = await categoryService.getCategoriesHTML();
+    
+            ctx.body = `
+            <html>
+                <head>
+                    <title>Gestione Category</title>
+                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                </head>
+                <body class="bg-gray-100 font-sans">
+                    <div class="max-w-4xl mx-auto p-8">
+                        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Gestione delle Categories</h1>
+                        <h3 class="text-xl font-medium text-gray-700 mb-4">Categories esistenti</h3>
+                        <ul class="mb-6">
+                            ${categoriesHTML}
+                        </ul>
+                        <form method="POST" action="/api/test-plugin/create-category" class="bg-white p-6 rounded-lg shadow-lg">
+                            <label for="name" class="block text-lg text-gray-800">Name:</label>
+                            <input type="text" name="name" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+                            <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Crea Category</button>
+                            <br>
+                            <a href="/api/test-plugin/display-answer" class="text-blue-500 hover:underline mt-4 inline-block">Indietro</a>
+                        </form>
+                    </div>
+                </body>
+            </html>`;
+            ctx.type = 'html';
+        } catch (error) {
+            ctx.body = { error: error.message };
+        }
+    },    
+
+    async modifyCategory(ctx: Context) {
+        try {
+            const { documentId } = ctx.query; // Ottieni il documentId dalla query
+            const response = await axios.get(`http://localhost:1337/api/categories/${documentId}`);
+            const data = response.data.data;
+    
+            ctx.body = `
+            <html>
+                <head>
+                    <title>Modifica Categoria</title>
+                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                </head>
+                <body class="bg-gray-100 font-sans">
+                    <div class="max-w-3xl mx-auto p-8">
+                        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Modifica Categoria</h1>
+                        <form action="/api/test-plugin/submit-modify-category?documentId=${documentId}" method="POST" class="bg-white p-6 rounded-lg shadow-lg">
+                            <label for="name" class="block text-lg text-gray-800">Nome:</label>
+                            <input type="text" name="name" value="${data.name}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+                            <button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Salva Modifiche</button>
+                            <br>
+                            <a href="/api/test-plugin/display-category" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione delle category</a>
+                        </form>
+                    </div>
+                </body>
+            </html>`;
+            ctx.type = 'html';
+        } catch (error) {
+            ctx.body = { error: error.message };
+        }
+    },    
   
-    // Funzione per ottenere la lista di categories esistenti
-    async getCategoriesHTML() {
-      try {
-        const response = await axios.get('http://localhost:1337/api/categories');
-        const jsonResponse = JSON.stringify(response.data, null, 2);
-        return response.data.data
-          .map(
-            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-            (category: any) =>
-              `<li><strong>ID:</strong> ${category.documentId}, <strong>Text:</strong> ${category.name} </li>`
-          )
-          .join('');
-      } catch (error) {
-        return `<li>Errore nel caricamento delle categorys: ${error.message}</li>`;
-      }
+    // funzione per gestire la PUT
+    async submitModifyCategory(ctx: Context) {
+        try {
+          const { documentId } = ctx.query; // Ottieni il documentId dalla query
+          const { name } = ctx.request.body; // Ottieni il nuovo valore di "name" dal body della richiesta
+        
+          // Effettua la richiesta PUT al server
+          const response = await axios.put(`http://localhost:1337/api/categories/${documentId}`, {
+            data: { name },
+          });
+      
+          ctx.body = `
+          <html>
+              <head>
+                  <meta charset="UTF-8">
+                  <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
+                  <title>Redirect</title>
+                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                </head>
+                <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h1 class="text-2xl font-semibold text-green-600 mb-4">Categoria Modificata con Successo!</h1>
+                        <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
+                    </div>
+                </body>
+          </html>`;
+          ctx.type = 'html';
+        } catch (error) {
+          ctx.body = { error: error.message };
+        }
     },
-  };
+
+    async deleteCategory(ctx: Context) {
+        try {
+            const { documentId } = ctx.query; // Ottieni il documentId dalla query
+    
+            await axios.delete(`http://localhost:1337/api/categories/${documentId}`);
+    
+            ctx.body = `
+                <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
+                        <title>Redirect</title>
+                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                    </head>
+                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+                        <div class="bg-white p-8 rounded-lg shadow-lg">
+                            <h1 class="text-2xl font-semibold text-red-600 mb-4">Categoria Eliminata con Successo!</h1>
+                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
+                        </div>
+                    </body>
+                </html>`;
+            ctx.type = 'html';
+        } catch (error) {
+            ctx.body = { error: error.message };
+        }
+    },  
+};
