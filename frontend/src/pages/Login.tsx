@@ -52,7 +52,7 @@ const Login: React.FC = () => {
 							type="email"
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							className="w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+							className="w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-navbar-hover focus:border-navbar-hover"
 						/>
 					</div>
 					<div>
@@ -67,13 +67,13 @@ const Login: React.FC = () => {
 							type="password"
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							className="w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+							className="w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-navbar-hover focus:border-navbar-hover"
 						/>
 					</div>
 					{error && <p className="text-sm text-red-600">{error}</p>}
 					<button
 						type="submit"
-						className="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+						className="w-full px-4 py-2 text-white bg-navbar-hoverhover rounded-md hover:bg-navbar-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 					>
 						Login
 					</button>

@@ -76,16 +76,11 @@ const UsefulLinksPage: React.FC = () => {
 						{section.title}
 					</h2>
 				</div>
-
 				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
-					{/* Check if the resource has links */}
 					{section.resource?.map((resource, index) => (
 						<div key={resource.id} className="w-full flex flex-col gap-4">
-							{/* Content of the resource */}
 							<TextBlock content={resource.content} />
-
 							<div className="w-full">
-								{/* 2-column grid for YouTube and other videos */}
 								<div
 									className={`grid gap-6 ${
 										resource.links.length === 1
