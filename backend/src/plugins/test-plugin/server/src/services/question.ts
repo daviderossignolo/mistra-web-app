@@ -37,13 +37,15 @@ export default {
             const questions = response.data.data;
         
             return questions
-                .map((question: { documentId: string, id_question: string; name: string; text: string; answers: { id_answer: string; text: string; score: number; }[]; }) => {
+                .map((question: { documentId: string, id_question: string; name: string; text: string; answers: { id_answer: string; text: string; score: number; }[], id_category: { id_category: string, name: string}; }) => {
                     const answersHTML = question.answers
                         .map(
                             (answer: { id_answer: string; text: string; score: number; }) =>
                                 `<li><strong>ID:</strong> ${answer.id_answer}, <strong>Text:</strong> ${answer.text}, <strong>Score:</strong> ${answer.score}</li>`
                         )
                         .join('');
+
+                    const categoryName = question.id_category ? question.id_category.name : 'Nessuna categoria';
                     
                     return `
                         <ul>
@@ -55,6 +57,8 @@ export default {
                                 <strong>Name:</strong> ${question.name}
                                 <br>
                                 <strong>Text:</strong> ${question.text}
+                                <br>
+                                <strong>Category:</strong> ${categoryName}
                                 <br>
                                 <strong>Answers:</strong>
                                 <ul>${answersHTML}</ul>
