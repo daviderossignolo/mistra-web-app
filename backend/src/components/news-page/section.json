@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_news_page_sections",
+  "info": {
+    "displayName": "section",
+    "icon": "apps",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "blocks"
+    },
+    "title": {
+      "type": "string"
+    },
+    "qrcode": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

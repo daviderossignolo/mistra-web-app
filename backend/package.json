@@ -22,7 +22,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "strapi-plugin-populate-deep": "^3.0.1",
+    "strapi-v5-plugin-populate-deep": "^4.0.4",
     "styled-components": "^6.0.0",
     "tailwindcss": "^3.4.17",
     "ts-node": "^10.9.2"

@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_contact_opening_hours",
+  "info": {
+    "displayName": "openingHours",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "hour": {
+      "displayName": "hours",
+      "type": "component",
+      "repeatable": true,
+      "component": "contact.hours"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

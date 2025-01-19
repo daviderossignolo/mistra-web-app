@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_useful_links_links_sections",
+  "info": {
+    "displayName": "links-section",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "resource": {
+      "displayName": "video",
+      "type": "component",
+      "repeatable": true,
+      "component": "useful-links.video"
+    }
+  }
+}

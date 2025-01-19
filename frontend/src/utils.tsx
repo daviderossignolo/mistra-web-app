@@ -11,6 +11,8 @@ export const jsonToMarkdown = (nodes: any[]) => {
 		italic?: boolean;
 		url?: string;
 		format?: "ordered" | "unordered";
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		image?: any;
 	}): string => {
 		switch (node.type) {
 			case "heading":
@@ -52,6 +54,10 @@ export const jsonToMarkdown = (nodes: any[]) => {
 
 			case "list-item": {
 				return node.children?.map(convertNode).join("") || "";
+			}
+
+			case "image": {
+				return `![${node.image.alternativeText}](${node.image.url})`;
 			}
 
 			default:

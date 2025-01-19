@@ -9500,10 +9500,10 @@ stdin-discarder@^0.2.2:
   resolved "https://registry.npmjs.org/stdin-discarder/-/stdin-discarder-0.2.2.tgz"
   integrity sha512-UhDfHmA92YAlNnCfhmq0VeNL5bDbiZGg7sZ2IvPsXubGkiNa9EC+tUTsjBRsYUAz87btI6/1wf4XoVvQ3uRnmQ==
 
-strapi-plugin-populate-deep@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.npmjs.org/strapi-plugin-populate-deep/-/strapi-plugin-populate-deep-3.0.1.tgz"
-  integrity sha512-7t1bPPBN1AGKZlFT/6qsqmwgd7SzTA9CNzEBSzeYEjL/e0GKD2lf4wF11C2vMkfsQW2GhRAXZQRCGlLnV2XHFQ==
+strapi-v5-plugin-populate-deep@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/strapi-v5-plugin-populate-deep/-/strapi-v5-plugin-populate-deep-4.0.4.tgz#2ae0e8a093f6f5c76978c7bc38679de2eaad1d3d"
+  integrity sha512-f1JUKhYLP3vibtx9LyLdrxoGNHdMAaBFEX2vIWBIo1NLL7huR0+FmPQhFKt8BmvEyxj9Big9Ry/nZ2eZodDicw==
 
 stream-chain@2.2.5, stream-chain@^2.2.5:
   version "2.2.5"
