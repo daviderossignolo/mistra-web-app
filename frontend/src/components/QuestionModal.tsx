@@ -30,7 +30,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ onClose, onSave }) => {
 		"categoria2",
 		"categoria3",
 	]); // Stato per le categorie disponibili
-	const [answers, setAnswers] = useState<Answer[]>([]); // Stato per le risposte
+	const [answers, setAnswers] = useState<Answer[]>([
+		{ id: uuidv4(), text: "", score: 0, correction: "" },
+	]); // Stato per le risposte
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false); // Stato per il modale delle categorie
 
 	// Aggiungi una nuova risposta vuota
@@ -128,48 +130,49 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ onClose, onSave }) => {
 					<h4 className="font-medium text-lg mb-2">Risposte</h4>
 					<div className="max-h-96 overflow-y-auto border rounded p-2 mb-4">
 						{/* La lista di risposte */}
-						{answers?.map((answer) => (
-							<div key={answer.id} className="flex items-center gap-3 mb-4">
-								<textarea
-									value={answer.text}
-									onChange={(e) =>
-										updateAnswerField(answer.id, "text", e.target.value)
-									}
-									placeholder="Testo della risposta"
-									className="flex-1 border rounded p-2"
-								/>
-								<textarea
-									value={answer.correction}
-									onChange={(e) =>
-										updateAnswerField(answer.id, "correction", e.target.value)
-									}
-									placeholder="Correzione della risposta"
-									className="flex-1 border rounded p-2"
-								/>
-								<select
-									value={answer.score}
-									onChange={(e) =>
-										updateAnswerField(
-											answer.id,
-											"score",
-											Number.parseFloat(e.target.value),
-										)
-									}
-									className="border rounded p-2"
-								>
-									<option value={0}>0</option>
-									<option value={0.5}>0.5</option>
-									<option value={1}>1</option>
-								</select>
-								<button
-									type="button"
-									onClick={() => removeAnswer(answer.id)}
-									className="text-red-500 font-bold hover:text-red-700"
-								>
-									X
-								</button>
-							</div>
-						))}
+						{answers.length > 0 &&
+							answers.map((answer) => (
+								<div key={answer.id} className="flex items-center gap-3 mb-4">
+									<textarea
+										value={answer.text}
+										onChange={(e) =>
+											updateAnswerField(answer.id, "text", e.target.value)
+										}
+										placeholder="Testo della risposta"
+										className="flex-1 border rounded p-2"
+									/>
+									<textarea
+										value={answer.correction}
+										onChange={(e) =>
+											updateAnswerField(answer.id, "correction", e.target.value)
+										}
+										placeholder="Correzione della risposta"
+										className="flex-1 border rounded p-2"
+									/>
+									<select
+										value={answer.score}
+										onChange={(e) =>
+											updateAnswerField(
+												answer.id,
+												"score",
+												Number.parseFloat(e.target.value),
+											)
+										}
+										className="border rounded p-2"
+									>
+										<option value={0}>0</option>
+										<option value={0.5}>0.5</option>
+										<option value={1}>1</option>
+									</select>
+									<button
+										type="button"
+										onClick={() => removeAnswer(answer.id)}
+										className="text-red-500 font-bold hover:text-red-700"
+									>
+										X
+									</button>
+								</div>
+							))}
 					</div>
 					<button
 						onClick={addAnswer}
