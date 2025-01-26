@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_useful_links_videos",
+  "info": {
+    "displayName": "video",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "blocks"
+    },
+    "links": {
+      "displayName": "links",
+      "type": "component",
+      "repeatable": true,
+      "component": "useful-links.links"
+    }
+  }
+}

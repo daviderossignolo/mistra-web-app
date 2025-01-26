@@ -1,0 +1,28 @@
+{
+  "kind": "singleType",
+  "collectionName": "useful_links",
+  "info": {
+    "singularName": "useful-link",
+    "pluralName": "useful-links",
+    "displayName": "UsefulLinks",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "section": {
+      "type": "component",
+      "repeatable": true,
+      "component": "useful-links.links-section"
+    }
+  }
+}

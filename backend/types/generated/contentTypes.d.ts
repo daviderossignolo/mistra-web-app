@@ -505,6 +505,33 @@ export interface ApiContactContact extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiEventEvent extends Struct.SingleTypeSchema {
+  collectionName: 'events';
+  info: {
+    displayName: 'Events';
+    pluralName: 'events';
+    singularName: 'event';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::event.event'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    sections: Schema.Attribute.Component<'events.sections', true>;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGivenAnswerGivenAnswer extends Struct.CollectionTypeSchema {
   collectionName: 'given_answers';
   info: {
@@ -663,6 +690,7 @@ export interface ApiMainMenuMainMenu extends Struct.SingleTypeSchema {
 export interface ApiNewsPageNewsPage extends Struct.CollectionTypeSchema {
   collectionName: 'news_pages';
   info: {
+    description: '';
     displayName: 'NewsPages';
     pluralName: 'news-pages';
     singularName: 'news-page';
@@ -680,6 +708,9 @@ export interface ApiNewsPageNewsPage extends Struct.CollectionTypeSchema {
       'api::news-page.news-page'
     > &
       Schema.Attribute.Private;
+    main_image: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     section: Schema.Attribute.Component<'news-page.section', true>;
     slug: Schema.Attribute.UID<'title'>;
@@ -933,6 +964,37 @@ export interface ApiTestTest extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::test-execution.test-execution'
     >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiUsefulLinkUsefulLink extends Struct.SingleTypeSchema {
+  collectionName: 'useful_links';
+  info: {
+    description: '';
+    displayName: 'UsefulLinks';
+    pluralName: 'useful-links';
+    singularName: 'useful-link';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::useful-link.useful-link'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    section: Schema.Attribute.Component<'useful-links.links-section', true>;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1452,6 +1514,7 @@ declare module '@strapi/strapi' {
       'api::answer.answer': ApiAnswerAnswer;
       'api::category.category': ApiCategoryCategory;
       'api::contact.contact': ApiContactContact;
+      'api::event.event': ApiEventEvent;
       'api::given-answer.given-answer': ApiGivenAnswerGivenAnswer;
       'api::header.header': ApiHeaderHeader;
       'api::home.home': ApiHomeHome;
@@ -1465,6 +1528,7 @@ declare module '@strapi/strapi' {
       'api::sex.sex': ApiSexSex;
       'api::test-execution.test-execution': ApiTestExecutionTestExecution;
       'api::test.test': ApiTestTest;
+      'api::useful-link.useful-link': ApiUsefulLinkUsefulLink;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

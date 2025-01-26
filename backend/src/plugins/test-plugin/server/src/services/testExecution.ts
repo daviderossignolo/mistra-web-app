@@ -13,7 +13,7 @@ export default {
                             <strong>documentId:</strong> ${test.documentId}, 
                             <strong>Age:</strong> ${test.age}, 
                             <strong>Score:</strong> ${test.score}
-                            <a href="http://localhost:1337/api/test-plugin/display-test/?documentId=${test.documentId}">Modifica</a>
+                            <a href="http://localhost:1337/api/test-plugin/display-test/?documentId=${test.documentId}" class="text-blue-500 hover:underline mt-4 inline-block">Modifica</a>
                         </li>`
                 )
                 .join('');

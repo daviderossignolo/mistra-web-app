@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import MenuComponent from "./components/navbar";
 import Login from "./pages/Login";
-import Page from "./pages/Page";
 import PrivateRoute from "./components/PrivateRoute";
 import TestPage from "./pages/testPage";
 import Homepage from "./pages/Homepage";
@@ -14,24 +13,28 @@ import InfectionList from "./pages/InfectionListPage";
 import ServicePage from "./pages/ServicePage";
 import ServicesListPage from "./pages/ServicesListPage";
 import ContattiPage from "./pages/ContattiPage";
+import NewsPage from "./pages/newsPage";
+import UsefulLinksPage from "./pages/UsefulLinksPage";
+import EventsPage from "./pages/EventsPage";
 
 function App() {
-	const [slugs, setRoutes] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [infectionSlugs, setInfectionSlugs] = useState<string[]>([]);
 	const [serviceSlugs, setServiceSlugs] = useState<string[]>([]);
+	const [newsSlugs, setNewsSlugs] = useState<string[]>([]);
 	useEffect(() => {
 		const fetchPages = async () => {
 			try {
-				const response = await fetch("http://localhost:1337/api/pages");
 				const infectionResponse = await fetch(
 					"http://localhost:1337/api/infection-pages",
 				);
 				const serviceResponse = await fetch(
 					"http://localhost:1337/api/services-pages",
 				);
-				const data = await response.json();
-				const pageData = data.data;
+				const newsResponse = await fetch(
+					"http://localhost:1337/api/news-pages",
+				);
+
 				const infectionData = await infectionResponse.json();
 				const infectionSlugs: string[] = infectionData.data.map(
 					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -42,11 +45,14 @@ function App() {
 					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 					(page: any) => page.slug,
 				);
+				const newsData = await newsResponse.json();
+				const newsSlugs: string[] = newsData.data.map(
+					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+					(page: any) => page.slug,
+				);
+				setNewsSlugs(newsSlugs);
 				setInfectionSlugs(infectionSlugs);
 				setServiceSlugs(servicesSlugs);
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-				const slugs: string[] = pageData.map((page: any) => page.slug);
-				setRoutes(slugs);
 			} catch (error) {
 				console.error("Errore durante il fetch delle pagine:", error);
 			} finally {
@@ -77,6 +83,8 @@ function App() {
 					<Route path="/chi-siamo" element={<About />} />
 					<Route path="/infezioni" element={<InfectionList />} />
 					<Route path="/servizi" element={<ServicesListPage />} />
+					<Route path="/link-utili" element={<UsefulLinksPage />} />
+					<Route path="/eventi" element={<EventsPage />} />
 					{infectionSlugs.map((slug: string) => (
 						<Route
 							key={slug}
@@ -91,13 +99,13 @@ function App() {
 							element={<ServicePage slug={slug} />}
 						/>
 					))}
-					{/* {slugs.map((slug: string) => (
+					{newsSlugs.map((slug: string) => (
 						<Route
 							key={slug}
 							path={`/${slug}`}
-							element={<Page slug={slug} />}
+							element={<NewsPage slug={slug} />}
 						/>
-					))} */}
+					))}
 				</Routes>
 				<Footer />
 			</div>

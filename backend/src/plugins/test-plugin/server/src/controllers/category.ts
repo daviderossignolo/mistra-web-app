@@ -8,29 +8,31 @@ export default {
         try {
             const { name } = ctx.request.body;
             const id_category = uuidv4();
-
+    
             await axios.post('http://localhost:1337/api/categories', {
               data: {
                 id_category,
                 name,
               },
             });
-
+    
             ctx.body = `
                 <html>
                     <head>
-						<meta charset="UTF-8">
-						<meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
-						<title>Redirect</title>
-					</head>
-                    <body>
-                        <h1>Category creata con successo</h1>
-                        <p>Stai per essere reindirizzato...</p>
+                        <meta charset="UTF-8">
+                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
+                        <title>Redirect</title>
+                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                    </head>
+                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+                        <div class="bg-white p-8 rounded-lg shadow-lg">
+                            <h1 class="text-2xl font-semibold text-green-600 mb-4">Categoria Creata con Successo!</h1>
+                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
+                        </div>
                     </body>
                 </html>`;
             ctx.type = 'html';
-        } 
-        catch (error) {
+        } catch (error) {
             ctx.body = { error: error.message };
         }
     },
@@ -38,55 +40,66 @@ export default {
     async categoryManagement(ctx: Context) {
         try {
             const categoriesHTML = await categoryService.getCategoriesHTML();
-
+    
             ctx.body = `
             <html>
                 <head>
                     <title>Gestione Category</title>
+                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
                 </head>
-                <body>
-                    <h1>Creazione Categories</h1>
-                    <h3>Categories esistenti</h3>
-                    <ul>${categoriesHTML}</ul>
-                    <form method="POST" action="/api/test-plugin/create-category">
-                      <label for="name">Name:</label>
-                      <input type="text" name="name" required />
-                      <button type="submit">Crea Category</button>
-                      <br>
-                      <a href="/api/test-plugin/display-answer">Indietro</a>
-                    </form>
+                <body class="bg-gray-100 font-sans">
+                    <div class="max-w-4xl mx-auto p-8">
+                        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Gestione delle Categories</h1>
+                        <h3 class="text-xl font-medium text-gray-700 mb-4">Categories esistenti</h3>
+                        <ul class="mb-6">
+                            ${categoriesHTML}
+                        </ul>
+                        <form method="POST" action="/api/test-plugin/create-category" class="bg-white p-6 rounded-lg shadow-lg">
+                            <label for="name" class="block text-lg text-gray-800">Name:</label>
+                            <input type="text" name="name" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+                            <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Crea Category</button>
+                            <br>
+                            <a href="/api/test-plugin/display-answer" class="text-blue-500 hover:underline mt-4 inline-block">Indietro</a>
+                        </form>
+                    </div>
                 </body>
             </html>`;
             ctx.type = 'html';
         } catch (error) {
             ctx.body = { error: error.message };
         }
-    },
+    },    
 
     async modifyCategory(ctx: Context) {
         try {
             const { documentId } = ctx.query; // Ottieni il documentId dalla query
             const response = await axios.get(`http://localhost:1337/api/categories/${documentId}`);
             const data = response.data.data;
-            
-            // Costruzione della pagina HTML con il form
+    
             ctx.body = `
-              <html>
-              <body>
-                <h1>Modify Category</h1>
-                <form action="/api/test-plugin/submit-modify-category?documentId=${documentId}" method="POST">
-                  <label for="name">Name:</label>
-                  <input type="text" name="name" value="${data.name}" required />
-                  <button type="submit">Save Changes</button>
-                </form>
-              </body>
-              </html>`;
+            <html>
+                <head>
+                    <title>Modifica Categoria</title>
+                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                </head>
+                <body class="bg-gray-100 font-sans">
+                    <div class="max-w-3xl mx-auto p-8">
+                        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Modifica Categoria</h1>
+                        <form action="/api/test-plugin/submit-modify-category?documentId=${documentId}" method="POST" class="bg-white p-6 rounded-lg shadow-lg">
+                            <label for="name" class="block text-lg text-gray-800">Nome:</label>
+                            <input type="text" name="name" value="${data.name}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+                            <button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Salva Modifiche</button>
+                            <br>
+                            <a href="/api/test-plugin/display-category" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione delle category</a>
+                        </form>
+                    </div>
+                </body>
+            </html>`;
             ctx.type = 'html';
-        } 
-        catch (error) {
+        } catch (error) {
             ctx.body = { error: error.message };
         }
-    },
+    },    
   
     // funzione per gestire la PUT
     async submitModifyCategory(ctx: Context) {
@@ -105,11 +118,14 @@ export default {
                   <meta charset="UTF-8">
                   <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
                   <title>Redirect</title>
-              </head>
-              <body>
-                  <h1>Category modificata con successo</h1>
-                  <p>Stai per essere reindirizzato...</p>
-              </body>
+                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                </head>
+                <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h1 class="text-2xl font-semibold text-green-600 mb-4">Categoria Modificata con Successo!</h1>
+                        <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
+                    </div>
+                </body>
           </html>`;
           ctx.type = 'html';
         } catch (error) {
@@ -120,25 +136,26 @@ export default {
     async deleteCategory(ctx: Context) {
         try {
             const { documentId } = ctx.query; // Ottieni il documentId dalla query
-
-            // Effettua la richiesta DELETE al server
+    
             await axios.delete(`http://localhost:1337/api/categories/${documentId}`);
-
+    
             ctx.body = `
                 <html>
                     <head>
-						<meta charset="UTF-8">
-						<meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
-						<title>Redirect</title>
-					</head>
-                    <body>
-                        <h1>Category eliminata con successo</h1>
-                        <p>Stai per essere reindirizzato...</p>
+                        <meta charset="UTF-8">
+                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
+                        <title>Redirect</title>
+                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+                    </head>
+                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+                        <div class="bg-white p-8 rounded-lg shadow-lg">
+                            <h1 class="text-2xl font-semibold text-red-600 mb-4">Categoria Eliminata con Successo!</h1>
+                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
+                        </div>
                     </body>
                 </html>`;
-                ctx.type = 'html';
-        } 
-        catch (error) {
+            ctx.type = 'html';
+        } catch (error) {
             ctx.body = { error: error.message };
         }
     },  

@@ -13,8 +13,8 @@ export default {
                     <strong>Text:</strong> ${answer.text}
                     <strong>Score:</strong> ${answer.score}
                     <strong>Correction:</strong> ${answer.correction}
-                    <a href="/api/test-plugin/modify-answer/?documentId=${answer.documentId}">Modifica</a>
-                    <a href="/api/test-plugin/delete-answer/?documentId=${answer.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa answer?')">Elimina</a>
+                    <a href="/api/test-plugin/modify-answer/?documentId=${answer.documentId}" class="text-blue-500 hover:underline mt-4 inline-block">Modifica</a>
+                    <a href="/api/test-plugin/delete-answer/?documentId=${answer.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa answer?')" class="text-blue-500 hover:underline mt-4 inline-block">Elimina</a>
                 </li>`
             )
         } catch (error) {

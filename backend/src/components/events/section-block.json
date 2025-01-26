@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_events_section_blocks",
+  "info": {
+    "displayName": "section_block"
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "blocks"
+    },
+    "images": {
+      "type": "component",
+      "repeatable": true,
+      "component": "events.images"
+    },
+    "moving_banner": {
+      "type": "string"
+    }
+  }
+}
