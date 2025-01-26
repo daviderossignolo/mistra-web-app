@@ -4,6 +4,7 @@ import QuestionModal from "./QuestionModal";
 
 interface QuizData {
 	questions: Question[];
+	name: string;
 }
 
 interface Question {
@@ -43,11 +44,19 @@ const QuestionSelectionStep = ({
 
 	return (
 		<div className="flex">
-			{/* Sidebar */}
-			<QuestionSidebar questions={questions} />
-
 			{/* Main content */}
 			<div className="flex-grow p-6">
+				<h2 className="text-xl font-semibold mb-4">
+					Domande del Test: {quizData.name}
+				</h2>
+				<div className="mb-4">
+					{questions.map((question) => (
+						<div key={question.id} className="bg-gray-100 p-4 mb-2">
+							<p className="font-semibold">{question.text}</p>
+							<p className="text-sm text-gray-500">{question.category}</p>
+						</div>
+					))}
+				</div>
 				<div className="mb-4">
 					<button
 						type="button"
