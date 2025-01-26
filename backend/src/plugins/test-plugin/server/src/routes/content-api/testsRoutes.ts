@@ -55,4 +55,20 @@ export default [
               auth: false, // Nessuna autenticazione per il test
         },
     },
+    {
+        method: 'POST',
+        path: '/delete-QuestionInTest',
+        handler: 'tests.deleteQuestionInTest',
+        config: {
+              auth: false, // Nessuna autenticazione per il test
+        },
+    },
+    {
+        method: 'GET',
+        path: '/get-tests', // Questa rotta genera un test casuale
+        handler: 'tests.getTests', // Aggiungi il controller per ottenere il test
+        config: {
+        	auth: false, // Nessuna autenticazione per il test
+        },
+    },
 ]

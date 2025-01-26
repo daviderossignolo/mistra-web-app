@@ -8,6 +8,7 @@ export default {
         try {
             const { name } = ctx.request.body;
             const id_category = uuidv4();
+            console.log(ctx.request.body)
     
             await axios.post('http://localhost:1337/api/categories', {
               data: {
@@ -75,6 +76,15 @@ export default {
             const { documentId } = ctx.query; // Ottieni il documentId dalla query
             const response = await axios.get(`http://localhost:1337/api/categories/${documentId}`);
             const data = response.data.data;
+            
+            
+            const filteredData = {
+                id: data.id,
+                documentId: data.documentId,
+                id_category: data.id_category,
+                name: data.name,
+            };
+            console.log(filteredData);
     
             ctx.body = `
             <html>
@@ -106,6 +116,8 @@ export default {
         try {
           const { documentId } = ctx.query; // Ottieni il documentId dalla query
           const { name } = ctx.request.body; // Ottieni il nuovo valore di "name" dal body della richiesta
+          console.log(ctx.request.body);
+          
         
           // Effettua la richiesta PUT al server
           const response = await axios.put(`http://localhost:1337/api/categories/${documentId}`, {
@@ -159,4 +171,21 @@ export default {
             ctx.body = { error: error.message };
         }
     },  
+
+    async getCategories() {
+        try {
+            const response = await axios.get('http://localhost:1337/api/categories');
+            const filteredCategories = response.data.data.map(category => ({
+                id: category.id,
+                documentId: category.documentId,
+                id_category: category.id_category,
+                name: category.name,
+            }));
+            console.log(filteredCategories);
+            return filteredCategories;
+        } catch (error) {
+            return `<li>Errore nel caricamento delle categories: ${error.message}</li>`;
+        }
+    }
+    
 };
