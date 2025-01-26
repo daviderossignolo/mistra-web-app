@@ -47,5 +47,20 @@ export default [
         	policies: [],
         },
     },
-	
+	{
+        method: 'GET',
+        path: '/get-answers', // Questa rotta genera un test casuale
+        handler: 'answer.getAnswers', // Aggiungi il controller per ottenere il test
+        config: {
+        	auth: false, // Nessuna autenticazione per il test
+        },
+    },
+	{
+        method: 'GET',
+        path: '/get-free-answers', // Questa rotta genera un test casuale
+        handler: 'answer.getFreeAnswers', // Aggiungi il controller per ottenere il test
+        config: {
+        	auth: false, // Nessuna autenticazione per il test
+        },
+    },
 ]

@@ -39,4 +39,12 @@ export default [
       	  	auth: false, // Nessuna autenticazione per il test
       	},
     },
+	{
+        method: 'GET',
+        path: '/get-categories', // Questa rotta genera un test casuale
+        handler: 'category.getCategories', // Aggiungi il controller per ottenere il test
+        config: {
+        	auth: false, // Nessuna autenticazione per il test
+        },
+    },
 ]

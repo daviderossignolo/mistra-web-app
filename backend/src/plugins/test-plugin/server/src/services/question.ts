@@ -9,21 +9,21 @@ export default {
 
     		// Filtra le answers con id_question null
     		const filteredAnswers = answers.filter(
-      		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      		(answer: any) => answer.id_question === null
-    	);
+      		    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      		    (answer: any) => answer.id_question === null
+    	    );
 
-    	return filteredAnswers
-        .map(
-          	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-          	(answer: any) =>
-            	`<li>
-                    <strong>ID:</strong> ${answer.documentId} 
-                    <strong>Text:</strong> ${answer.text}
-                    <strong>Score:</strong> ${answer.score}
-                    <a href="/api/test-plugin/modify-answer/?documentId=${answer.documentId}" class="text-blue-500 hover:underline mt-4 inline-block">Modifica</a>
-                    <a href="/api/test-plugin/delete-answer/?documentId=${answer.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa answer?')" class="text-blue-500 hover:underline mt-4 inline-block">Elimina</a>
-                </li>`
+    	    return filteredAnswers
+            .map(
+          	    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          	    (answer: any) =>
+                	`<li>
+                        <strong>ID:</strong> ${answer.documentId} 
+                        <strong>Text:</strong> ${answer.text}
+                        <strong>Score:</strong> ${answer.score}
+                        <a href="/api/test-plugin/modify-answer/?documentId=${answer.documentId}" class="text-blue-500 hover:underline mt-4 inline-block">Modifica</a>
+                        <a href="/api/test-plugin/delete-answer/?documentId=${answer.documentId}" onclick="return confirm('Sei sicuro di voler eliminare questa answer?')" class="text-blue-500 hover:underline mt-4 inline-block">Elimina</a>
+                    </li>`
         	).join('');
     	} catch (error) {
       		return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
