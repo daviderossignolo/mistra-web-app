@@ -4,11 +4,13 @@ import testsService from '../services/tests';
 import questionService from '../services/question';
 import axios from 'axios'; // Assicurati di avere axios installato con `yarn add axios`
 
+
 export default {
 
     async createTest(ctx: Context) {
         try {
             const { name_test, description_test } = ctx.request.body;
+            console.log(ctx.request.body);
             
             // Genera un UUID per id_test
             const id_test = uuidv4();
@@ -21,8 +23,6 @@ export default {
                     description_test,
                 }
             };
-
-            console.log(payload);
             
             // Creazione del Test con i dati forniti
             await axios.post('http://localhost:1337/api/tests', payload);
@@ -74,7 +74,7 @@ export default {
             	    			<textarea name="description_test" id="description_test" class="border border-gray-300 p-2 rounded-lg w-full mb-4"></textarea>
                                 <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Crea Test</button>
         	    			</form>
-                            <a href="http://localhost:1337/api/test-plugin/search-test" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla pagina principale</a>
+                            <a href="http://localhost:1337/api/test-plugin/search-test-Execution" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla pagina principale</a>
                         </div>
                     </body>
                 </html>`;
@@ -88,9 +88,33 @@ export default {
     async modifyTest(ctx: Context) {
         try {
             const { documentId } = ctx.query;
-            const response = await axios.get(`http://localhost:1337/api/tests/${documentId}?populate=*`);
+            const response = await axios.get(`http://localhost:1337/api/tests/${documentId}?pLevel=3`);
             const data = response.data.data;
-    
+            
+
+            // Filtro i dati
+            const filteredData = {
+                id: data.id ? data.id : null,
+                documentId: data.documentId,
+                id_test: data.id_test,
+                name_test: data.name_test,
+                description_test: data.description_test,
+                question_in_tests: data.question_in_tests
+                ? data.question_in_tests.map((question_in_tests) => ({
+                    id: question_in_tests.id ? question_in_tests.id : null,
+                    documentId: question_in_tests.documentId,
+                    id_question: question_in_tests.id_question
+                        ? {
+                            id: question_in_tests.id_question.id ? question_in_tests.id_question.id : null,
+                            documentId: question_in_tests.id_question.documentId,
+                            id_question: question_in_tests.id_question.id_question,
+                            name: question_in_tests.id_question.name,
+                            text: question_in_tests.id_question.text
+                        } : []
+                  }))
+                : [],
+              };
+
             ctx.body = `
             <html>
                 <head>
@@ -124,6 +148,7 @@ export default {
         try {
             const { documentId } = ctx.query;
             const { name_test, description_test } = ctx.request.body;
+            console.log(ctx.request.body)
             
             // Struttura il payload correttamente
             const payload = {
@@ -191,6 +216,39 @@ export default {
         }
     },
 
+    async getTests(){
+        try {
+            const tests = await axios.get('http://localhost:1337/api/tests?pLevel=3');
+            const filteredTests = tests.data.data.map(data => ({
+                id: data.id ? data.id : null,
+                documentId: data.documentId,
+                id_test: data.id_test,
+                name_test: data.name_test,
+                description_test: data.description_test,
+                question_in_tests: data.question_in_tests
+                ? data.question_in_tests.map((question_in_tests) => ({
+                    id: question_in_tests.id ? question_in_tests.id : null,
+                    documentId: question_in_tests.documentId,
+                    id_question: question_in_tests.id_question
+                        ? {
+                            id: question_in_tests.id_question.id ? question_in_tests.id_question.id : null,
+                            documentId: question_in_tests.id_question.documentId,
+                            id_question: question_in_tests.id_question.id_question,
+                            name: question_in_tests.id_question.name,
+                            text: question_in_tests.id_question.text
+                        } : []
+                  }))
+                : []
+            }));
+
+            console.log(filteredTests)
+            return filteredTests
+        } catch (error) {
+            return `<li>Errore nel caricamento delle categories: ${error.message}</li>`;
+        }
+        
+    },
+
     async addQuestionToTest(ctx: Context) {
         try {
             const { documentId } = ctx.query;
@@ -251,7 +309,7 @@ export default {
                             </form>
                             
                             <a 
-                                href="http://localhost:1337/api/test-plugin/display-test" 
+                                href="http://localhost:1337/api/test-plugin/search-test-Execution" 
                                 class="text-blue-500 hover:underline block mt-4 text-center"
                             >
                                 Torna alla visualizzazione dei test
@@ -270,6 +328,7 @@ export default {
         try {
             const id_test = ctx.query.id_test;
             const { id_question } = ctx.request.body;
+            console.log(ctx.request.body);
 
             const payload = {
                 data: {
@@ -299,6 +358,36 @@ export default {
 					</div>
             	</body>
             </html>`;
+        } catch (error) {
+            ctx.body = { error: error.message };
+        }
+    },
+
+    async deleteQuestionInTest(ctx: Context) {
+        try {
+            const id_test = ctx.query.id_test;
+            const { id_question } = ctx.request.body;
+    
+            // Recupera tutte le question_in_tests dall'API
+            const response = await axios.get("http://localhost:1337/api/question-in-tests/?pLevel=3");
+    
+            const QuestionInTest = response.data.data;
+
+            console.log(QuestionInTest);
+
+            const targetQuestionInTest = QuestionInTest.filter(
+                (question_in_tests) => question_in_tests.id_question.documentId === id_question 
+                                        && question_in_tests.id_test.documentId === id_test
+            );
+            console.log("Valore filtrato");
+            console.log(targetQuestionInTest);
+            console.log(targetQuestionInTest[0].documentId);
+    
+            await axios.delete(`http://localhost:1337/api/question-in-tests/${targetQuestionInTest[0].documentId}`)
+            
+            // Se trovi un elemento, restituisci le informazioni o elimina
+            ctx.body = { data: targetQuestionInTest };
+    
         } catch (error) {
             ctx.body = { error: error.message };
         }

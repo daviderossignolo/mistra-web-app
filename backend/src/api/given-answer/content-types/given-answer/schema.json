@@ -12,16 +12,16 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "id_test_execution": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::test-execution.test-execution",
-      "inversedBy": "given_answers"
-    },
     "id_answer": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::answer.answer",
+      "inversedBy": "given_answers"
+    },
+    "id_test_execution": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::test-execution.test-execution",
       "inversedBy": "given_answers"
     }
   }

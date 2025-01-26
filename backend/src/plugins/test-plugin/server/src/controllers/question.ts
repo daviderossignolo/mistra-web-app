@@ -9,6 +9,7 @@ export default {
     async createQuestion(ctx) {
         try {
             const { name, text, id_category, answer } = ctx.request.body;
+            console.log(ctx.request.body);
             const id_question = uuidv4();
             const answers = answer.split(',').map(answer => answer.trim());
 
@@ -79,7 +80,7 @@ export default {
                         </form>
                         <a href="http://localhost:1337/api/test-plugin/display-answer" class="text-blue-500 hover:underline mt-4 inline-block">Creare una Answer</a>
                         <br>
-                        <a href="http://localhost:1337/api/test-plugin/search-test" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla creazione del Test</a>
+                        <a href="http://localhost:1337/api/test-plugin/search-test-Execution" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla creazione del Test</a>
                     </div>
                 </body>
             </html>`;
@@ -93,8 +94,44 @@ export default {
     async modifyQuestion(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
-			const response = await axios.get(`http://localhost:1337/api/questions/${documentId}?populate=*`);
-			const data = response.data.data;
+            const response = await axios.get(`http://localhost:1337/api/questions/${documentId}?populate=*`);
+            const data = response.data.data;
+
+            // Filtro i dati
+            const filteredData = {
+              id: data.id,
+              documentId: data.documentId,
+              id_question: data.id_question,
+              name: data.name,
+              text: data.text,
+              id_category: data.id_category
+                ? {
+                    id: data.id_category.id,
+                    documentId: data.id_category.documentId,
+                    id_category: data.id_category.id_category,
+                    name: data.id_category.name
+                  }
+                : null,
+              answers: data.answers
+                ? data.answers.map((answer) => ({
+                    id: answer.id,
+                    documentId: answer.documentId,
+                    id_answer: answer.id_answer,
+                    text: answer.text,
+                    score: answer.score,
+                    correction: answer.correction
+                  }))
+                : [],
+              question_in_tests: data.question_in_tests
+                ? data.question_in_tests.map((test) => ({
+                    id: test.id,
+                    documentId: test.documentId
+                  }))
+                : []
+            };
+
+            console.log(filteredData);
+
 			const answers = Array.isArray(data.answers) ? data.answers : [];
 	
 			ctx.body = `
@@ -133,6 +170,7 @@ export default {
             const { documentId } = ctx.query;
             const { name, text, id_category, answer } = ctx.request.body;
             const answers = answer.split(',').map(answer => answer.trim());
+            console.log(ctx.request.body);
 
             const payload = {
                 data: {
@@ -142,8 +180,6 @@ export default {
                     answers
                 }
             };
-
-            console.log(payload)
 
             await axios.put(`http://localhost:1337/api/questions/${documentId}`, payload);
 
@@ -193,4 +229,47 @@ export default {
             ctx.body = { error: error.message };
         }
     },
+
+    async getQuestions() {
+        try {
+            const response = await axios.get('http://localhost:1337/api/questions?populate=*');
+            const filteredAnswers = response.data.data.map(data => ({
+                id: data.id ? data.id : null,
+                documentId: data.documentId,
+                id_question: data.id_question,
+                name: data.name,
+                text: data.text,
+                id_category: data.id_category
+                    ? {
+                        id: data.id_category.id ? data.id_category.id : null,
+                        documentId: data.id_category.documentId,
+                        id_category: data.id_category.id_category,
+                        name: data.id_category.name
+                    }
+                  : null,
+                answers: data.answers
+                    ? data.answers.map((answer) => ({
+                        id: answer.id ? answer.id : null,
+                        documentId: answer.documentId,
+                        id_answer: answer.id_answer,
+                        text: answer.text,
+                        score: answer.score,
+                        correction: answer.correction
+                    }))
+                  : [],
+                question_in_tests: data.question_in_tests
+                    ? data.question_in_tests.map((test) => ({
+                        id: test.id ? test.id : null,
+                        documentId: test.documentId
+                    }))
+                  : []
+            }));
+
+            console.log(filteredAnswers)
+            return response.data.data;
+        
+        } catch (error) {
+            return `<li>Errore nel caricamento delle questions: ${error.message}</li>`;
+        }
+    }
 };
