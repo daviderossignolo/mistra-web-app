@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         navbar: '#2B6CA3',
         "navbar-hover": '#003449',
+        "navbar-hover-light": '#2B6CA3',
         "services-hover": '#ACF1BD',
         "contact-bg": '#E0E6E8',
       },

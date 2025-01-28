@@ -16,6 +16,7 @@ import ContattiPage from "./pages/ContattiPage";
 import NewsPage from "./pages/newsPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
 import EventsPage from "./pages/EventsPage";
+import TakeQuizSetup from "./components/TakeQuizSetup";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -77,6 +78,7 @@ function App() {
 					<Route path="/login" element={<Login />} />{" "}
 					{/* Controllare la visualizzazione delle pagine protette dal login  */}
 					<Route path="/test" element={<PrivateRoute element={TestPage} />} />
+					<Route path="/taketest" element={<TakeQuizSetup />} />
 					<Route path="/contatti" element={<ContattiPage />} />
 					<Route path="/" element={<Homepage />} />
 					<Route path="/home" element={<Homepage />} />
