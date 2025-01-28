@@ -1,48 +1,34 @@
-import type { Context } from 'koa';
-import axios from 'axios';
-import categoryService from '../services/category';
-const { v4: uuidv4 } = require('uuid');
+import type { Context } from "koa";
+import axios from "axios";
+import categoryService from "../services/category";
+const { v4: uuidv4 } = require("uuid");
 
 export default {
-    async createCategory(ctx: Context) {
-        try {
-            const { name } = ctx.request.body;
-            const id_category = uuidv4();
-            console.log(ctx.request.body)
-    
-            await axios.post('http://localhost:1337/api/categories', {
-              data: {
-                id_category,
-                name,
-              },
-            });
-    
-            ctx.body = `
-                <html>
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-category">
-                        <title>Redirect</title>
-                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-                    </head>
-                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-                        <div class="bg-white p-8 rounded-lg shadow-lg">
-                            <h1 class="text-2xl font-semibold text-green-600 mb-4">Categoria Creata con Successo!</h1>
-                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
-                        </div>
-                    </body>
-                </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+	async createCategory(ctx: Context) {
+		const { id_category, name } = ctx.request.body;
+		console.log(ctx.request.body);
 
-    async categoryManagement(ctx: Context) {
-        try {
-            const categoriesHTML = await categoryService.getCategoriesHTML();
-    
-            ctx.body = `
+		const response = await fetch("http://localhost:1337/api/categories", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				data: {
+					id_category,
+					name,
+				},
+			}),
+		});
+
+		return response.json();
+	},
+
+	async categoryManagement(ctx: Context) {
+		try {
+			const categoriesHTML = await categoryService.getCategoriesHTML();
+
+			ctx.body = `
             <html>
                 <head>
                     <title>Gestione Category</title>
@@ -65,28 +51,29 @@ export default {
                     </div>
                 </body>
             </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },    
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async modifyCategory(ctx: Context) {
-        try {
-            const { documentId } = ctx.query; // Ottieni il documentId dalla query
-            const response = await axios.get(`http://localhost:1337/api/categories/${documentId}`);
-            const data = response.data.data;
-            
-            
-            const filteredData = {
-                id: data.id,
-                documentId: data.documentId,
-                id_category: data.id_category,
-                name: data.name,
-            };
-            console.log(filteredData);
-    
-            ctx.body = `
+	async modifyCategory(ctx: Context) {
+		try {
+			const { documentId } = ctx.query; // Ottieni il documentId dalla query
+			const response = await axios.get(
+				`http://localhost:1337/api/categories/${documentId}`,
+			);
+			const data = response.data.data;
+
+			const filteredData = {
+				id: data.id,
+				documentId: data.documentId,
+				id_category: data.id_category,
+				name: data.name,
+			};
+			console.log(filteredData);
+
+			ctx.body = `
             <html>
                 <head>
                     <title>Modifica Categoria</title>
@@ -105,26 +92,28 @@ export default {
                     </div>
                 </body>
             </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },    
-  
-    // funzione per gestire la PUT
-    async submitModifyCategory(ctx: Context) {
-        try {
-          const { documentId } = ctx.query; // Ottieni il documentId dalla query
-          const { name } = ctx.request.body; // Ottieni il nuovo valore di "name" dal body della richiesta
-          console.log(ctx.request.body);
-          
-        
-          // Effettua la richiesta PUT al server
-          const response = await axios.put(`http://localhost:1337/api/categories/${documentId}`, {
-            data: { name },
-          });
-      
-          ctx.body = `
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
+
+	// funzione per gestire la PUT
+	async submitModifyCategory(ctx: Context) {
+		try {
+			const { documentId } = ctx.query; // Ottieni il documentId dalla query
+			const { name } = ctx.request.body; // Ottieni il nuovo valore di "name" dal body della richiesta
+			console.log(ctx.request.body);
+
+			// Effettua la richiesta PUT al server
+			const response = await axios.put(
+				`http://localhost:1337/api/categories/${documentId}`,
+				{
+					data: { name },
+				},
+			);
+
+			ctx.body = `
           <html>
               <head>
                   <meta charset="UTF-8">
@@ -139,19 +128,19 @@ export default {
                     </div>
                 </body>
           </html>`;
-          ctx.type = 'html';
-        } catch (error) {
-          ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async deleteCategory(ctx: Context) {
-        try {
-            const { documentId } = ctx.query; // Ottieni il documentId dalla query
-    
-            await axios.delete(`http://localhost:1337/api/categories/${documentId}`);
-    
-            ctx.body = `
+	async deleteCategory(ctx: Context) {
+		try {
+			const { documentId } = ctx.query; // Ottieni il documentId dalla query
+
+			await axios.delete(`http://localhost:1337/api/categories/${documentId}`);
+
+			ctx.body = `
                 <html>
                     <head>
                         <meta charset="UTF-8">
@@ -166,26 +155,26 @@ export default {
                         </div>
                     </body>
                 </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },  
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async getCategories() {
-        try {
-            const response = await axios.get('http://localhost:1337/api/categories');
-            const filteredCategories = response.data.data.map(category => ({
-                id: category.id,
-                documentId: category.documentId,
-                id_category: category.id_category,
-                name: category.name,
-            }));
-            console.log(filteredCategories);
-            return filteredCategories;
-        } catch (error) {
-            return `<li>Errore nel caricamento delle categories: ${error.message}</li>`;
-        }
-    }
-    
+	/**
+	 * Function that calls strapi API to get all categories.
+	 * @returns {Promise<{id_category: string, name: string}[] | {error: string}>}
+	 */
+	async getCategories() {
+		try {
+			const response = await axios.get("http://localhost:1337/api/categories");
+			const filteredCategories = response.data.data.map((category) => ({
+				id_category: category.id_category,
+				name: category.name,
+			}));
+			return filteredCategories;
+		} catch (error) {
+			return { error: error.message };
+		}
+	},
 };

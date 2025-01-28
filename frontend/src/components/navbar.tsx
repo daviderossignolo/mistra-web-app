@@ -102,6 +102,15 @@ const MenuComponent: React.FC = () => {
 		});
 	};
 
+	const handleLogout = (
+		event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+	): void => {
+		event.preventDefault();
+		localStorage.removeItem("token");
+		setIsAuthenticated(false);
+		navigate("/login");
+	};
+
 	if (loading) return <div className="p-4 text-center">Caricamento...</div>;
 	if (error) return <div className="p-4 text-red-500">Errore: {error}</div>;
 
@@ -206,6 +215,24 @@ const MenuComponent: React.FC = () => {
 					}
 					return null;
 				})}
+				<li className="relative">
+					{isAuthenticated ? (
+						<button
+							type="button"
+							onClick={handleLogout}
+							className="text-white py-2 px-4 transition-colors duration-200 hover:bg-navbar-hover rounded"
+						>
+							Logout
+						</button>
+					) : (
+						<Link
+							to="/login"
+							className="text-white py-2 px-4 transition-colors duration-200 hover:bg-navbar-hover rounded"
+						>
+							Login
+						</Link>
+					)}
+				</li>
 			</ul>
 		);
 	};
@@ -218,7 +245,7 @@ const MenuComponent: React.FC = () => {
 						<button
 							type="button"
 							onClick={() => setIsMenuOpen(!isMenuOpen)}
-							className="text-gray-700 focus:outline-none"
+							className="text-navbar-hover focus:outline-none"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -237,7 +264,7 @@ const MenuComponent: React.FC = () => {
 							</svg>
 						</button>
 					</div>
-					<div className="hidden sm:flex justify-center flex-1">
+					<div className="hidden sm:flex justify-center flex-1 text-[15px]">
 						{menuData ? renderMenu(menuData.MainMenuItems) : null}
 					</div>
 				</div>

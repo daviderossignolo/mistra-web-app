@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import QuestionSelectionStep from "../components/QuizSelectionStep";
 import QuizSetupStep from "../components/QuizSetupStep";
+import type { Question } from "../components/QuestionModal";
 
 type QuizData = {
 	id: string;
@@ -48,7 +49,9 @@ const TestPage: React.FC = () => {
 	};
 
 	// funzion che gestische il passaggio allo stato precedente, in modo da tornare indietro
-	const handlePreviousStep = () => {
+	const handlePreviousStep = (questions: Question[]) => {
+		setQuizData((prev) => ({ ...prev, questions }));
+
 		setCurrentStep((prev) => prev - 1);
 	};
 
@@ -72,7 +75,7 @@ const TestPage: React.FC = () => {
 					{currentStep === 2 && (
 						<QuestionSelectionStep
 							quizData={quizData}
-							onPrevious={handlePreviousStep}
+							onPrevious={(questions) => handlePreviousStep(questions)}
 							onNext={handleNextStep}
 						/>
 					)}
