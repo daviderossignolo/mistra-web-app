@@ -161,19 +161,20 @@ export default {
 		}
 	},
 
+	/**
+	 * Function that calls strapi API to get all categories.
+	 * @returns {Promise<{id_category: string, name: string}[] | {error: string}>}
+	 */
 	async getCategories() {
 		try {
 			const response = await axios.get("http://localhost:1337/api/categories");
 			const filteredCategories = response.data.data.map((category) => ({
-				id: category.id,
-				documentId: category.documentId,
 				id_category: category.id_category,
 				name: category.name,
 			}));
-			console.log(filteredCategories);
 			return filteredCategories;
 		} catch (error) {
-			return `<li>Errore nel caricamento delle categories: ${error.message}</li>`;
+			return { error: error.message };
 		}
 	},
 };

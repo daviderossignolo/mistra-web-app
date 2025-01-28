@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import type { Category } from "./QuestionModal";
 
 interface CategoryModalProps {
 	onClose: () => void;
-	onSave: (category: string) => void; // Callback per salvare la categoria
+	onSave: (category: Category) => void;
 }
 
 // Componente per il modale di creazione categoria
@@ -20,6 +21,8 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 
 		try {
 			// Eseguo la chiamata API al plugin per salvare la categoria
+			const category_id = uuidv4();
+			const name = categoryName.trim();
 			const response = await fetch(
 				"http://localhost:1337/api/test-plugin/create-category",
 				{
@@ -27,7 +30,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ id: uuidv4(), name: categoryName.trim() }),
+					body: JSON.stringify({ id_category: category_id, name: name }),
 				},
 			);
 
@@ -37,7 +40,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 			}
 
 			// Chiamo la funzione onSave passata come prop e chiudo il modale
-			onSave(categoryName);
+			onSave({ name: name, id_category: category_id });
 			onClose();
 		} catch (error) {
 			alert(
@@ -50,10 +53,15 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 	return (
 		<div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-poppins text-navbar-hover">
 			<div className="bg-white w-11/12 max-w-md p-4 rounded shadow-lg">
-				<h3 className="text-xl font-bold mb-4">Nuova Categoria</h3>
+				<div className="w-full bg-navbar-hover px-4 py-4 mb-4">
+					<h3 className="font-bold text-center text-white">Nuova Categoria</h3>
+				</div>
 
 				{/* Label e campo input per il nome della categoria */}
-				<label htmlFor="categoryName" className="block mb-2 font-medium">
+				<label
+					htmlFor="categoryName"
+					className="block mb-2 font-bold font-poppins"
+				>
 					Nome della Categoria
 				</label>
 				<input
@@ -63,12 +71,13 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 					placeholder="Inserisci il nome della categoria"
 					className="w-full border rounded p-2 mb-4"
 				/>
-				{/* Div per i bottoni allinea a destra */}
+
+				{/* Div per i bottoni allineati a destra */}
 				<div className="flex justify-end">
 					<button
 						type="button"
 						onClick={onClose}
-						className="bg-red-700 text-white px-4 py-2 rounded mr-2"
+						className="bg-red-600 text-white px-4 py-2 rounded mr-2"
 					>
 						Annulla
 					</button>

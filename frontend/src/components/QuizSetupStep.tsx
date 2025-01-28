@@ -31,13 +31,10 @@ const QuizSetupStep: React.FC<QuizSetupStepProps> = ({ quizData, onNext }) => {
 
 	return (
 		<div>
-			<h2 className="text-xl font-bold mb-4 font-poppins">
-				Crea un nuovo quiz
-			</h2>
 			<div className="mb-4">
 				<label
 					htmlFor="quiz-name"
-					className="block text-sm font-medium mb-2 font-poppins"
+					className="block font-bold mb-2 font-poppins text-navbar-hover"
 				>
 					Nome
 				</label>
@@ -46,13 +43,13 @@ const QuizSetupStep: React.FC<QuizSetupStepProps> = ({ quizData, onNext }) => {
 					type="text"
 					value={name}
 					onChange={(e) => setName(e.target.value)}
-					className="w-full p-2 border rounded font-poppins"
+					className="w-full p-2 border rounded font-poppins text-navbar-hover"
 				/>
 			</div>
 			<div className="mb-4">
 				<label
 					htmlFor="quiz-description"
-					className="block text-sm font-medium mb-2 font-poppins"
+					className="block text-sm font-bold mb-2 font-poppins text-navbar-hover"
 				>
 					Descrizione
 				</label>
@@ -60,13 +57,13 @@ const QuizSetupStep: React.FC<QuizSetupStepProps> = ({ quizData, onNext }) => {
 					id="quiz-description"
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
-					className="w-full p-2 border rounded font-poppins"
+					className="w-full p-2 border rounded font-poppins text-navbar-hover"
 				/>
 			</div>
 			<button
 				type="button"
 				onClick={handleNext}
-				className="bg-navbar text-white py-2 px-4 rounded font-poppins"
+				className="bg-navbar-hover text-white py-2 px-4 rounded font-poppins"
 			>
 				Avanti
 			</button>
