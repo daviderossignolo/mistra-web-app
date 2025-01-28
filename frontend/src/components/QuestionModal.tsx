@@ -64,7 +64,13 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 					"http://localhost:1337/api/test-plugin/get-categories",
 				);
 				const data = await response.json();
-				setCategories(data);
+				console.log(data);
+
+				if (data.length === 0) {
+					setCategories([]);
+				} else {
+					setCategories(data);
+				}
 			} catch (error) {
 				console.error("Errore nel recupero delle categorie:", error);
 			}
