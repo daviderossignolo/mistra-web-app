@@ -1,5 +1,5 @@
 import type React from "react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Answer {
 	id: string;
@@ -33,7 +33,6 @@ const TakeQuizSetup: React.FC = () => {
 	// Step: 0=Setup User, 1=Quiz, 2=Result
 	const [step, setStep] = useState(0);
 	const [userData, setUserData] = useState({ sex: "", age: "" });
-	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 	const [selectedAnswers, setSelectedAnswers] = useState<{
 		[key: string]: string;
 	}>({});
@@ -179,8 +178,6 @@ const TakeQuizSetup: React.FC = () => {
 
 	if (step === 1) {
 		// Quiz Step
-		const question = quizData?.questions[currentQuestionIndex];
-
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
 				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5">
@@ -200,10 +197,10 @@ const TakeQuizSetup: React.FC = () => {
 						</>
 					)}
 
-					{question && (
-						<>
+					{quizData?.questions.map((question, index) => (
+						<div key={question.id} className="mb-6">
 							<h2 className="text-lg font-medium mb-4">
-								Domanda {currentQuestionIndex + 1}: {question.text}
+								Domanda {index + 1}: {question.text}
 							</h2>
 							<div className="flex flex-row space-x-2">
 								{question.answers.map((answer) => (
@@ -221,36 +218,16 @@ const TakeQuizSetup: React.FC = () => {
 									</button>
 								))}
 							</div>
-						</>
-					)}
-					<div className="mt-6 flex justify-between">
-						{currentQuestionIndex > 0 && (
-							<button
-								type="button"
-								onClick={() => setCurrentQuestionIndex((i) => i - 1)}
-								className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
-							>
-								Indietro
-							</button>
-						)}
-						{quizData &&
-						currentQuestionIndex < quizData.questions.length - 1 ? (
-							<button
-								type="button"
-								onClick={() => setCurrentQuestionIndex((i) => i + 1)}
-								className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
-							>
-								Avanti
-							</button>
-						) : (
-							<button
-								type="button"
-								onClick={handleQuizSubmit}
-								className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
-							>
-								Concludi Test
-							</button>
-						)}
+						</div>
+					))}
+					<div className="mt-6 flex justify-end">
+						<button
+							type="button"
+							onClick={handleQuizSubmit}
+							className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
+						>
+							Concludi Test
+						</button>
 					</div>
 				</div>
 			</div>
