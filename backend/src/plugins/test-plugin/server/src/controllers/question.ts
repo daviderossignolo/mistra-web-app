@@ -8,9 +8,8 @@ export default {
     // Endpoint per creare una Question
     async createQuestion(ctx) {
         try {
-            const { name, text, id_category, answer } = ctx.request.body;
+            const { id_question, name, text, id_category, answer } = ctx.request.body;
             console.log(ctx.request.body);
-            const id_question = uuidv4();
             const answers = answer.split(',').map(answer => answer.trim());
 
             const payload = {
@@ -23,7 +22,9 @@ export default {
                 }
             };
 
-            await axios.post('http://localhost:1337/api/questions', payload);
+            const response = await axios.post('http://localhost:1337/api/questions', payload);
+
+            return response;
 
             ctx.body = `
             <!DOCTYPE html>

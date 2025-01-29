@@ -71,4 +71,12 @@ export default [
         	auth: false, // Nessuna autenticazione per il test
         },
     },
+    {
+        method: 'POST',
+        path: '/create-CompleteTest',
+        handler: 'tests.createCompleteTest',
+        config: {
+              auth: false, // Nessuna autenticazione per il test
+        },
+    },
 ]

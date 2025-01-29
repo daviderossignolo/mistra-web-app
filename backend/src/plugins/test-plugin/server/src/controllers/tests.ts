@@ -3,17 +3,36 @@ const { v4: uuidv4 } = require('uuid');
 import testsService from '../services/tests';
 import questionService from '../services/question';
 import axios from 'axios'; // Assicurati di avere axios installato con `yarn add axios`
+import { cp } from 'fs';
 
+
+interface Quiz {
+    id: string;
+    name: string;
+    description: string;
+    questions: {
+        id: string;
+        name:string;
+        text: string;
+        category: {
+            id_category: string;
+            name: string;
+        };
+        answers: {
+            id: string;
+            text: string;
+            correction: boolean;
+            score: number;
+        }[];
+    }[];
+}
 
 export default {
 
     async createTest(ctx: Context) {
         try {
-            const { name_test, description_test } = ctx.request.body;
+            const { id_test, name_test, description_test } = ctx.request.body;
             console.log(ctx.request.body);
-            
-            // Genera un UUID per id_test
-            const id_test = uuidv4();
             
             // Struttura il payload correttamente
             const payload = {
@@ -23,9 +42,13 @@ export default {
                     description_test,
                 }
             };
+
+            console.log("Sto per mandare:", payload);
             
             // Creazione del Test con i dati forniti
-            await axios.post('http://localhost:1337/api/tests', payload);
+            const response = await axios.post('http://localhost:1337/api/tests', payload);
+
+            return response;
             
             // Pagina di conferma
             ctx.body = `
@@ -391,6 +414,125 @@ export default {
         } catch (error) {
             ctx.body = { error: error.message };
         }
-    }
+    },
+
+    async createCompleteTest(ctx: Context) {
+        try {
+            const { id, name, description, questions } = ctx.request.body as Quiz;
+    
+            console.log("Dati ricevuti:", ctx.request.body);
+    
+            let testId = id || uuidv4();
+    
+            // Recupera tutti i test e filtra localmente
+            const allTests = await axios.get('http://localhost:1337/api/tests')
+                .then(res => res.data.data)
+                .catch(() => []);
+
+            console.log("allTests", allTests);
+    
+            const existingTest = allTests.filter((test) => {
+                return test.id_test === testId;
+            });
+
+            console.log("payload", {
+                id_test: testId,
+                name_test: name,
+                description_test: description,
+            });
+
+            console.log("existingTest", existingTest);
+    
+            if (existingTest.length === 0) {
+                // Crea il test solo se non esiste
+                console.log("Creo il test perchè non esiste");
+                const testResponse = await axios.post('http://localhost:1337/api/test-plugin/create-test', {
+                    id_test: testId,
+                    name_test: name,
+                    description_test: description,
+                });
+                testId = testResponse.data.data.data.documentId;
+            }
+    
+            // Recupera tutte le domande
+            const allQuestions = await axios.get('http://localhost:1337/api/questions')
+            .then(res => res.data.data)
+            .catch(() => []);
+
+            console.log("allQuestions", allQuestions);
+
+            for (const question of questions) {
+                let questionId = question.id || uuidv4();
+                
+                // Filtra localmente per vedere se la domanda esiste già
+                const existingQuestion = allQuestions.filter((question) => {
+                    return question.id_question === questionId;
+                });
+
+                console.log("existingQuestion", existingQuestion);
+                
+                let createdAnswers = [];
+                
+                // Se la domanda non esiste, prima creiamo le risposte
+                if (existingQuestion.length === 0) {
+                    for (const answer of question.answers) {
+                        let answerId = answer.id || uuidv4();
+
+                        console.log("payload Answer", 
+                        {
+                            id: answerId,
+                            text: answer.text,
+                            score: answer.score,
+                            correction: answer.correction,
+                        });
+                    
+                        // Creiamo la risposta e la memorizziamo
+                        const answerResponse = await axios.post('http://localhost:1337/api/test-plugin/create-answer', {
+                                id_answer: answerId,
+                                text: answer.text,
+                                score: answer.score,
+                                correction: answer.correction,
+                        });
+                        console.log("risposta answer", answerResponse.data.data);
+                        console.log("DocumentID: ", answerResponse.data.data.data.documentId)
+                        createdAnswers.push(answerResponse.data.data.data.documentId);
+                    }
+
+                    console.log("createdAnswers", createdAnswers);
+                
+                    // Dopo aver creato le risposte, creiamo la domanda e le associamo
+                    const responseQuestion = await axios.post('http://localhost:1337/api/test-plugin/create-question', {
+                            id_question: questionId,
+                            name: question.name,
+                            text: question.text,
+                            category: {
+                                id: question.category.id_category,
+                                name: question.category.name
+                            },
+                            answer: createdAnswers.join(','),
+                    });
+                    questionId = responseQuestion.data.data.data.documentId
+                    console.log("documentId question", questionId);
+
+                }
+                else {
+                    questionId = existingQuestion[0].documentId;
+                }
+
+                //Creo question in test
+                await axios.post(`http://localhost:1337/api/test-plugin/create-QuestionInTest?id_test=${testId}`, {
+                    id_question: questionId,
+                }
+            )}
+    
+            console.log("Test creato con successo");
+            ctx.body = { message: "Test creato con successo" };
+            ctx.status = 200;
+        }
+        catch (error) {
+            ctx.body = { error: error.message };
+            ctx.status = 500;
+        }
+    }    
 
 }

@@ -6,11 +6,10 @@ import axios from 'axios';
 export default {
     async createAnswer(ctx) {
         try {
-            const { text, score, correction } = ctx.request.body;
-            const id_answer = uuidv4();
+            const { id_answer, text, score, correction } = ctx.request.body;
             console.log(ctx.request.body)
 
-            await axios.post('http://localhost:1337/api/answers', {
+            const response = await axios.post('http://localhost:1337/api/answers', {
                 data: {
                     id_answer,
                     text,
@@ -18,6 +17,8 @@ export default {
                     correction,
                 },
             });
+
+            return response;
 
             ctx.body = `
                 <!DOCTYPE html>
