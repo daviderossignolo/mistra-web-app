@@ -1,59 +1,57 @@
-import type { Context } from 'koa';
-const { v4: uuidv4 } = require('uuid');
-import questionService from '../services/question';
-import categoryService from '../services/category';
-import axios from 'axios';
+import type { Context } from "koa";
+const { v4: uuidv4 } = require("uuid");
+import questionService from "../services/question";
+import categoryService from "../services/category";
+import axios from "axios";
 
 export default {
-    // Endpoint per creare una Question
-    async createQuestion(ctx) {
-        try {
-            const { id_question, name, text, id_category, answer } = ctx.request.body;
-            console.log(ctx.request.body);
-            const answers = answer.split(',').map(answer => answer.trim());
+	/**
+	 * Endpoint per la creazione di una domanda.
+	 * @param ctx
+	 * @returns
+	 */
+	async createQuestion(ctx: Context) {
+		const { id_question, name, text, category_id } = ctx.request.body;
 
-            const payload = {
-                data: {
-                    id_question,
-                    name,
-                    text,
-                    id_category,
-                    answers
-                }
-            };
+		// Faccio la chiamata API a Strapi per creare la Question
+		const response = await fetch("http://localhost:1337/api/questions", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				data: {
+					id_question: id_question,
+					name: name,
+					text: text,
+					category_id: category_id,
+				},
+			}),
+		});
 
-            const response = await axios.post('http://localhost:1337/api/questions', payload);
+		if (!response.ok) {
+			ctx.status = response.status;
+			ctx.body = { error: "Errore nella creazione della domanda" };
+			return ctx;
+		}
 
-            return response;
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const questionData: any = await response.json();
+		const id = questionData.data.documentId;
 
-            ctx.body = `
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-question">
-                    <title>Redirect</title>
-                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                </head>
-                <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-                    <div class="bg-white p-8 rounded-lg shadow-lg">
-                        <h1 class="text-2xl font-semibold text-green-600 mb-4">Question creata con successo</h1>
-                        <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
-                    </div>
-                </body>
-            </html>`;
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+		ctx.status = 200;
+		ctx.body = { question_id: id };
 
-    async questionManagement(ctx: Context) {
-        try {
-            const getQuestionsHTML = await questionService.getQuestionsHTML();
-            const getAnswersHTML = await questionService.getAnswersHTML();
-            const getCategoriesHTML = await categoryService.getCategoriesHTML();
+		return ctx;
+	},
 
-            ctx.body = `
+	async questionManagement(ctx: Context) {
+		try {
+			const getQuestionsHTML = await questionService.getQuestionsHTML();
+			const getAnswersHTML = await questionService.getAnswersHTML();
+			const getCategoriesHTML = await categoryService.getCategoriesHTML();
+
+			ctx.body = `
             <html>
                 <head>
                     <title>Gestione Questions</title>
@@ -85,56 +83,58 @@ export default {
                     </div>
                 </body>
             </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    // Endpoint per modificare una Question
-    async modifyQuestion(ctx: Context) {
+	// Endpoint per modificare una Question
+	async modifyQuestion(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
-            const response = await axios.get(`http://localhost:1337/api/questions/${documentId}?populate=*`);
-            const data = response.data.data;
+			const response = await axios.get(
+				`http://localhost:1337/api/questions/${documentId}?populate=*`,
+			);
+			const data = response.data.data;
 
-            // Filtro i dati
-            const filteredData = {
-              id: data.id,
-              documentId: data.documentId,
-              id_question: data.id_question,
-              name: data.name,
-              text: data.text,
-              id_category: data.id_category
-                ? {
-                    id: data.id_category.id,
-                    documentId: data.id_category.documentId,
-                    id_category: data.id_category.id_category,
-                    name: data.id_category.name
-                  }
-                : null,
-              answers: data.answers
-                ? data.answers.map((answer) => ({
-                    id: answer.id,
-                    documentId: answer.documentId,
-                    id_answer: answer.id_answer,
-                    text: answer.text,
-                    score: answer.score,
-                    correction: answer.correction
-                  }))
-                : [],
-              question_in_tests: data.question_in_tests
-                ? data.question_in_tests.map((test) => ({
-                    id: test.id,
-                    documentId: test.documentId
-                  }))
-                : []
-            };
+			// Filtro i dati
+			const filteredData = {
+				id: data.id,
+				documentId: data.documentId,
+				id_question: data.id_question,
+				name: data.name,
+				text: data.text,
+				id_category: data.id_category
+					? {
+							id: data.id_category.id,
+							documentId: data.id_category.documentId,
+							id_category: data.id_category.id_category,
+							name: data.id_category.name,
+						}
+					: null,
+				answers: data.answers
+					? data.answers.map((answer) => ({
+							id: answer.id,
+							documentId: answer.documentId,
+							id_answer: answer.id_answer,
+							text: answer.text,
+							score: answer.score,
+							correction: answer.correction,
+						}))
+					: [],
+				question_in_tests: data.question_in_tests
+					? data.question_in_tests.map((test) => ({
+							id: test.id,
+							documentId: test.documentId,
+						}))
+					: [],
+			};
 
-            console.log(filteredData);
+			console.log(filteredData);
 
 			const answers = Array.isArray(data.answers) ? data.answers : [];
-	
+
 			ctx.body = `
 			<html>
 				<head>
@@ -146,45 +146,48 @@ export default {
 						<h1 class="text-3xl font-semibold text-gray-800 mb-6">Modifica Question</h1>
 						<form action="http://localhost:1337/api/test-plugin/submit-modify-question/?documentId=${documentId}" method="POST" class="bg-white p-6 rounded-lg shadow-lg">
 							<label for="name" class="block text-lg text-gray-800 mb-2">Name:</label>
-							<input type="text" name="name" id="name" value="${data.name || ''}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+							<input type="text" name="name" id="name" value="${data.name || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
 							<label for="text" class="block text-lg text-gray-800 mb-2">Text:</label>
-							<input type="text" name="text" id="text" value="${data.text || ''}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+							<input type="text" name="text" id="text" value="${data.text || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
 							<label for="id_category" class="block text-lg text-gray-800 mb-2">Category:</label>
-							<input type="text" name="id_category" id="id_category" value="${data.id_category.documentId || ''}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+							<input type="text" name="id_category" id="id_category" value="${data.id_category.documentId || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
 							<label for="answer" class="block text-lg text-gray-800 mb-2">Answer ids:</label>
-							<input type="text" name="answer" id="answer" value="${answers.map(answer => answer.documentId).join(',')}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
+							<input type="text" name="answer" id="answer" value="${answers.map((answer) => answer.documentId).join(",")}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
 							<button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Modifica Question</button>
                             <a href="/api/test-plugin/display-question" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione delle Question</a>
 						</form>
 					</div>
 				</body>
 			</html>`;
-			ctx.type = 'html';
+			ctx.type = "html";
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
 	},
 
-    // Endpoint per sottoporre la modifica di una Question
-    async submitModifyQuestion(ctx: Context) {
-        try {
-            const { documentId } = ctx.query;
-            const { name, text, id_category, answer } = ctx.request.body;
-            const answers = answer.split(',').map(answer => answer.trim());
-            console.log(ctx.request.body);
+	// Endpoint per sottoporre la modifica di una Question
+	async submitModifyQuestion(ctx: Context) {
+		try {
+			const { documentId } = ctx.query;
+			const { name, text, id_category, answer } = ctx.request.body;
+			const answers = answer.split(",").map((answer) => answer.trim());
+			console.log(ctx.request.body);
 
-            const payload = {
-                data: {
-                    name,
-                    text,
-                    id_category,
-                    answers
-                }
-            };
+			const payload = {
+				data: {
+					name,
+					text,
+					id_category,
+					answers,
+				},
+			};
 
-            await axios.put(`http://localhost:1337/api/questions/${documentId}`, payload);
+			await axios.put(
+				`http://localhost:1337/api/questions/${documentId}`,
+				payload,
+			);
 
-            ctx.body = `
+			ctx.body = `
             <!DOCTYPE html>
             <html lang="en">
                 <head>
@@ -198,20 +201,20 @@ export default {
                     <p class="text-xl mt-4">Stai per essere reindirizzato...</p>
                 </body>
             </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    // Endpoint per eliminare una Question
-    async deleteQuestion(ctx: Context) {
-        try {
-            const { documentId } = ctx.query;
+	// Endpoint per eliminare una Question
+	async deleteQuestion(ctx: Context) {
+		try {
+			const { documentId } = ctx.query;
 
-            await axios.delete(`http://localhost:1337/api/questions/${documentId}`);
+			await axios.delete(`http://localhost:1337/api/questions/${documentId}`);
 
-            ctx.body = `
+			ctx.body = `
             <!DOCTYPE html>
             <html lang="en">
                 <head>
@@ -225,52 +228,53 @@ export default {
                     <p class="text-xl mt-4">Stai per essere reindirizzato...</p>
                 </body>
             </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async getQuestions() {
-        try {
-            const response = await axios.get('http://localhost:1337/api/questions?populate=*');
-            const filteredAnswers = response.data.data.map(data => ({
-                id: data.id ? data.id : null,
-                documentId: data.documentId,
-                id_question: data.id_question,
-                name: data.name,
-                text: data.text,
-                id_category: data.id_category
-                    ? {
-                        id: data.id_category.id ? data.id_category.id : null,
-                        documentId: data.id_category.documentId,
-                        id_category: data.id_category.id_category,
-                        name: data.id_category.name
-                    }
-                  : null,
-                answers: data.answers
-                    ? data.answers.map((answer) => ({
-                        id: answer.id ? answer.id : null,
-                        documentId: answer.documentId,
-                        id_answer: answer.id_answer,
-                        text: answer.text,
-                        score: answer.score,
-                        correction: answer.correction
-                    }))
-                  : [],
-                question_in_tests: data.question_in_tests
-                    ? data.question_in_tests.map((test) => ({
-                        id: test.id ? test.id : null,
-                        documentId: test.documentId
-                    }))
-                  : []
-            }));
+	async getQuestions() {
+		try {
+			const response = await axios.get(
+				"http://localhost:1337/api/questions?populate=*",
+			);
+			const filteredAnswers = response.data.data.map((data) => ({
+				id: data.id ? data.id : null,
+				documentId: data.documentId,
+				id_question: data.id_question,
+				name: data.name,
+				text: data.text,
+				id_category: data.id_category
+					? {
+							id: data.id_category.id ? data.id_category.id : null,
+							documentId: data.id_category.documentId,
+							id_category: data.id_category.id_category,
+							name: data.id_category.name,
+						}
+					: null,
+				answers: data.answers
+					? data.answers.map((answer) => ({
+							id: answer.id ? answer.id : null,
+							documentId: answer.documentId,
+							id_answer: answer.id_answer,
+							text: answer.text,
+							score: answer.score,
+							correction: answer.correction,
+						}))
+					: [],
+				question_in_tests: data.question_in_tests
+					? data.question_in_tests.map((test) => ({
+							id: test.id ? test.id : null,
+							documentId: test.documentId,
+						}))
+					: [],
+			}));
 
-            console.log(filteredAnswers)
-            return response.data.data;
-        
-        } catch (error) {
-            return `<li>Errore nel caricamento delle questions: ${error.message}</li>`;
-        }
-    }
+			console.log(filteredAnswers);
+			return response.data.data;
+		} catch (error) {
+			return `<li>Errore nel caricamento delle questions: ${error.message}</li>`;
+		}
+	},
 };

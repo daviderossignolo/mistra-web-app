@@ -21,7 +21,17 @@ export default {
 			}),
 		});
 
-		return response.json();
+		if (!response.ok) {
+			ctx.status = response.status;
+			ctx.body = { error: "Errore nella creazione della Category" };
+			return;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const categoryData = (await response.json()) as any;
+		const id = categoryData.data.documentId;
+
+		return id;
 	},
 
 	async categoryManagement(ctx: Context) {
@@ -163,12 +173,13 @@ export default {
 
 	/**
 	 * Function that calls strapi API to get all categories.
-	 * @returns {Promise<{id_category: string, name: string}[] | {error: string}>}
+	 * @returns {Promise<{id: string, id_category: string, name: string}[] | {error: string}>}
 	 */
 	async getCategories() {
 		try {
 			const response = await axios.get("http://localhost:1337/api/categories");
 			const filteredCategories = response.data.data.map((category) => ({
+				documentId: category.documentId,
 				id_category: category.id_category,
 				name: category.name,
 			}));

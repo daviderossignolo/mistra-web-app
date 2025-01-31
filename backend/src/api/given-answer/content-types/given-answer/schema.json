@@ -12,12 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "id_answer": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::answer.answer",
-      "inversedBy": "given_answers"
-    },
     "id_test_execution": {
       "type": "relation",
       "relation": "manyToOne",
