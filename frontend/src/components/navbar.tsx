@@ -1,66 +1,70 @@
 import type React from "react";
+import Lottie from "react-lottie";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import * as animationData from "../lottie/loader.json";
 
-interface MenuLink {
+type MenuLink = {
 	id: number;
 	name: string;
 	url: string;
 	description: string;
-}
+};
 
-interface DropdownSection {
+type DropdownSection = {
 	id: number;
 	heading: string;
 	links: MenuLink[];
-}
+};
 
-interface DropdownMenu {
+type DropdownMenu = {
 	__component: "menu.dropdown";
 	id: number;
 	title: string;
 	url: string;
 	sections: DropdownSection[];
-}
+};
 
-interface MenuLinkItem {
+type MenuLinkItem = {
 	__component: "menu.menu-link";
 	id: number;
 	title: string;
 	url: string | null;
-}
+};
 
 type MainMenuItem = DropdownMenu | MenuLinkItem;
 
-interface MenuData {
+type MenuData = {
 	id: number;
 	documentId: string;
 	createdAt: string;
 	updatedAt: string;
 	publishedAt: string;
 	MainMenuItems: MainMenuItem[];
-}
-
-/**
- * TO DO: style the navbar.
- *
- */
+};
 
 const MenuComponent: React.FC = () => {
 	const [menuData, setMenuData] = useState<MenuData | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false); // Mobile menu state
+
+	// stato per gestire l'apertura e la chiusura del menù mobile
+	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
 	const [activeDropdowns, setActiveDropdowns] = useState<Set<number>>(
 		new Set(),
-	); // Track active dropdowns in mobile view
+	);
 	const navigate = useNavigate();
 
+	// Recupero il base url e l'host del backend strapi
+	const baseUrl = process.env.REACT_APP_BACKEND_HOST;
+	const port = process.env.REACT_APP_BACKEND_PORT;
+
+	// Funzione che recupera i dati delle voci del menù dal backend strapi
 	useEffect(() => {
 		const fetchMenuData = async () => {
-			const url =
-				"http://localhost:1337/api/main-menu?populate%5B0%5D=MainMenuItems&populate%5B1%5D=MainMenuItems.sections&populate%5B2%5D=MainMenuItems.sections.links";
+			const url = `${baseUrl}:${port}/api/main-menu?populate%5B0%5D=MainMenuItems&populate%5B1%5D=MainMenuItems.sections&populate%5B2%5D=MainMenuItems.sections.links`;
 			try {
 				const response = await fetch(url);
 
@@ -81,8 +85,9 @@ const MenuComponent: React.FC = () => {
 		};
 
 		fetchMenuData();
-	}, []);
+	}, [baseUrl, port]);
 
+	// Funzione che controlla se l'utente è autenticato
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		if (token) {
@@ -90,6 +95,7 @@ const MenuComponent: React.FC = () => {
 		}
 	}, []);
 
+	// FUnzione che permette di aprire o chiudere un dropdown
 	const toggleDropdown = (id: number) => {
 		setActiveDropdowns((prev) => {
 			const newSet = new Set(prev);
@@ -102,16 +108,36 @@ const MenuComponent: React.FC = () => {
 		});
 	};
 
+	// Funzione che permette di effettuare il logout
 	const handleLogout = (
 		event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 	): void => {
+		// Rimuovo il token dal localStorage e setto isAuthenticated a false
 		event.preventDefault();
 		localStorage.removeItem("token");
 		setIsAuthenticated(false);
 		navigate("/login");
 	};
 
-	if (loading) return <div className="p-4 text-center">Caricamento...</div>;
+	// Configurazione di default per il componente Lottie
+	const defaultOptions = {
+		loop: true,
+		autoplay: true,
+		animationData: animationData,
+		rendererSettings: {
+			preserveAspectRatio: "xMidYMid slice",
+		},
+	};
+
+	// Loading spinner se i dati sono in caricamento
+	if (loading) {
+		return (
+			<div className="p-4 text-center">
+				<Lottie options={defaultOptions} height={150} width={150} />
+			</div>
+		);
+	}
+
 	if (error) return <div className="p-4 text-red-500">Errore: {error}</div>;
 
 	const renderMenu = (items: MainMenuItem[], isMobile = false) => {
@@ -146,9 +172,8 @@ const MenuComponent: React.FC = () => {
 					if (item.__component === "menu.dropdown") {
 						return (
 							<li key={item.id} className="relative group">
-								{/* Dropdown Title */}
 								<div
-									className={`text-white px-4 py-2 transition-colors duration-200 hover:bg-navbar-hover rounded ${
+									className={`text-white px-4 py-2 font-poppins text-sm transition-colors duration-200 hover:bg-navbar-hover rounded ${
 										isMobile
 											? "flex justify-between items-center cursor-pointer"
 											: ""
@@ -158,7 +183,9 @@ const MenuComponent: React.FC = () => {
 										e.key === "Enter" && isMobile && toggleDropdown(item.id)
 									}
 								>
-									<a href={item.url}>{item.title}</a>
+									<a href={item.url} className="font-poppins text-sm">
+										{item.title}
+									</a>
 									{isMobile && (
 										<span>
 											<svg
@@ -200,7 +227,7 @@ const MenuComponent: React.FC = () => {
 													<li key={link.id}>
 														<a
 															href={link.url}
-															className="block px-4 py-2 text-sm text-white hover:bg-navbar-hover"
+															className="block px-4 py-2 text-sm font-poppins text-white hover:bg-navbar-hover"
 														>
 															{link.name}
 														</a>
@@ -220,14 +247,14 @@ const MenuComponent: React.FC = () => {
 						<button
 							type="button"
 							onClick={handleLogout}
-							className="text-white py-2 px-4 transition-colors duration-200 hover:bg-navbar-hover rounded"
+							className="text-white py-2 px-4 transition-colors font-poppins text-sm duration-200 hover:bg-navbar-hover rounded"
 						>
 							Logout
 						</button>
 					) : (
 						<Link
 							to="/login"
-							className="text-white py-2 px-4 transition-colors duration-200 hover:bg-navbar-hover rounded"
+							className="text-white py-2 px-4 transition-colors font-poppins text-sm duration-200 hover:bg-navbar-hover rounded"
 						>
 							Login
 						</Link>
@@ -240,7 +267,7 @@ const MenuComponent: React.FC = () => {
 	return (
 		<nav className="bg-navbar shadow-md">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="flex items-center justify-between h-16">
+				<div className="flex items-center justify-between h-16 container">
 					<div className="sm:hidden">
 						<button
 							type="button"
@@ -264,7 +291,7 @@ const MenuComponent: React.FC = () => {
 							</svg>
 						</button>
 					</div>
-					<div className="hidden sm:flex justify-center flex-1 text-[15px]">
+					<div className="hidden sm:flex justify-center flex-1 text-">
 						{menuData ? renderMenu(menuData.MainMenuItems) : null}
 					</div>
 				</div>

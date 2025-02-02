@@ -29,16 +29,26 @@ interface TakeQuizSetupProps {
 	quizData: QuizData;
 }
 
+/**
+ * TODO: Recuperare un quiz a caso da database, chiedere età e sesso all'utente, generare un codice di esecuzione del test casuale (data formato iso + 3 lettere)
+ * una volta ottenute le risposte e quando l'utente conferma salva il risultato e indica all'utente il codice dell'esecuzione. Deve quindi mostrare per ogni domanda
+ * la risposta data dall'utente e se errata la spiegazione associata, non si deve vedere la risposta corretta. Il tutto deve poter essere salvato come pdf.
+ *
+ */
+
 const TakeQuizSetup: React.FC = () => {
-	// Step: 0=Setup User, 1=Quiz, 2=Result
 	const [step, setStep] = useState(0);
 	const [userData, setUserData] = useState({ sex: "", age: "" });
+	const [testCode, setTestCode] = useState("");
 	const [selectedAnswers, setSelectedAnswers] = useState<{
 		[key: string]: string;
 	}>({});
 	const [score, setScore] = useState(0);
 	const [mistakes, setMistakes] = useState<Mistake[]>([]);
 	const [quizData, setQuizData] = useState<QuizData>();
+
+	const host = process.env.REACT_APP_BACKEND_HOST;
+	const port = process.env.REACT_APP_BACKEND_PORT;
 
 	const handleUserDataSubmit = () => {
 		if (userData.sex && userData.age) {
@@ -49,36 +59,26 @@ const TakeQuizSetup: React.FC = () => {
 	};
 
 	useEffect(() => {
-		const mockQuizData: QuizData = {
-			name: "Quiz di Prova",
-			description: "Questo è un quiz di prova.",
-			questions: [
-				{
-					id: "q1",
-					text: "Qual è la capitale d'Italia?",
-					answers: [
-						{ id: "a1", text: "Roma", correction: "correct", score: 1 },
-						{ id: "a2", text: "Milano", correction: "wrong", score: 0 },
-						{ id: "a3", text: "Napoli", correction: "wrong", score: 0 },
-					],
-				},
-				{
-					id: "q2",
-					text: "Qual è la capitale della Francia?",
-					answers: [
-						{ id: "a1", text: "Parigi", correction: "correct", score: 1 },
-						{ id: "a2", text: "Lione", correction: "wrong", score: 0 },
-						{ id: "a3", text: "Marsiglia", correction: "wrong", score: 0 },
-					],
-				},
-			],
+		const fetchRandomTest = async () => {
+			try {
+				const randomTestResponse = await fetch(
+					`${host}:${port}/api/test-plugin/get-random-test`,
+				);
+				console.log("Risposta ricevuta: ", randomTestResponse);
+
+				if (randomTestResponse.ok) {
+					const randomTest = await randomTestResponse.json();
+					console.log("Test ricevuto: ", randomTest);
+				} else {
+					throw new Error("Errore nel recupero del test.");
+				}
+			} catch (error) {
+				console.error("Errore durante il recupero del test:", error);
+			}
 		};
 
-		// Simulate fetching data
-		setTimeout(() => {
-			setQuizData(mockQuizData);
-		}, 1000);
-	}, []);
+		fetchRandomTest();
+	}, [host, port]);
 
 	const handleAnswerSelect = (questionId: string, answerId: string) => {
 		setSelectedAnswers((prev) => ({

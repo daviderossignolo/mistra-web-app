@@ -233,7 +233,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 										className="border rounded p-2"
 									>
 										<option value={0}>0</option>
-										<option value={0.5}>0.25</option>
+										<option value={0.25}>0.25</option>
 										<option value={0.5}>0.5</option>
 										<option value={1}>1</option>
 									</select>

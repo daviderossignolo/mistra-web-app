@@ -13,7 +13,9 @@ type headerData = {
 	documentId: string;
 	id: number;
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	lateral_logos: any;
+	sx_logo: any;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	dx_logo: any;
 	publishedAt: string;
 	title: string;
 	updatedAt: string;
@@ -23,11 +25,12 @@ const Header: React.FC = () => {
 	const [headerData, setHeaderData] = useState<headerData | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
+	const host = process.env.REACT_APP_BACKEND_HOST;
+	const port = process.env.REACT_APP_BACKEND_PORT;
 
 	useEffect(() => {
 		const fetchHeaderData = async () => {
-			const url =
-				"http://localhost:1337/api/header?populate[0]=content.main_image&populate[1]=lateral_logos";
+			const url = `${host}:${port}/api/header?populate[0]=content.main_image&populate[1]=sx_logo&populate[2]=dx_logo`;
 			try {
 				const response = await fetch(url);
 
@@ -49,13 +52,15 @@ const Header: React.FC = () => {
 		};
 
 		fetchHeaderData();
-	}, []);
+	}, [host, port]);
 
 	// Recupero i dati ritornati dalla API per inizialiizzare le variabili che verranno utilizzate per la visualizzazione
-	const lateral_logos = `http://localhost:1337${headerData?.lateral_logos.url}`;
-	const lateral_logos_altertext = headerData?.lateral_logos.alternativeText;
+	const sx_logo = `${host}:${port}${headerData?.sx_logo.url}`;
+	const sx_logo_altertext = headerData?.sx_logo.alternativeText;
+	const dx_logo = `${host}:${port}${headerData?.dx_logo.url}`;
+	const dx_logo_altertext = headerData?.dx_logo.alternativeText;
 	const header_title = headerData?.title;
-	const main_image = `http://localhost:1337${headerData?.content.main_image.url}`;
+	const main_image = `${host}:${port}${headerData?.content.main_image.url}`;
 	const main_altertext = headerData?.content.main_image.alternativeText;
 
 	// Funzione che formatta il markdown per la visualizzazione degli a capo
@@ -78,25 +83,22 @@ const Header: React.FC = () => {
 
 	return (
 		<header className="w-full bg-navbar shadow-md">
-			{/* Barra in alto iniziale dell'header */}
-			<div className="container mx-auto py-2 relative flex flex-col items-center md:flex-row md:justify-between">
-				{/* Immagini laterali, loghi ospedale */}
+			<div className=" container mx-auto py-2 relative flex flex-col items-center md:flex-row md:justify-between">
 				<img
-					src={lateral_logos}
-					alt={lateral_logos_altertext}
-					className="h-8 w-8 md:h-12 md:w-12 object-contain rounded-full"
+					src={sx_logo}
+					alt={sx_logo_altertext}
+					className="h-12 w-12 md:h-16 md:w-16 object-contain rounded-full mx-2"
 				/>
 				{/* Titolo */}
-				<h1 className="text-center text-lg md:text-2xl font-bold py-4 text-white px-16">
+				<h1 className="text-center text-lg md:text-2xl font-poppins font-bold py-4 text-white px-2">
 					{header_title}
 				</h1>
 				<img
-					src={lateral_logos}
-					alt={lateral_logos_altertext}
-					className="h-8 w-8 md:h-12 md:w-12 object-contain rounded-full"
+					src={dx_logo}
+					alt={dx_logo_altertext}
+					className="h-12 w-12 md:h-16 md:w-16 object-contain rounded-full mx-2"
 				/>
 			</div>
-			{/* Sezione con immagine e titolo */}
 			<div className="container mx-auto px-4 py-6">
 				<div className="max-w-4xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-1 items-center md:items-start">
 					{/* Immagine principale */}
