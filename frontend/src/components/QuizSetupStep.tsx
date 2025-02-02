@@ -36,7 +36,7 @@ const QuizSetupStep: React.FC<QuizSetupStepProps> = ({ quizData, onNext }) => {
 					htmlFor="quiz-name"
 					className="block font-bold mb-2 font-poppins text-navbar-hover"
 				>
-					Nome
+					Nome del Quiz
 				</label>
 				<input
 					id="quiz-name"
@@ -51,7 +51,7 @@ const QuizSetupStep: React.FC<QuizSetupStepProps> = ({ quizData, onNext }) => {
 					htmlFor="quiz-description"
 					className="block text-sm font-bold mb-2 font-poppins text-navbar-hover"
 				>
-					Descrizione
+					Descrizione del Quiz
 				</label>
 				<textarea
 					id="quiz-description"

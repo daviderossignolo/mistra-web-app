@@ -54,11 +54,6 @@ const QuestionSelectionStep = ({
 		setModalOpen(true);
 	};
 
-	/**
-	 * TODO: BRAGA, compila la richiesta al backend per salvare il quiz
-	 * Gestione del salvataggio del quiz, questa funzione chiama l'API corrispondente sul plugin e invia il quiz
-	 * appena creato per il salvataggio nel database.
-	 */
 	const handleSave = async () => {
 		// costruzione del quiz
 		const quiz = {
@@ -89,10 +84,12 @@ const QuestionSelectionStep = ({
 
 			// Se la risposta non è ok, lancio un errore
 			if (!response.ok) {
-				throw new Error("Errore durante il salvataggio della categoria");
+				throw new Error(
+					`Status: ${response.status}, Message: ${response.statusText}`,
+				);
 			}
 		} catch (error) {
-			alert("Si è verificato un errore durante il salvataggio del test.");
+			alert(error);
 		}
 	};
 

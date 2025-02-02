@@ -15,7 +15,7 @@
     "title": {
       "type": "string"
     },
-    "lateral_logos": {
+    "sx_logo": {
       "type": "media",
       "multiple": false,
       "required": false,
@@ -31,6 +31,17 @@
       "type": "component",
       "repeatable": false,
       "component": "header.content"
+    },
+    "dx_logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }

@@ -20,12 +20,6 @@
     },
     "description_test": {
       "type": "string"
-    },
-    "test_executions": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::test-execution.test-execution",
-      "mappedBy": "test"
     }
   }
 }
