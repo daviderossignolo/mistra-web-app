@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import type { Category } from "./QuestionModal";
+import type { Category } from "./questionModal";
 
 // Definizione dei tipi per i dati che arrivano dal backend
 type Sex = {
@@ -38,7 +38,7 @@ type QuizData = {
 	questions: Question[];
 };
 
-const TakeQuizSetup: React.FC = () => {
+const TakeQuiz: React.FC = () => {
 	// Variabile di stato usata per gestire gli step del quiz
 	const [step, setStep] = useState(0);
 
@@ -510,4 +510,4 @@ const TakeQuizSetup: React.FC = () => {
 	return null;
 };
 
-export default TakeQuizSetup;
+export default TakeQuiz;

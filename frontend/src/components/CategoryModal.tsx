@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import type { Category } from "./QuestionModal";
+import type { Category } from "./questionModal";
 
 interface CategoryModalProps {
 	onClose: () => void;

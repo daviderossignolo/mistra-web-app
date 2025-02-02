@@ -1,5 +1,6 @@
 import { useState } from "react";
-import QuestionModal, { type Question } from "./QuestionModal";
+import type { Question } from "./questionModal";
+import QuestionModal from "./questionModal";
 
 interface QuestionSelectionStepProps {
 	quizData: QuizData;

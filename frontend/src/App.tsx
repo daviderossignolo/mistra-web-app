@@ -1,22 +1,23 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
-import MenuComponent from "./components/navbar";
-import Login from "./pages/Login";
-import PrivateRoute from "./components/PrivateRoute";
-import TestPage from "./pages/testPage";
-import Homepage from "./pages/Homepage";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Footer from "./components/footer";
 import Header from "./components/header";
+import MenuComponent from "./components/navbar";
+import PrivateRoute from "./components/privateRoute";
 import About from "./pages/About";
-import InfectionPage from "./pages/InfectionPage";
+import TestPage from "./pages/CreateTestPage";
+import EventsPage from "./pages/EventsPage";
+import Homepage from "./pages/Homepage";
 import InfectionList from "./pages/InfectionListPage";
+import InfectionPage from "./pages/InfectionPage";
+import Login from "./pages/Login";
+import NewsPage from "./pages/newsPage";
 import ServicePage from "./pages/ServicePage";
 import ServicesListPage from "./pages/ServicesListPage";
-import ContattiPage from "./pages/ContattiPage";
-import NewsPage from "./pages/newsPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
-import EventsPage from "./pages/EventsPage";
-import TakeQuizSetup from "./components/TakeQuizSetup";
+import CreateTestPage from "./pages/CreateTestPage";
+import ContactPage from "./pages/ContactPage";
+import TakeQuiz from "./components/takeQuiz";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -77,9 +78,12 @@ function App() {
 				<Routes>
 					<Route path="/login" element={<Login />} />{" "}
 					{/* Controllare la visualizzazione delle pagine protette dal login  */}
-					<Route path="/test" element={<PrivateRoute element={TestPage} />} />
-					<Route path="/taketest" element={<TakeQuizSetup />} />
-					<Route path="/contatti" element={<ContattiPage />} />
+					<Route
+						path="/test"
+						element={<PrivateRoute element={CreateTestPage} />}
+					/>
+					<Route path="/taketest" element={<TakeQuiz />} />
+					<Route path="/contatti" element={<ContactPage />} />
 					<Route path="/" element={<Homepage />} />
 					<Route path="/home" element={<Homepage />} />
 					<Route path="/chi-siamo" element={<About />} />

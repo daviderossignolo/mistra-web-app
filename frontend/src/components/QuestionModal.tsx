@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid"; // Generatore di ID univoci
-import CategoryModal from "./CategoryModal";
+import { v4 as uuidv4 } from "uuid";
+import CategoryModal from "./categoryModal";
 
 // Tipi TypeScript
 export type Answer = {

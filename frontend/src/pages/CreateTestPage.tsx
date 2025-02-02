@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import QuestionSelectionStep from "../components/QuizSelectionStep";
-import QuizSetupStep from "../components/QuizSetupStep";
-import type { Question } from "../components/QuestionModal";
+import QuestionSelectionStep from "../components/quizSelectionStep";
+import QuizSetupStep from "../components/quizSetupStep";
+import type { Question } from "../components/questionModal";
 
 type QuizData = {
 	id: string;
@@ -20,7 +20,7 @@ type StepData = {
 	questions?: any[];
 };
 
-const TestPage: React.FC = () => {
+const CreateTestPage: React.FC = () => {
 	const navigate = useNavigate();
 	// imposto lo stato iniziale alla pagina di creazione del test
 	const [currentStep, setCurrentStep] = useState(1);
@@ -85,4 +85,4 @@ const TestPage: React.FC = () => {
 	);
 };
 
-export default TestPage;
+export default CreateTestPage;

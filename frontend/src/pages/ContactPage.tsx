@@ -65,7 +65,7 @@ type ContactPageData = {
 	updatedAt: string;
 };
 
-const ContattiPage: React.FC = () => {
+const ContactPage: React.FC = () => {
 	const [pageData, setPageData] = useState<ContactPageData | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -217,4 +217,4 @@ const ContattiPage: React.FC = () => {
 	);
 };
 
-export default ContattiPage;
+export default ContactPage;
