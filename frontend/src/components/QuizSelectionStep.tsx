@@ -70,27 +70,30 @@ const QuestionSelectionStep = ({
 		console.log(quiz);
 
 		// chiamata API per salvare il quiz
-		// try {
-		// 	const response = await fetch("h", {
-		// 		method: "POST",
-		// 		headers: {
-		// 			"Content-Type": "application/json",
-		// 		},
-		// 		body: JSON.stringify(quiz),
-		// 	});
+		try {
+			const response = await fetch(
+				"http://localhost:1337/api/test-plugin/create-test",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(quiz),
+				},
+			);
 
-		// 	// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
-		// 	if (response.ok) {
-		// 		window.close();
-		// 	}
+			// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
+			if (response.status === 200) {
+				alert("Il test è stato salvato con successo.");
+			}
 
-		// 	// Se la risposta non è ok, lancio un errore
-		// 	if (!response.ok) {
-		// 		throw new Error("Errore durante il salvataggio della categoria");
-		// 	}
-		// } catch (error) {
-		// 	alert("Si è verificato un errore durante il salvataggio del test.");
-		// }
+			// Se la risposta non è ok, lancio un errore
+			if (!response.ok) {
+				throw new Error("Errore durante il salvataggio della categoria");
+			}
+		} catch (error) {
+			alert("Si è verificato un errore durante il salvataggio del test.");
+		}
 	};
 
 	return (

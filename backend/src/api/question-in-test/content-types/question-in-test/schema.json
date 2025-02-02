@@ -12,17 +12,15 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "id_question": {
+    "test_id": {
       "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::question.question",
-      "inversedBy": "question_in_tests"
+      "relation": "oneToOne",
+      "target": "api::test.test"
     },
-    "id_test": {
+    "question_id": {
       "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::test.test",
-      "inversedBy": "question_in_tests"
+      "relation": "oneToOne",
+      "target": "api::question.question"
     }
   }
 }

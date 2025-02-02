@@ -1,51 +1,56 @@
-import type { Context } from 'koa';
-import answerService from '../services/answer';
-const { v4: uuidv4 } = require('uuid');
-import axios from 'axios';
+import type { Context } from "koa";
+import answerService from "../services/answer";
+const { v4: uuidv4 } = require("uuid");
+import axios from "axios";
 
 export default {
-    async createAnswer(ctx) {
-        try {
-            const { text, score, correction } = ctx.request.body;
-            const id_answer = uuidv4();
-            console.log(ctx.request.body)
+	/**
+	 * Endpoin per la creazione di una risposta.
+	 * @param ctx
+	 * @returns
+	 */
+	async createAnswer(ctx: Context) {
+		const { id_answer, text, correction, score, question_id } =
+			ctx.request.body;
 
-            await axios.post('http://localhost:1337/api/answers', {
-                data: {
-                    id_answer,
-                    text,
-                    score,
-                    correction,
-                },
-            });
+		// Faccio la chiamata API a Strapi per creare la Question
+		const response = await fetch("http://localhost:1337/api/answers", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				data: {
+					id_answer: id_answer,
+					text: text,
+					correction: correction,
+					score: score,
+					question_id: question_id,
+				},
+			}),
+		});
 
-            ctx.body = `
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-answer">
-                        <title>Redirect</title>
-                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-                    </head>
-                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-                        <div class="bg-white p-8 rounded-lg shadow-lg text-center">
-                            <h1 class="text-2xl font-semibold text-green-600 mb-4">Answer Creata con Successo!</h1>
-                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
-                        </div>
-                    </body>
-                </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+		if (!response.ok) {
+			ctx.status = response.status;
+			ctx.body = { error: "Errore nella creazione della risposta" };
+			return ctx;
+		}
 
-    async answerManagement(ctx) {
-        try {
-            const answersHTML = await answerService.getAnswersHTML();
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const answerData: any = await response.json();
+		const id = answerData.data.documentId;
 
-            ctx.body = `
+		ctx.status = 200;
+		ctx.body = { answer_id: id };
+
+		return ctx;
+	},
+
+	async answerManagement(ctx) {
+		try {
+			const answersHTML = await answerService.getAnswersHTML();
+
+			ctx.body = `
                 <!DOCTYPE html>
                 <html lang="en">
                     <head>
@@ -78,39 +83,41 @@ export default {
                         </div>
                     </body>
                 </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async modifyAnswer(ctx: Context) {
-        try {
-            const { documentId } = ctx.query;
-            const response = await axios.get(`http://localhost:1337/api/answers/${documentId}?populate=*`);
-            const data = response.data.data;
+	async modifyAnswer(ctx: Context) {
+		try {
+			const { documentId } = ctx.query;
+			const response = await axios.get(
+				`http://localhost:1337/api/answers/${documentId}?populate=*`,
+			);
+			const data = response.data.data;
 
-            const filteredData = {
-                id: data.id,
-                documentId: data.documentId,
-                id_answer: data.id_answer,
-                text: data.text,
-                score: data.score,
-                correction: data.correction,
-                id_question: data.id_question
-                    ? {
-                        id: data.id_question.id,
-                        documentId: data.id_question.documentId,
-                        id_question: data.id_question.id_question,
-                        name: data.id_question.name,
-                        text: data.id_question.text
-                    }
-                    : null
-            };
+			const filteredData = {
+				id: data.id,
+				documentId: data.documentId,
+				id_answer: data.id_answer,
+				text: data.text,
+				score: data.score,
+				correction: data.correction,
+				id_question: data.id_question
+					? {
+							id: data.id_question.id,
+							documentId: data.id_question.documentId,
+							id_question: data.id_question.id_question,
+							name: data.id_question.name,
+							text: data.id_question.text,
+						}
+					: null,
+			};
 
-            console.log(filteredData);
+			console.log(filteredData);
 
-            ctx.body = `
+			ctx.body = `
                 <!DOCTYPE html>
                 <html lang="en">
                     <head>
@@ -134,26 +141,26 @@ export default {
                         </div>
                     </body>
                 </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async submitModifyAnswer(ctx: Context) {
-        try {
-            const { documentId } = ctx.query;
-            const { text, score, correction } = ctx.request.body;
-            console.log(ctx.request.body)
-            await axios.put(`http://localhost:1337/api/answers/${documentId}`, {
-                data: {
-                    text,
-                    score,
-                    correction,
-                },
-            });
+	async submitModifyAnswer(ctx: Context) {
+		try {
+			const { documentId } = ctx.query;
+			const { text, score, correction } = ctx.request.body;
+			console.log(ctx.request.body);
+			await axios.put(`http://localhost:1337/api/answers/${documentId}`, {
+				data: {
+					text,
+					score,
+					correction,
+				},
+			});
 
-            ctx.body = `
+			ctx.body = `
                 <!DOCTYPE html>
                 <html lang="en">
                     <head>
@@ -169,19 +176,19 @@ export default {
                         </div>
                     </body>
                 </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async deleteAnswer(ctx: Context) {
-        try {
-            const { documentId } = ctx.query;
+	async deleteAnswer(ctx: Context) {
+		try {
+			const { documentId } = ctx.query;
 
-            await axios.delete(`http://localhost:1337/api/answers/${documentId}`);
+			await axios.delete(`http://localhost:1337/api/answers/${documentId}`);
 
-            ctx.body = `
+			ctx.body = `
                 <!DOCTYPE html>
                 <html lang="en">
                     <head>
@@ -197,72 +204,76 @@ export default {
                         </div>
                     </body>
                 </html>`;
-            ctx.type = 'html';
-        } catch (error) {
-            ctx.body = { error: error.message };
-        }
-    },
+			ctx.type = "html";
+		} catch (error) {
+			ctx.body = { error: error.message };
+		}
+	},
 
-    async getAnswers() {
-        try {
-            const response = await axios.get('http://localhost:1337/api/answers?populate=*');
-            const filteredAnswers = response.data.data.map(answer => ({
-                id: answer.id ? answer.id : null,
-                documentId: answer.documentId,
-                id_answer: answer.id_answer,
-                text: answer.text,
-                score: answer.score,
-                correction: answer.correction,
-                id_question: answer.id_question
-                    ? {
-                        id: answer.id_question.id,
-                        documentId: answer.id_question.documentId,
-                        id_question: answer.id_question.id_question,
-                        name: answer.id_question.name,
-                        text: answer.id_question.text
-                    }
-                    : null
-            }));
-            console.log(filteredAnswers);
-            return filteredAnswers;
-        } catch (error) {
-            return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
-        }
-    },
+	async getAnswers() {
+		try {
+			const response = await axios.get(
+				"http://localhost:1337/api/answers?populate=*",
+			);
+			const filteredAnswers = response.data.data.map((answer) => ({
+				id: answer.id ? answer.id : null,
+				documentId: answer.documentId,
+				id_answer: answer.id_answer,
+				text: answer.text,
+				score: answer.score,
+				correction: answer.correction,
+				id_question: answer.id_question
+					? {
+							id: answer.id_question.id,
+							documentId: answer.id_question.documentId,
+							id_question: answer.id_question.id_question,
+							name: answer.id_question.name,
+							text: answer.id_question.text,
+						}
+					: null,
+			}));
+			console.log(filteredAnswers);
+			return filteredAnswers;
+		} catch (error) {
+			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
+		}
+	},
 
-    async getFreeAnswers() {
-        try {
-            const response = await axios.get('http://localhost:1337/api/answers/?populate=*');
-            const answers = response.data.data;
-    
-            // Filtra le answers con id_question null
-            const FreeAnswers = answers.filter(
-                (answer) => answer.id_question === null
-            );
-    
-            const filteredAnswers = FreeAnswers.map(answer => ({
-                id: answer.id ? answer.id : null,
-                documentId: answer.documentId,
-                id_answer: answer.id_answer,
-                text: answer.text,
-                score: answer.score,
-                correction: answer.correction,
-                id_question: answer.id_question
-                    ? {
-                        id: answer.id_question.id,
-                        documentId: answer.id_question.documentId,
-                        id_question: answer.id_question.id_question,
-                        name: answer.id_question.name,
-                        text: answer.id_question.text
-                    }
-                    : null // Se id_question è null, assegni null
-            }));
-    
-            console.log(filteredAnswers);
-            return filteredAnswers;
-        } catch (error) {
-            console.error(`Errore nel caricamento delle answers: ${error.message}`);
-            return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
-        }
-    }
+	async getFreeAnswers() {
+		try {
+			const response = await axios.get(
+				"http://localhost:1337/api/answers/?populate=*",
+			);
+			const answers = response.data.data;
+
+			// Filtra le answers con id_question null
+			const FreeAnswers = answers.filter(
+				(answer) => answer.id_question === null,
+			);
+
+			const filteredAnswers = FreeAnswers.map((answer) => ({
+				id: answer.id ? answer.id : null,
+				documentId: answer.documentId,
+				id_answer: answer.id_answer,
+				text: answer.text,
+				score: answer.score,
+				correction: answer.correction,
+				id_question: answer.id_question
+					? {
+							id: answer.id_question.id,
+							documentId: answer.id_question.documentId,
+							id_question: answer.id_question.id_question,
+							name: answer.id_question.name,
+							text: answer.id_question.text,
+						}
+					: null, // Se id_question è null, assegni null
+			}));
+
+			console.log(filteredAnswers);
+			return filteredAnswers;
+		} catch (error) {
+			console.error(`Errore nel caricamento delle answers: ${error.message}`);
+			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
+		}
+	},
 };

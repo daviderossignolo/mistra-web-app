@@ -17,12 +17,6 @@
     },
     "name": {
       "type": "string"
-    },
-    "questions": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::question.question",
-      "mappedBy": "id_category"
     }
   }
 }

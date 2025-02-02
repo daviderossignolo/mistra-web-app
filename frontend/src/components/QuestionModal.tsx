@@ -13,6 +13,7 @@ export type Answer = {
 
 export type Question = {
 	id: string;
+	name: string;
 	text: string;
 	category: Category;
 	answers: {
@@ -33,6 +34,7 @@ interface QuestionModalProps {
 	onClose: () => void;
 	onSave: (question: {
 		id: string;
+		name: string;
 		text: string;
 		category: Category;
 		answers: Answer[];
@@ -45,6 +47,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	onClose,
 	onSave,
 }) => {
+	const [name, setName] = useState<string>("");
 	const [text, setText] = useState<string>("");
 	const [category, setCategory] = useState<Category>({
 		id_category: "",
@@ -64,7 +67,13 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 					"http://localhost:1337/api/test-plugin/get-categories",
 				);
 				const data = await response.json();
-				setCategories(data);
+				console.log(data);
+
+				if (data.length === 0) {
+					setCategories([]);
+				} else {
+					setCategories(data);
+				}
 			} catch (error) {
 				console.error("Errore nel recupero delle categorie:", error);
 			}
@@ -74,6 +83,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 
 	useEffect(() => {
 		if (question) {
+			setName(question.name);
 			setText(question.text);
 			setCategory(question.category);
 			setAnswers(question.answers);
@@ -126,6 +136,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 		// Passo i dati alla funzione onSave
 		onSave({
 			id: questionId,
+			name,
 			text,
 			category: { id_category: category.id_category, name: category.name },
 			answers,
@@ -177,6 +188,21 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 						Nuova
 					</button>
 				</div>
+
+				{/* Nome della domanda */}
+				<label
+					htmlFor="questionName"
+					className="block mb-2 font-poppins font-bold"
+				>
+					Nome della Domanda
+				</label>
+				<input
+					id="questionName"
+					value={name}
+					onChange={(e) => setName(e.target.value)}
+					placeholder="Inserisci il nome della domanda"
+					className="w-full border rounded p-2 mb-4 font-poppins"
+				/>
 
 				{/* Testo della domanda */}
 				<label

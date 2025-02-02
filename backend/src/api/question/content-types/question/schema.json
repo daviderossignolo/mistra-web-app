@@ -21,23 +21,10 @@
     "text": {
       "type": "text"
     },
-    "id_category": {
+    "category_id": {
       "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::category.category",
-      "inversedBy": "questions"
-    },
-    "answers": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::answer.answer",
-      "mappedBy": "id_question"
-    },
-    "question_in_tests": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::question-in-test.question-in-test",
-      "mappedBy": "id_question"
+      "relation": "oneToOne",
+      "target": "api::category.category"
     }
   }
 }
