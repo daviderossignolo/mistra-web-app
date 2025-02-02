@@ -3,6 +3,34 @@ const { v4: uuidv4 } = require("uuid");
 import axios from "axios";
 import testService from "../services/testExecution";
 
+// Tipi TypeScript
+export type Answer = {
+	id: string;
+	documentId: string;
+	text: string;
+	correction: string;
+	score: number;
+};
+
+export type Question = {
+	id: string;
+	documentId: string;
+	name: string;
+	text: string;
+	category: Category;
+	answers: {
+		id: string;
+		text: string;
+		correction: string;
+		score: number;
+	}[];
+};
+
+export type Category = {
+	id_category: string;
+	name: string;
+};
+
 export default {
 	async searchTestExecution(ctx: Context) {
 		const getTestExecutionsHTML = await testService.getTestExecutionsHTML();
@@ -65,76 +93,151 @@ export default {
 		}
 	},
 
+	/**
+	 * Return a random test from the database
+	 * @param ctx
+	 * @returns
+	 */
 	async getRandomTest(ctx: Context) {
-		console.log("getRandomTest");
-		try {
-			// Recupera tutti i test
-			const tests = await axios.get("http://localhost:1337/api/tests?pLevel");
-			const entryTests = tests.data.data; // Array delle entry nella proprietà 'data'
+		const host = process.env.HOST;
+		const port = process.env.PORT;
+		// Recupera tutti i test
+		const testResponse = await fetch(
+			`http://${host}:${port}/api/tests?pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
 
-			if (entryTests.length === 0) {
-				console.log("Nessuna entry trovata.");
-				return null;
+		// Se ho errore faccio il throw di un errore
+		if (!testResponse.ok) {
+			throw new Error(
+				`Errore nel recupero dei test - status: ${testResponse.status}`,
+			);
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const tests = (await testResponse.json()) as any;
+		const entryTests = tests.data;
+
+		if (entryTests.length === 0) {
+			console.log("Nessuna entry trovata.");
+			return null;
+		}
+
+		// Genera un indice casuale
+		const randomIndex = Math.floor(Math.random() * entryTests.length);
+		const data = entryTests[randomIndex];
+
+		// Struttura dati del quiz
+		const quizData = {
+			id: data.id_test,
+			documentId: data.documentId,
+			name: data.name_test,
+			description: data.description_test,
+			questions: [],
+		};
+
+		// Recupera tutte le domande appartenti al test
+		const questionsInTestResponse = await fetch(
+			`http://${host}:${port}/api/question-in-tests?filters[test_id][$eq]=${data.id}&populate=*`,
+			{
+				method: "GET",
+
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		// Errore
+		if (!questionsInTestResponse.ok) {
+			throw new Error(
+				`Errore nel recupero delle domande del test - status: ${questionsInTestResponse.status}`,
+			);
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const questionInTest = (await questionsInTestResponse.json()) as any;
+		const questionInTestData = questionInTest.data;
+
+		for (const row of questionInTestData) {
+			// recupero la domanda dal db usando il document id
+			const questionResponse = await fetch(
+				`http://${host}:${port}/api/questions/${row.question_id.documentId}?pLevel=4`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
+			if (!questionResponse.ok) {
+				throw new Error(
+					`Errore nel recupero della domanda - status: ${questionResponse.status}`,
+				);
 			}
 
-			// Genera un indice casuale
-			const randomIndex = Math.floor(Math.random() * entryTests.length);
-			const data = entryTests[randomIndex];
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const questionData = (await questionResponse.json()) as any;
+			const question = questionData.data;
 
-			const filteredData = {
-				id: data.id ? data.id : null,
-				documentId: data.documentId,
-				id_test: data.id_test,
-				name_test: data.name_test,
-				description_test: data.description_test,
-				question_in_tests: data.question_in_tests
-					? data.question_in_tests.map((question_in_tests) => ({
-							id: question_in_tests.id ? question_in_tests.id : null,
-							documentId: question_in_tests.documentId,
-							id_question: question_in_tests.id_question
-								? {
-										id: question_in_tests.id_question.id
-											? question_in_tests.id_question.id
-											: null,
-										documentId: question_in_tests.id_question.documentId,
-										id_question: question_in_tests.id_question.id_question,
-										name: question_in_tests.id_question.name,
-										text: question_in_tests.id_question.text,
-										id_category: question_in_tests.id_question.id_category
-											? {
-													id: question_in_tests.id_question.id_category.id,
-													documentId:
-														question_in_tests.id_question.id_category
-															.documentId,
-													id_category:
-														question_in_tests.id_question.id_category
-															.id_category,
-													name: question_in_tests.id_question.id_category.name,
-												}
-											: null,
-										answers: question_in_tests.id_question.answers
-											? question_in_tests.id_question.answers.map((answer) => ({
-													id: answer.id,
-													documentId: answer.documentId,
-													id_answer: answer.id_answer,
-													text: answer.text,
-													score: answer.score,
-													correction: answer.correction,
-												}))
-											: [],
-									}
-								: null,
-						}))
-					: [],
+			// recupero tutte le risposte legate alla domanda corrente
+			const answersResponse = await fetch(
+				`http://localhost:1337/api/answers?filters[question_id][$eq]=${question.id}&populate=*`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
+			if (!answersResponse.ok) {
+				throw new Error(
+					`Errore nel recupero delle risposte - status: ${answersResponse.status}`,
+				);
+			}
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const answersData = (await answersResponse.json()) as any;
+			const answers = answersData.data;
+
+			const answersList: Answer[] = [];
+			for (const answer of answers) {
+				answersList.push({
+					id: answer.id_answer,
+					documentId: answer.documentId,
+					text: answer.text,
+					correction: answer.correction,
+					score: answer.score,
+				});
+			}
+
+			// costruisco un oggetto che verrà inserito nel quizData
+			const questionObj: Question = {
+				id: question.id_question,
+				documentId: question.documentId,
+				name: question.name,
+				text: question.text,
+				category: {
+					id_category: question.category_id.id_category,
+					name: question.category_id.name,
+				},
+				answers: answersList,
 			};
 
-			console.log(filteredData);
-
-			return filteredData;
-		} catch (error) {
-			console.error("Errore durante il recupero dei dati:", error);
-			throw error;
+			quizData.questions.push(questionObj);
 		}
+
+		ctx.status = 200;
+		ctx.body = quizData;
+
+		return quizData;
 	},
 
 	async getTestExecution(ctx: Context) {

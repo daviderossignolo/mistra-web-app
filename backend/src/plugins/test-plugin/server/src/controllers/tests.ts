@@ -258,6 +258,8 @@ export default {
 			}),
 		});
 
+		console.log(testResponse.ok);
+
 		// Se la risposta non è ok, setto l'errore nella risposta
 		if (!testResponse.ok) {
 			ctx.status = testResponse.status;

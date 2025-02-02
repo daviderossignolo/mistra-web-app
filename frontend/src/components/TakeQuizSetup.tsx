@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 interface Answer {
 	id: string;
+	documentId: string;
 	text: string;
 	correction: string;
 	score: number;
@@ -10,6 +11,7 @@ interface Answer {
 
 interface Question {
 	id: string;
+	documentId: string;
 	text: string;
 	answers: Answer[];
 }
@@ -62,9 +64,14 @@ const TakeQuizSetup: React.FC = () => {
 		const fetchRandomTest = async () => {
 			try {
 				const randomTestResponse = await fetch(
-					`${host}:${port}/api/test-plugin/get-random-test`,
+					`${host}:${port}/api/test-plugin/random-test`,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					},
 				);
-				console.log("Risposta ricevuta: ", randomTestResponse);
 
 				if (randomTestResponse.ok) {
 					const randomTest = await randomTestResponse.json();

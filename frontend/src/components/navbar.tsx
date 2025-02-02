@@ -157,12 +157,12 @@ const MenuComponent: React.FC = () => {
 								{item.url ? (
 									<Link
 										to={item.url}
-										className="text-white py-2 px-4 transition-colors duration-200 hover:bg-navbar-hover rounded"
+										className="text-white py-2 px-4 transition-colors duration-200 hover:bg-navbar-hover rounded font-poppins text-sm"
 									>
 										{item.title}
 									</Link>
 								) : (
-									<span className="text-white px-4 hover_bg-navbar-hover rounded">
+									<span className="text-white px-4 hover_bg-navbar-hover rounded font-poppins text-sm">
 										{item.title}
 									</span>
 								)}
