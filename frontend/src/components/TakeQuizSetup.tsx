@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import type { Category } from "./QuestionModal";
 
+// Definizione dei tipi per i dati che arrivano dal backend
 type Sex = {
 	id: number;
 	documentId: string;
@@ -12,46 +13,30 @@ type Sex = {
 	publishedAt: string;
 };
 
-interface Answer {
+type Answer = {
 	id: string;
 	documentId: string;
 	text: string;
 	correction: string;
 	score: number;
-}
+};
 
-interface Question {
+type Question = {
 	id: string;
 	documentId: string;
 	name: string;
 	text: string;
 	category: Category;
 	answers: Answer[];
-}
+};
 
-interface QuizData {
+type QuizData = {
 	id: string;
 	documentId: string;
 	name: string;
 	description: string;
 	questions: Question[];
-}
-
-interface Mistake {
-	questionText: string;
-	correction: string;
-}
-
-interface TakeQuizSetupProps {
-	quizData: QuizData;
-}
-
-/**
- * TODO: Recuperare un quiz a caso da database, chiedere età e sesso all'utente, generare un codice di esecuzione del test casuale (data formato iso + 3 lettere)
- * una volta ottenute le risposte e quando l'utente conferma salva il risultato e indica all'utente il codice dell'esecuzione. Deve quindi mostrare per ogni domanda
- * la risposta data dall'utente e se errata la spiegazione associata, non si deve vedere la risposta corretta. Il tutto deve poter essere salvato come pdf.
- *
- */
+};
 
 const TakeQuizSetup: React.FC = () => {
 	// Variabile di stato usata per gestire gli step del quiz
