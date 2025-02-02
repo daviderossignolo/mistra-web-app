@@ -12,22 +12,13 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "id_textexecution": {
-      "type": "uid"
-    },
     "age": {
       "type": "integer"
     },
-    "test": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::test.test",
-      "inversedBy": "test_executions"
-    },
     "score": {
-      "type": "integer"
+      "type": "decimal"
     },
-    "IP": {
+    "ip": {
       "type": "string",
       "regex": "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
     },
@@ -37,20 +28,21 @@
     "note": {
       "type": "text"
     },
-    "sex": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::sex.sex",
-      "inversedBy": "test_executions"
-    },
     "execution_time": {
       "type": "datetime"
     },
-    "given_answers": {
+    "id_sex": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::given-answer.given-answer",
-      "mappedBy": "id_test_execution"
+      "relation": "oneToOne",
+      "target": "api::sex.sex"
+    },
+    "id_test": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::test.test"
+    },
+    "test_execution_id": {
+      "type": "string"
     }
   }
 }

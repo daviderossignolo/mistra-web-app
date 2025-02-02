@@ -31,4 +31,12 @@ export default [
 			auth: false, // Nessuna autenticazione per il test
 		},
 	},
+	{
+		method: "POST",
+		path: "/insert-test-execution",
+		handler: "testExecution.insertTest",
+		config: {
+			auth: false, // Nessuna autenticazione per il test
+		},
+	},
 ];

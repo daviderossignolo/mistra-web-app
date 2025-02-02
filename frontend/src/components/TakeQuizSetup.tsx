@@ -1,5 +1,16 @@
 import type React from "react";
 import { useEffect, useState } from "react";
+import type { Category } from "./QuestionModal";
+
+type Sex = {
+	id: number;
+	documentId: string;
+	name: string;
+	sex_id: string;
+	createdAt: string;
+	updatedAt: string;
+	publishedAt: string;
+};
 
 interface Answer {
 	id: string;
@@ -12,11 +23,15 @@ interface Answer {
 interface Question {
 	id: string;
 	documentId: string;
+	name: string;
 	text: string;
+	category: Category;
 	answers: Answer[];
 }
 
 interface QuizData {
+	id: string;
+	documentId: string;
 	name: string;
 	description: string;
 	questions: Question[];
@@ -39,28 +54,48 @@ interface TakeQuizSetupProps {
  */
 
 const TakeQuizSetup: React.FC = () => {
+	// Variabile di stato usata per gestire gli step del quiz
 	const [step, setStep] = useState(0);
+
+	// Variabili di stato per gestire i dati utente
 	const [userData, setUserData] = useState({ sex: "", age: "" });
+
+	// Variabili di stato per gestire il test
 	const [testCode, setTestCode] = useState("");
 	const [selectedAnswers, setSelectedAnswers] = useState<{
 		[key: string]: string;
 	}>({});
 	const [score, setScore] = useState(0);
-	const [mistakes, setMistakes] = useState<Mistake[]>([]);
-	const [quizData, setQuizData] = useState<QuizData>();
 
+	// Variabili che contengono i dati arrivati dal backend
+	const [quizData, setQuizData] = useState<QuizData>();
+	const [sexData, setSexData] = useState<Sex[]>([]);
+
+	// Chiavi per le variabili d'ambiente
 	const host = process.env.REACT_APP_BACKEND_HOST;
 	const port = process.env.REACT_APP_BACKEND_PORT;
 
+	// Funzione che permette di gestire il submit dei dati utente
 	const handleUserDataSubmit = () => {
-		if (userData.sex && userData.age) {
+		const age = Number.parseInt(userData.age, 10);
+
+		// Se i dati sono validi procedo con il prossimo step
+		if (userData.sex && age >= 16 && age <= 100) {
 			setStep(1);
 		} else {
-			alert("Per favore, inserisci sesso ed età.");
+			if (!userData.sex) {
+				alert("Per continuare inserisci il sesso.");
+			} else if (age < 16 || age > 100) {
+				alert("Per continuare inserisci un'età compresa tra 16 e 100 anni.");
+			} else {
+				alert("Per continuare inserisci sesso ed età.");
+			}
 		}
 	};
 
+	// Recupero dei dati dal backend
 	useEffect(() => {
+		// Funzione per recuperare un test casuale dal database
 		const fetchRandomTest = async () => {
 			try {
 				const randomTestResponse = await fetch(
@@ -75,7 +110,8 @@ const TakeQuizSetup: React.FC = () => {
 
 				if (randomTestResponse.ok) {
 					const randomTest = await randomTestResponse.json();
-					console.log("Test ricevuto: ", randomTest);
+					setQuizData(randomTest);
+					createQuizId();
 				} else {
 					throw new Error("Errore nel recupero del test.");
 				}
@@ -84,9 +120,31 @@ const TakeQuizSetup: React.FC = () => {
 			}
 		};
 
+		// Funzione per recuperare i dati sul sesso
+		const fetchSexData = async () => {
+			try {
+				const response = await fetch(`${host}:${port}/api/sexes`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
+
+				if (!response.ok) {
+					throw new Error("Errore nel recupero dei dati sul sesso.");
+				}
+
+				const data = await response.json();
+				console.log(data);
+				setSexData(data.data);
+			} catch (error) {}
+		};
+
+		fetchSexData();
 		fetchRandomTest();
 	}, [host, port]);
 
+	// Funzione per gestire la selezione delle risposte
 	const handleAnswerSelect = (questionId: string, answerId: string) => {
 		setSelectedAnswers((prev) => ({
 			...prev,
@@ -94,50 +152,91 @@ const TakeQuizSetup: React.FC = () => {
 		}));
 	};
 
-	const handleQuizSubmit = () => {
-		let totalScore = 0;
-		const wrongAnswers: Mistake[] = [];
+	// Funzione di help che crea il codice del test
+	const createQuizId = () => {
+		const date = new Date();
+		const isoDate = date.toISOString();
+		const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		const randomLetters = Array.from(
+			{ length: 3 },
+			() => letters[Math.floor(Math.random() * letters.length)],
+		).join("");
 
+		setTestCode(`${isoDate}-${randomLetters}`);
+	};
+
+	// Funzione di help per ottenere l'indirizzo IP dell'utente
+	const getIP = async () => {
+		const ip = await fetch("https://api.ipify.org?format=json")
+			.then((res) => res.json())
+			.then((data) => data.ip);
+
+		return ip;
+	};
+
+	// Funzione che gestisce la logica di submit del quiz
+	const handleQuizSubmit = async () => {
+		// Se non ci sono dati sul quiz non proseguo
 		if (!quizData) return;
+
+		let totalScore = 0;
 		for (const question of quizData.questions) {
-			const selectedAnswerId = selectedAnswers[question.id];
-			const correctAnswer = question.answers.find(
-				(a) => a.correction === "correct" && a.id === selectedAnswerId,
+			const selectedAnswerId = selectedAnswers[question.documentId];
+			const selectedAnswer = question.answers.find(
+				(a) => a.documentId === selectedAnswerId,
 			);
 
-			if (correctAnswer) {
-				totalScore += correctAnswer.score;
-			} else {
-				const wrongAnswer = question.answers.find(
-					(a) => a.correction === "wrong",
-				);
-				if (wrongAnswer) {
-					wrongAnswers.push({
-						questionText: question.text,
-						correction: wrongAnswer.text,
-					});
-				}
+			if (selectedAnswer?.score === 1) {
+				totalScore += selectedAnswer.score;
 			}
+		}
+
+		// salvo il test nel database
+		// inserisco il quiz all'interno del database
+		const compiledQuiz = {
+			id: testCode,
+			execution_time: new Date().toISOString(),
+			age: Number.parseInt(userData.age),
+			id_sex: sexData.filter((sex) => sex.name === userData.sex)[0].documentId,
+			id_test: quizData.documentId,
+			score: totalScore,
+			ip: await getIP(),
+			answers: Object.values(selectedAnswers),
+		};
+
+		// chiamata al backend per salvare il test
+		const response = await fetch(
+			`${host}:${port}/api/test-plugin/insert-test-execution`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(compiledQuiz),
+			},
+		);
+
+		if (!response.ok) {
+			alert("Errore durante il salvataggio del test.");
 		}
 
 		// Set final score and mistakes
 		setScore(totalScore);
-		setMistakes(wrongAnswers);
 		setStep(2);
 	};
 
+	// Primo step: inserimento dei dati su sesso ed età da parte dell'utente
 	if (step === 0) {
-		// User Setup Step
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
 				<div className="flex flex-col items-center bg-white shadow-md rounded-lg p-4 w-4/5">
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
 							Inserisci i tuoi dati
 						</h2>
 					</div>
 					<div className="w-full max-w-md">
-						<div className="mb-4 mt-4">
+						<div className="mb-8 mt-8">
 							<label htmlFor="sex" className="block text-sm font-bold mb-2">
 								Sesso
 							</label>
@@ -149,13 +248,17 @@ const TakeQuizSetup: React.FC = () => {
 								}
 								className="border rounded w-full py-2 px-3"
 							>
-								<option value="">Seleziona...</option>
-								<option value="male">Maschio</option>
-								<option value="female">Femmina</option>
-								<option value="other">Altro</option>
+								<option value="" disabled>
+									Seleziona...
+								</option>
+								{sexData?.map((sex: Sex) => (
+									<option key={sex.name} value={sex.name}>
+										{sex.name}
+									</option>
+								))}
 							</select>
 						</div>
-						<div className="mb-4">
+						<div className="mb-8">
 							<label htmlFor="age" className="block text-sm font-bold mb-2">
 								Età
 							</label>
@@ -167,7 +270,7 @@ const TakeQuizSetup: React.FC = () => {
 									setUserData({ ...userData, age: e.target.value })
 								}
 								className="border rounded w-full py-2 px-3"
-								min={1}
+								placeholder="Inserisci la tua età..."
 							/>
 						</div>
 						<button
@@ -175,7 +278,7 @@ const TakeQuizSetup: React.FC = () => {
 							onClick={handleUserDataSubmit}
 							className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
 						>
-							Iniziamo il Quiz
+							Procedi con il test
 						</button>
 					</div>
 				</div>
@@ -188,15 +291,44 @@ const TakeQuizSetup: React.FC = () => {
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
 				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5">
+					{/* Informazioni sul test da eseguire */}
 					{quizData && (
 						<>
 							<div className="w-full bg-navbar-hover px-4 py-4">
-								<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
-									{quizData.name}
+								<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+									Rispondi alle domande
 								</h2>
 							</div>
-							<div className="bg-gray-200 p-4 mt-2 rounded-lg mb-6">
-								<h3 className="text-lg font-semibold mb-2">Descrizione</h3>
+							{/* Banner per salvataggio codice test */}
+							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50">
+								<h3 className="text-xl font-bold text-red-600 mb-2">
+									IMPORTANTE!
+								</h3>
+								<p className="text-lg text-navbar-hover">
+									Di seguito troverai il codice univoco del tuo quiz, salvalo da
+									qualche parte, dovrai comunicarlo al medico al momento della
+									visita.
+								</p>
+								<p className="text-lg font-bold text-navbar-hover mt-2">
+									CODICE: {testCode}
+								</p>
+							</div>
+
+							{/* Sezione informazioni */}
+							<div className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm">
+								<h3 className="text-xl font-bold mb-2 text-navbar-hover">
+									Informazioni sul test
+								</h3>
+								<hr className="mb-4" />
+								<div className="flex items-center mb-2">
+									<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+										Nome del Test:
+									</h3>
+									<h3 className="text-lg text-navbar-hover">{quizData.name}</h3>
+								</div>
+								<h3 className="text-lg font-semibold mb-2 text-navbar-hover">
+									Descrizione:
+								</h3>
 								<p className="text-navbar-hover text-left">
 									{quizData.description}
 								</p>
@@ -204,29 +336,54 @@ const TakeQuizSetup: React.FC = () => {
 						</>
 					)}
 
+					{/* Sezione domande del test */}
 					{quizData?.questions.map((question, index) => (
-						<div key={question.id} className="mb-6">
-							<h2 className="text-lg font-medium mb-4">
-								Domanda {index + 1}: {question.text}
-							</h2>
-							<div className="flex flex-row space-x-2">
-								{question.answers.map((answer) => (
-									<button
-										type="button"
-										key={answer.id}
-										onClick={() => handleAnswerSelect(question.id, answer.id)}
-										className={`p-3 rounded border ${
-											selectedAnswers[question.id] === answer.id
-												? "bg-blue-500 text-white"
-												: "bg-white text-gray-700"
-										} hover:bg-blue-200`}
-									>
-										{answer.text}
-									</button>
-								))}
+						<div
+							key={question.id}
+							className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm"
+						>
+							<h3 className="text-xl font-bold mb-2 text-navbar-hover">
+								Domande
+							</h3>
+							<hr className="mb-4" />
+							<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-poppins">
+								<p className="text-sm text-gray-600 mb-2">
+									Categoria: {question.category.name}
+								</p>
+								<h2 className="text-lg font-medium mb-2">
+									{index + 1}. {question.name}: {question.text}
+								</h2>
+								<div className="flex flex-col space-y-2">
+									{question.answers.map((answer) => (
+										<label
+											key={answer.documentId}
+											className="flex items-center space-x-2"
+										>
+											<input
+												type="radio"
+												name={`question-${question.documentId}`}
+												value={answer.id}
+												checked={
+													selectedAnswers[question.documentId] ===
+													answer.documentId
+												}
+												onChange={() =>
+													handleAnswerSelect(
+														question.documentId,
+														answer.documentId,
+													)
+												}
+												className="form-radio text-navbar"
+											/>
+											<span className="text-navbar-hover">{answer.text}</span>
+										</label>
+									))}
+								</div>
 							</div>
 						</div>
 					))}
+
+					{/* Bottone per il submit */}
 					<div className="mt-6 flex justify-end">
 						<button
 							type="button"
@@ -245,33 +402,120 @@ const TakeQuizSetup: React.FC = () => {
 		// Result Step
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
-				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5 relative">
-					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
-							Risultati
-						</h2>
-					</div>
-					{mistakes.length > 0 ? (
-						<div className="p-6 w-full max-w-2xl">
-							<h2 className="text-lg font-bold mb-4">Domande Sbagliate</h2>
-							{mistakes.map((mistake) => (
-								<div key={mistake.questionText} className="mb-4">
-									<p className="text-gray-700 font-medium">
-										Testo della domanda: {mistake.questionText}
-									</p>
-									<p className="text-red-500">
-										Correzione: {mistake.correction}
-									</p>
+				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5">
+					{/* Informazioni sul test da eseguire */}
+					{quizData && (
+						<>
+							<div className="w-full bg-navbar-hover px-4 py-4">
+								<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+									Risultati del Test
+								</h2>
+							</div>
+
+							{/* Banner per salvataggio codice test */}
+							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50">
+								<h3 className="text-xl font-bold text-red-600 mb-2">
+									IMPORTANTE!
+								</h3>
+								<p className="text-lg text-navbar-hover">
+									Di seguito troverai il codice univoco del tuo quiz, salvalo da
+									qualche parte, dovrai comunicarlo al medico al momento della
+									visita.
+								</p>
+								<p className="text-lg font-bold text-navbar-hover mt-2">
+									CODICE: {testCode}
+								</p>
+							</div>
+
+							{/* Sezione informazioni */}
+							<div className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm">
+								<h3 className="text-xl font-bold mb-2 text-navbar-hover">
+									Informazioni sul test
+								</h3>
+								<hr className="mb-4" />
+								<div className="flex items-center mb-2">
+									<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+										Nome del Test:
+									</h3>
+									<h3 className="text-lg text-navbar-hover">{quizData.name}</h3>
 								</div>
-							))}
-						</div>
-					) : (
-						<p className="text-green-500 font-bold">
-							Complimenti! Hai risposto correttamente a tutte le domande!
-						</p>
+								<h3 className="text-lg font-semibold mb-2 text-navbar-hover">
+									Descrizione:
+								</h3>
+								<p className="text-navbar-hover text-left">
+									{quizData.description}
+								</p>
+							</div>
+						</>
 					)}
-					<div className="absolute bottom-4 right-4 text-lg font-bold">
-						Punteggio: {score}/{quizData?.questions.length}
+
+					{/* Sezione domande del test */}
+					{quizData?.questions.map((question, index) => {
+						const selectedAnswerId = selectedAnswers[question.documentId];
+						const selectedAnswer = question.answers.find(
+							(a) => a.documentId === selectedAnswerId,
+						);
+						const isCorrect = selectedAnswer?.score === 1;
+
+						return (
+							<div
+								key={question.id}
+								className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm"
+							>
+								<h3 className="text-xl font-bold mb-2 text-navbar-hover">
+									Domande
+								</h3>
+								<hr className="mb-4" />
+								<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-poppins">
+									<p className="text-sm text-gray-600 mb-2">
+										Categoria: {question.category.name}
+									</p>
+									<h2 className="text-lg font-medium mb-2">
+										{index + 1}. {question.name}: {question.text}
+									</h2>
+									<div className="flex flex-col space-y-2">
+										{question.answers.map((answer) => (
+											<label
+												key={answer.documentId}
+												className="flex items-center space-x-2"
+											>
+												<input
+													type="radio"
+													name={`question-${question.documentId}`}
+													value={answer.documentId}
+													checked={
+														selectedAnswers[question.documentId] ===
+														answer.documentId
+													}
+													disabled
+													className="form-radio text-navbar"
+												/>
+												<span className="text-navbar-hover">{answer.text}</span>
+											</label>
+										))}
+									</div>
+									{!isCorrect && selectedAnswer && (
+										<p className="text-red-700 mt-2">
+											Correzione: {selectedAnswer.correction}
+										</p>
+									)}
+								</div>
+							</div>
+						);
+					})}
+
+					{/* Sezione punteggio e download PDF */}
+					<div className="mt-6 flex justify-end items-center space-x-4">
+						<div className="text-lg font-bold">
+							Punteggio: {score}/{quizData?.questions.length}
+						</div>
+						<button
+							type="button"
+							onClick={window.print}
+							className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
+						>
+							Scarica PDF
+						</button>
 					</div>
 				</div>
 			</div>

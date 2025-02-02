@@ -17,12 +17,6 @@
     },
     "name": {
       "type": "string"
-    },
-    "test_executions": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::test-execution.test-execution",
-      "mappedBy": "sex"
     }
   }
 }

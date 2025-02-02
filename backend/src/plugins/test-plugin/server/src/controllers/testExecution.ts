@@ -240,6 +240,78 @@ export default {
 		return quizData;
 	},
 
+	/**
+	 * Insert a test execution in the database
+	 * @param ctx
+	 * @returns
+	 */
+	async insertTest(ctx: Context) {
+		const host = process.env.HOST;
+		const port = process.env.PORT;
+		const body = ctx.request.body;
+
+		// inserisco il test eseguito
+		const testExecutionResponse = await fetch(
+			`http://${host}:${port}/api/test-executions`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					data: {
+						test_execution_id: body.id,
+						age: body.age,
+						score: body.score,
+						ip: body.ip,
+						execution_time: body.execution_time,
+						id_test: body.id_test,
+						id_sex: body.id_sex,
+					},
+				}),
+			},
+		);
+
+		if (!testExecutionResponse.ok) {
+			throw new Error(
+				`Errore nell'inserimento del test eseguito - status: ${testExecutionResponse.status}`,
+			);
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const testExecutionData = (await testExecutionResponse.json()) as any;
+		const docId = testExecutionData.data.documentId;
+
+		// inserisco le risposte date
+		for (const answer of body.answers) {
+			const givenAnswersResponse = await fetch(
+				`http://${host}:${port}/api/given-answers`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						data: {
+							id_testExecution: docId,
+							id_answer: answer,
+						},
+					}),
+				},
+			);
+
+			if (!givenAnswersResponse.ok) {
+				throw new Error(
+					`Errore nell'inserimento delle risposte date - status: ${givenAnswersResponse.status}`,
+				);
+			}
+		}
+
+		ctx.status = 200;
+		ctx.body = "Test eseguito inserito correttamente";
+		return ctx;
+	},
+
 	async getTestExecution(ctx: Context) {
 		const { testExecutionId } = ctx.query;
 
