@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import QuestionSelectionStep from "../components/quizSelectionStep";
 import QuizSetupStep from "../components/quizSetupStep";
 import type { Question } from "../components/questionModal";
+import QuestionSelectionStep from "../components/QuizSelectionStep";
 
 type QuizData = {
 	id: string;
@@ -55,32 +55,38 @@ const CreateTestPage: React.FC = () => {
 		setCurrentStep((prev) => prev - 1);
 	};
 
+	// return (
+	// 	<div className="flex justify-center items-center bg-gray-100 py-8">
+	// 		<div className="flex flex-col items-center bg-white shadow-md rounded-lg p-4 w-4/5">
+	// 			<div className="w-full bg-navbar-hover px-4 py-4">
+	// 				<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+	// 					CREAZIONE QUIZ
+	// 				</h2>
+	// 			</div>
+	// 			<div className="w-full px-4 py-4">
+	// 				{currentStep === 1 && (
+	// 					<QuizSetupStep
+	// 						quizData={quizData}
+	// 						onNext={(data) => {
+	// 							handleNextStep(data);
+	// 						}}
+	// 					/>
+	// 				)}
+	// 				{currentStep === 2 && (
+	// 					<QuestionSelectionStep
+	// 						quizData={quizData}
+	// 						onPrevious={(questions) => handlePreviousStep(questions)}
+	// 						onNext={handleNextStep}
+	// 					/>
+	// 				)}
+	// 			</div>
+	// 		</div>
+	// 	</div>
+	// );
+
 	return (
 		<div className="flex justify-center items-center bg-gray-100 py-8">
-			<div className="flex flex-col items-center bg-white shadow-md rounded-lg p-4 w-4/5">
-				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
-						CREAZIONE QUIZ
-					</h2>
-				</div>
-				<div className="w-full px-4 py-4">
-					{currentStep === 1 && (
-						<QuizSetupStep
-							quizData={quizData}
-							onNext={(data) => {
-								handleNextStep(data);
-							}}
-						/>
-					)}
-					{currentStep === 2 && (
-						<QuestionSelectionStep
-							quizData={quizData}
-							onPrevious={(questions) => handlePreviousStep(questions)}
-							onNext={handleNextStep}
-						/>
-					)}
-				</div>
-			</div>
+			vuoto
 		</div>
 	);
 };

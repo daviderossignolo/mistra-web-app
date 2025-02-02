@@ -1,11 +1,10 @@
 import { useState } from "react";
 import type { Question } from "./questionModal";
 import QuestionModal from "./questionModal";
+import { v4 as uuidv4 } from "uuid";
 
 interface QuestionSelectionStepProps {
 	quizData: QuizData;
-	onPrevious: (questions: Question[]) => void;
-	onNext: (data: { questions: Question[] }) => void;
 }
 
 type QuizData = {
@@ -15,11 +14,15 @@ type QuizData = {
 	questions: Question[];
 };
 
-const QuestionSelectionStep = ({
+const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	quizData,
-	onPrevious,
-	onNext,
-}: QuestionSelectionStepProps) => {
+}) => {
+	// Stati per il quiz
+	const [id, setId] = useState<string>(quizData.id || uuidv4());
+	const [name, setName] = useState<string>(quizData.name || "");
+	const [description, setDescription] = useState<string>(
+		quizData.description || "",
+	);
 	const [questions, setQuestions] = useState(quizData.questions || []);
 	const [isModalOpen, setModalOpen] = useState(false);
 	const [selectedQuestion, setSelectedQuestion] = useState<Question>();
@@ -56,12 +59,18 @@ const QuestionSelectionStep = ({
 	};
 
 	const handleSave = async () => {
+		// Se non ci sono nome o descrizione, allora non posso salvare il quiz
+		if (!name || !description) {
+			alert("Inserisci un nome e una descrizione per il quiz.");
+			return;
+		}
+
 		// costruzione del quiz
 		const quiz = {
-			id: quizData.id,
-			name: quizData.name,
-			description: quizData.description,
-			questions,
+			id: id,
+			name: name,
+			description: description,
+			questions: questions,
 		};
 		console.log(quiz);
 
@@ -81,6 +90,7 @@ const QuestionSelectionStep = ({
 			// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
 			if (response.status === 200) {
 				alert("Il test è stato salvato con successo.");
+				window.location.reload();
 			}
 
 			// Se la risposta non è ok, lancio un errore
@@ -97,14 +107,50 @@ const QuestionSelectionStep = ({
 	return (
 		<div className="flex">
 			<div className="flex-grow p-6">
-				<h2 className="text-xl font-semibold mb-4">
-					Domande del Test: {quizData.name}
+				<h2 className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
+					Informazioni sul test
 				</h2>
+				<hr className="mb-4" />
 				<div className="mb-4">
+					<label
+						htmlFor="quizName"
+						className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
+					>
+						Nome del Quiz
+					</label>
+					<input
+						id="quizName"
+						type="text"
+						placeholder="Inserisci il nome del quiz..."
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+						className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
+					/>
+				</div>
+				<div className="mb-4">
+					<label
+						htmlFor="quizDescription"
+						className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
+					>
+						Descrizione del Quiz
+					</label>
+					<textarea
+						id="quizDescription"
+						value={description}
+						placeholder="Inserisci una descrizione del quiz..."
+						onChange={(e) => setDescription(e.target.value)}
+						className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
+					/>
+				</div>
+				<div className="mb-6">
+					<h2 className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
+						Domande
+					</h2>
+					<hr className="mb-4" />
 					{questions.map((question, index) => (
 						<div
 							key={question.id}
-							className="p-4 mb-2 border rounded shadow-sm flex justify-between items-center"
+							className="p-4 mb-4 border rounded shadow-sm flex justify-between items-center"
 						>
 							<div>
 								<p className="text-sm text-gray-500">
@@ -163,29 +209,24 @@ const QuestionSelectionStep = ({
 						</div>
 					))}
 				</div>
-				<div className="mb-4">
+				<div className="mb-6">
 					<button
 						type="button"
 						onClick={() => setModalOpen(true)}
-						className="bg-navbar-hover text-white py-2 px-4 rounded"
+						className="bg-navbar-hover text-white py-2 px-6 rounded shadow-md hover:bg-navbar-hover-dark transition duration-300"
 					>
 						Aggiungi Nuova Domanda
 					</button>
 				</div>
-				<button
-					type="button"
-					onClick={() => onPrevious(questions)}
-					className="bg-gray-300 py-2 px-4 rounded mr-2"
-				>
-					Indietro
-				</button>
-				<button
-					type="button"
-					onClick={handleSave}
-					className="bg-navbar-hover text-white py-2 px-4 rounded"
-				>
-					Salva Quiz
-				</button>
+				<div className="flex justify-end mt-8">
+					<button
+						type="button"
+						onClick={handleSave}
+						className="bg-navbar-hover text-white py-2 px-4 rounded"
+					>
+						Salva Quiz
+					</button>
+				</div>
 			</div>
 
 			{/* Question Modal */}

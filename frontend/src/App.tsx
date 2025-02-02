@@ -5,7 +5,6 @@ import Header from "./components/header";
 import MenuComponent from "./components/navbar";
 import PrivateRoute from "./components/privateRoute";
 import About from "./pages/About";
-import TestPage from "./pages/CreateTestPage";
 import EventsPage from "./pages/EventsPage";
 import Homepage from "./pages/Homepage";
 import InfectionList from "./pages/InfectionListPage";
@@ -18,6 +17,7 @@ import UsefulLinksPage from "./pages/UsefulLinksPage";
 import CreateTestPage from "./pages/CreateTestPage";
 import ContactPage from "./pages/ContactPage";
 import TakeQuiz from "./components/takeQuiz";
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -91,6 +91,7 @@ function App() {
 					<Route path="/servizi" element={<ServicesListPage />} />
 					<Route path="/link-utili" element={<UsefulLinksPage />} />
 					<Route path="/eventi" element={<EventsPage />} />
+					<Route path="/dashboard" element={<DashboardPage />} />
 					{infectionSlugs.map((slug: string) => (
 						<Route
 							key={slug}
