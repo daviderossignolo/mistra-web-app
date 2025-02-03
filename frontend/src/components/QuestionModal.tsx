@@ -6,6 +6,7 @@ import CategoryModal from "./categoryModal";
 // Tipi TypeScript
 export type Answer = {
 	id: string;
+	documentId: string;
 	text: string;
 	correction: string;
 	score: number;
@@ -13,11 +14,13 @@ export type Answer = {
 
 export type Question = {
 	id: string;
+	documentId: string;
 	name: string;
 	text: string;
 	category: Category;
 	answers: {
 		id: string;
+		documentId: string;
 		text: string;
 		correction: string;
 		score: number;
@@ -26,6 +29,7 @@ export type Question = {
 
 export type Category = {
 	id_category: string;
+	documentId: string;
 	name: string;
 };
 
@@ -34,6 +38,7 @@ interface QuestionModalProps {
 	onClose: () => void;
 	onSave: (question: {
 		id: string;
+		documentId: string;
 		name: string;
 		text: string;
 		category: Category;
@@ -51,11 +56,12 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	const [text, setText] = useState<string>("");
 	const [category, setCategory] = useState<Category>({
 		id_category: "",
+		documentId: "",
 		name: "",
 	});
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [answers, setAnswers] = useState<Answer[]>([
-		{ id: uuidv4(), text: "", score: 0, correction: "" },
+		{ id: uuidv4(), documentId: "", text: "", score: 0, correction: "" },
 	]);
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
@@ -94,7 +100,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	const addAnswer = () => {
 		setAnswers((prevAnswers) => [
 			...prevAnswers,
-			{ id: uuidv4(), text: "", score: 0, correction: "" },
+			{ id: uuidv4(), documentId: "", text: "", score: 0, correction: "" },
 		]);
 	};
 
@@ -136,9 +142,14 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 		// Passo i dati alla funzione onSave
 		onSave({
 			id: questionId,
+			documentId: question ? question.documentId : "",
 			name,
 			text,
-			category: { id_category: category.id_category, name: category.name },
+			category: {
+				id_category: category.id_category,
+				name: category.name,
+				documentId: "",
+			},
 			answers,
 		});
 		onClose();

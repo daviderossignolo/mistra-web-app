@@ -1,24 +1,8 @@
 export default [
 	{
-		method: "GET",
-		path: "/display-test", // Questa rotta genera un test casuale
-		handler: "tests.testManagement", // Aggiungi il controller per ottenere il test
-		config: {
-			auth: false, // Nessuna autenticazione per il test
-		},
-	},
-	{
 		method: "POST",
 		path: "/create-test", // Questa rotta genera un test casuale
 		handler: "tests.createTest", // Aggiungi il controller per ottenere il test
-		config: {
-			auth: false, // Nessuna autenticazione per il test
-		},
-	},
-	{
-		method: "GET",
-		path: "/modify-Test", // Questa rotta genera un test casuale
-		handler: "tests.modifyTest", // Aggiungi il controller per ottenere il test
 		config: {
 			auth: false, // Nessuna autenticazione per il test
 		},
@@ -32,7 +16,7 @@ export default [
 		},
 	},
 	{
-		method: "GET",
+		method: "POST",
 		path: "/delete-test",
 		handler: "tests.deleteTest",
 		config: {
@@ -40,9 +24,9 @@ export default [
 		},
 	},
 	{
-		method: "GET",
-		path: "/get-tests", // Questa rotta genera un test casuale
-		handler: "tests.getTests", // Aggiungi il controller per ottenere il test
+		method: "POST",
+		path: "/get-complete-test",
+		handler: "tests.getCompleteTest",
 		config: {
 			auth: false, // Nessuna autenticazione per il test
 		},

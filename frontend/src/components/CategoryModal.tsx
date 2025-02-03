@@ -40,7 +40,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 			}
 
 			// Chiamo la funzione onSave passata come prop e chiudo il modale
-			onSave({ name: name, id_category: category_id });
+			onSave({ name: name, documentId: "", id_category: category_id });
 			onClose();
 		} catch (error) {
 			alert(

@@ -5,10 +5,12 @@ import { v4 as uuidv4 } from "uuid";
 
 interface QuestionSelectionStepProps {
 	quizData: QuizData;
+	edit: boolean;
 }
 
-type QuizData = {
+export type QuizData = {
 	id: string;
+	documentId: string;
 	name: string;
 	description: string;
 	questions: Question[];
@@ -16,6 +18,7 @@ type QuizData = {
 
 const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	quizData,
+	edit,
 }) => {
 	// Stati per il quiz
 	const [id, setId] = useState<string>(quizData.id || uuidv4());
@@ -26,6 +29,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	const [questions, setQuestions] = useState(quizData.questions || []);
 	const [isModalOpen, setModalOpen] = useState(false);
 	const [selectedQuestion, setSelectedQuestion] = useState<Question>();
+	const [editMode, setEdit] = useState<boolean>(edit || false);
 
 	// Questa funzione viene chiamata quando l'utente aggiunge una nuova domanda
 	const handleAddQuestion = (newQuestion: Question) => {
@@ -59,48 +63,88 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	};
 
 	const handleSave = async () => {
-		// Se non ci sono nome o descrizione, allora non posso salvare il quiz
-		if (!name || !description) {
-			alert("Inserisci un nome e una descrizione per il quiz.");
-			return;
-		}
+		if (!edit) {
+			if (!name || !description) {
+				// Se non ci sono nome o descrizione, allora non posso salvare il quiz
+				alert("Inserisci un nome e una descrizione per il quiz.");
+				return;
+			}
 
-		// costruzione del quiz
-		const quiz = {
-			id: id,
-			name: name,
-			description: description,
-			questions: questions,
-		};
-		console.log(quiz);
+			// costruzione del quiz
+			const quiz = {
+				id: id,
+				name: name,
+				description: description,
+				questions: questions,
+			};
 
-		// chiamata API per salvare il quiz
-		try {
-			const response = await fetch(
-				"http://localhost:1337/api/test-plugin/create-test",
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
+			// chiamata API per salvare il quiz
+			try {
+				const response = await fetch(
+					"http://localhost:1337/api/test-plugin/create-test",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(quiz),
 					},
-					body: JSON.stringify(quiz),
-				},
-			);
-
-			// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
-			if (response.status === 200) {
-				alert("Il test è stato salvato con successo.");
-				window.location.reload();
-			}
-
-			// Se la risposta non è ok, lancio un errore
-			if (!response.ok) {
-				throw new Error(
-					`Status: ${response.status}, Message: ${response.statusText}`,
 				);
+
+				// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
+				if (response.status === 200) {
+					alert("Il test è stato salvato con successo.");
+					window.location.reload();
+				}
+
+				// Se la risposta non è ok, lancio un errore
+				if (!response.ok) {
+					throw new Error(
+						`Status: ${response.status}, Message: ${response.statusText}`,
+					);
+				}
+			} catch (error) {
+				alert(error);
 			}
-		} catch (error) {
-			alert(error);
+		} else {
+			// TODO: Implementare la logica per la modifica del quiz
+			// costruzione del quiz
+			const quiz = {
+				id: id,
+				name: name,
+				documentId: quizData.documentId,
+				description: description,
+				questions: questions,
+			};
+
+			// chiamata API per salvare il quiz
+			try {
+				const response = await fetch(
+					"http://localhost:1337/api/test-plugin/submit-modify-test",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(quiz),
+					},
+				);
+
+				// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
+				if (response.status === 200) {
+					alert("Il test è stato salvato con successo.");
+					window.location.reload();
+				}
+
+				// Se la risposta non è ok, lancio un errore
+				if (!response.ok) {
+					throw new Error(
+						`Status: ${response.status}, Message: ${response.statusText}`,
+					);
+				}
+			} catch (error) {
+				alert(error);
+			}
 		}
 	};
 
