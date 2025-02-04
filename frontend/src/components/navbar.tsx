@@ -149,7 +149,7 @@ const MenuComponent: React.FC = () => {
 			>
 				{items.map((item) => {
 					if (item.__component === "menu.menu-link") {
-						if (item.title === "Test" && !isAuthenticated) {
+						if (item.title === "Dashboard" && !isAuthenticated) {
 							return null;
 						}
 						return (

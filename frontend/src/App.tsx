@@ -85,7 +85,10 @@ function App() {
 					<Route path="/servizi" element={<ServicesListPage />} />
 					<Route path="/link-utili" element={<UsefulLinksPage />} />
 					<Route path="/eventi" element={<EventsPage />} />
-					<Route path="/dashboard" element={<DashboardPage />} />
+					<Route
+						path="/dashboard"
+						element={<PrivateRoute element={DashboardPage} />}
+					/>
 					{infectionSlugs.map((slug: string) => (
 						<Route
 							key={slug}
