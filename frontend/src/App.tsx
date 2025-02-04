@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Footer from "./components/footer";
 import Header from "./components/header";
 import MenuComponent from "./components/navbar";
-import PrivateRoute from "./components/PrivateRoute";
 import About from "./pages/About";
 import EventsPage from "./pages/EventsPage";
 import Homepage from "./pages/Homepage";
@@ -14,10 +13,10 @@ import NewsPage from "./pages/newsPage";
 import ServicePage from "./pages/ServicePage";
 import ServicesListPage from "./pages/ServicesListPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
-import CreateTestPage from "./pages/CreateTestPage";
 import ContactPage from "./pages/ContactPage";
 import TakeQuiz from "./components/takeQuiz";
 import DashboardPage from "./pages/DashboardPage";
+import PrivateRoute from "./components/privateRoute";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -77,11 +76,6 @@ function App() {
 				<MenuComponent />
 				<Routes>
 					<Route path="/login" element={<Login />} />{" "}
-					{/* Controllare la visualizzazione delle pagine protette dal login  */}
-					<Route
-						path="/test"
-						element={<PrivateRoute element={CreateTestPage} />}
-					/>
 					<Route path="/taketest" element={<TakeQuiz />} />
 					<Route path="/contatti" element={<ContactPage />} />
 					<Route path="/" element={<Homepage />} />

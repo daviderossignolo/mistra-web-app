@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import CategoryModal from "./CategoryModal";
+import CategoryModal from "./categoryModal";
 
 // Tipi TypeScript
 export type Answer = {
@@ -35,6 +35,7 @@ export type Category = {
 
 interface QuestionModalProps {
 	question?: Question;
+	edit?: boolean;
 	onClose: () => void;
 	onSave: (question: {
 		id: string;
@@ -49,6 +50,7 @@ interface QuestionModalProps {
 // Functional Component principale per il modale di domande
 const QuestionModal: React.FC<QuestionModalProps> = ({
 	question,
+	edit,
 	onClose,
 	onSave,
 }) => {
@@ -109,6 +111,11 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 		setAnswers((prevAnswers) =>
 			prevAnswers.filter((answer) => answer.id !== id),
 		);
+
+		if (edit) {
+			// Faccio la chiamata API per eliminare la risposta dal database
+			// TODO: Completare la chiamata
+		}
 	};
 
 	// Permette di aggioranre un campo di una risposta

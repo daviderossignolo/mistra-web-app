@@ -29,7 +29,6 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	const [questions, setQuestions] = useState(quizData.questions || []);
 	const [isModalOpen, setModalOpen] = useState(false);
 	const [selectedQuestion, setSelectedQuestion] = useState<Question>();
-	const [editMode, setEdit] = useState<boolean>(edit || false);
 
 	// Questa funzione viene chiamata quando l'utente aggiunge una nuova domanda
 	const handleAddQuestion = (newQuestion: Question) => {
@@ -54,6 +53,11 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 		setQuestions((prev: Question[]) =>
 			prev.filter((question) => question.id !== id),
 		);
+
+		if (edit) {
+			// Faccio la chiamata API per eliminare la domanda dal database
+			// TODO: Completare la chiamata
+		}
 	};
 
 	// Funzione che viene chiamata quando l'utente clicca sul pulsante di modifica di una domanda
@@ -277,6 +281,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 			{isModalOpen && (
 				<QuestionModal
 					question={selectedQuestion}
+					edit={edit}
 					onClose={() => {
 						setModalOpen(false);
 						setSelectedQuestion(undefined);

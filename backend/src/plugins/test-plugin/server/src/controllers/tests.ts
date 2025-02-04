@@ -1,5 +1,6 @@
 import type { Context } from "koa";
 import axios from "axios";
+import answer from "./answer";
 
 type Quiz = {
 	id: string;
@@ -49,9 +50,8 @@ export default {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
 		const quiz = ctx.request.body as Quiz;
-		console.log(quiz);
 
-		// Inserisco il test all'interno del database
+		// Modifico il test all'interno del database
 		const testResponse = await fetch(
 			`http://${host}:${port}/api/tests/${quiz.documentId}`,
 			{
@@ -75,37 +75,40 @@ export default {
 
 		// Processo le domande del quiz
 		for (const question of quiz.questions) {
-			const categoryResp = await fetch(
-				`http://${host}:${port}/api/categories/${question.category.documentId}`,
-				{
-					method: "GET",
-					headers: { "Content-Type": "application/json" },
-				},
-			);
+			const idCategory = await getCategory(question.category.id_category);
 
-			if (!categoryResp.ok) {
-				ctx.status = categoryResp.status;
-				ctx.body = { message: "Failed to retrieve category" };
-				return ctx;
-			}
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const catContent = (await categoryResp.json()) as any;
-			const idStrapi = catContent.data.id;
-
-			const questionResponse = await fetch(
-				`http://${host}:${port}/api/questions/${question.documentId}`,
-				{
-					method: "PUT",
+			// Se la domanda non ha un documentId, allora vuol dire che la devo inserire
+			// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+			let questionResponse;
+			if (question.documentId === "") {
+				questionResponse = await fetch(`http://${host}:${port}/api/questions`, {
+					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						data: {
+							id_question: question.id,
 							name: question.name,
 							text: question.text,
-							category_id: idStrapi,
+							category_id: idCategory,
 						},
 					}),
-				},
-			);
+				});
+			} else {
+				questionResponse = await fetch(
+					`http://${host}:${port}/api/questions/${question.documentId}`,
+					{
+						method: "PUT",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							data: {
+								name: question.name,
+								text: question.text,
+								category_id: idCategory,
+							},
+						}),
+					},
+				);
+			}
 
 			// Se la chiama API non è andata a buon fine, setto l'errore nella risposta
 			if (!questionResponse.ok) {
@@ -117,24 +120,67 @@ export default {
 			// La chiamata API ha avuto successo, estraggo l'id della domanda appena creata
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			const questionData: any = await questionResponse.json();
-			const questionId = questionData.question_id;
+			const questionId = questionData.data.documentId;
+			console.log(questionData);
 
-			// Processo le risposte collegate alla domanda corrente
-			for (const answer of question.answers) {
-				const answerResponse = await fetch(
-					`http://${host}:${port}/api/answers/${answer.documentId}`,
+			// Iserisco la domanda in question in test
+			if (question.documentId === "") {
+				const questionInTestResponse = await fetch(
+					`http://${host}:${port}/api/question-in-tests`,
 					{
-						method: "PUT",
+						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
 							data: {
-								text: answer.text,
-								correction: answer.correction,
-								score: answer.score,
+								question_id: questionId,
+								test_id: quiz.documentId,
 							},
 						}),
 					},
 				);
+
+				if (!questionInTestResponse.ok) {
+					ctx.status = questionInTestResponse.status;
+					ctx.body = { message: "Errore nella creazione delle domande" };
+					return ctx;
+				}
+			}
+
+			// Processo le risposte collegate alla domanda corrente
+			for (const answer of question.answers) {
+				// Se la risposta non ha un documentId, allora vuol dire che la devo inserire
+				// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+				let answerResponse;
+				if (answer.documentId === "") {
+					answerResponse = await fetch(`http://${host}:${port}/api/answers`, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							data: {
+								id_answer: answer.id,
+								text: answer.text,
+								correction: answer.correction,
+								score: answer.score,
+								question_id: questionId,
+							},
+						}),
+					});
+				} else {
+					answerResponse = await fetch(
+						`http://${host}:${port}/api/answers/${answer.documentId}`,
+						{
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								data: {
+									text: answer.text,
+									correction: answer.correction,
+									score: answer.score,
+								},
+							}),
+						},
+					);
+				}
 
 				if (!answerResponse.ok) {
 					ctx.status = answerResponse.status;
@@ -373,8 +419,6 @@ export default {
 				},
 			}),
 		});
-
-		console.log(testResponse.ok);
 
 		// Se la risposta non è ok, setto l'errore nella risposta
 		if (!testResponse.ok) {
