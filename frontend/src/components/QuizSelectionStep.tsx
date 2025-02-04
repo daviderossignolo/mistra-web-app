@@ -277,7 +277,10 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 			{isModalOpen && (
 				<QuestionModal
 					question={selectedQuestion}
-					onClose={() => setModalOpen(false)}
+					onClose={() => {
+						setModalOpen(false);
+						setSelectedQuestion(undefined);
+					}}
 					onSave={handleAddQuestion}
 				/>
 			)}

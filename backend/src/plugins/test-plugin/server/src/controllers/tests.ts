@@ -49,6 +49,7 @@ export default {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
 		const quiz = ctx.request.body as Quiz;
+		console.log(quiz);
 
 		// Inserisco il test all'interno del database
 		const testResponse = await fetch(
