@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Question } from "./questionModal";
-import QuestionModal from "./questionModal";
+import type { Question } from "./QuestionModal";
+import QuestionModal from "./QuestionModal";
 import { v4 as uuidv4 } from "uuid";
 
 interface QuestionSelectionStepProps {

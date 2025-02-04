@@ -1,12 +1,4 @@
 export default [
-    {
-      	method: 'GET',
-      	path: '/display-question', // Questa rotta genera un test casuale
-      	handler: 'question.questionManagement', // Aggiungi il controller per ottenere il test
-      	config: {
-      		auth: false, // Nessuna autenticazione per il test
-      	},
-    },	
     {	
       	method: 'POST',
       	path: '/create-question', // Questa rotta genera un test casuale

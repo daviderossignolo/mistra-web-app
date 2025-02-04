@@ -354,7 +354,7 @@ export default {
 	},
 
 	/**
-	 * Funzione che permtedde di inserire un test nel database.
+	 * Funzione che permette di inserire un test nel database.
 	 * @param ctx
 	 * @returns
 	 */

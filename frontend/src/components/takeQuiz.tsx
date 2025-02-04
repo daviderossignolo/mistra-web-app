@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import type { Category } from "./questionModal";
+import type { Category } from "./QuestionModal";
 
 // Definizione dei tipi per i dati che arrivano dal backend
 type Sex = {

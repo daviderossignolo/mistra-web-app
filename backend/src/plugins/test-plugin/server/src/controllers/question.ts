@@ -45,50 +45,6 @@ export default {
 		return ctx;
 	},
 
-	async questionManagement(ctx: Context) {
-		try {
-			const getQuestionsHTML = await questionService.getQuestionsHTML();
-			const getAnswersHTML = await questionService.getAnswersHTML();
-			const getCategoriesHTML = await categoryService.getCategoriesHTML();
-
-			ctx.body = `
-            <html>
-                <head>
-                    <title>Gestione Questions</title>
-                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                </head>
-                <body class="bg-gray-100 font-sans">
-                    <div class="max-w-3xl mx-auto p-8">
-                        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Creazione Question</h1>
-                        <h3 class="text-xl font-medium text-gray-700 mb-4">Answers disponibili</h3>
-                        <ul class="list-disc pl-8 mb-4">${getAnswersHTML}</ul>
-                        <h3 class="text-xl font-medium text-gray-700 mb-4">Categorie disponibili</h3>
-                        <ul class="list-disc pl-8 mb-4">${getCategoriesHTML}</ul>
-                        <h3 class="text-xl font-medium text-gray-700 mb-4">Question esistenti</h3>
-                        <ul class="list-disc pl-8 mb-4">${getQuestionsHTML}</ul>
-                        <form method="POST" action="http://localhost:1337/api/test-plugin/create-question" enctype="application/json" class="bg-white p-6 rounded-lg shadow-lg">
-                            <label for="name" class="block text-lg text-gray-800 mb-2">Name:</label>
-                            <input type="text" name="name" id="name" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <label for="text" class="block text-lg text-gray-800 mb-2">Text:</label>
-                            <input type="text" name="text" id="text" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <label for="id_category" class="block text-lg text-gray-800 mb-2">Category:</label>
-                            <input type="text" name="id_category" id="id_category" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <label for="answer" class="block text-lg text-gray-800 mb-2">Answer ids:</label>
-                            <input type="text" name="answer" id="answer" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Crea Question</button>
-                        </form>
-                        <a href="http://localhost:1337/api/test-plugin/display-answer" class="text-blue-500 hover:underline mt-4 inline-block">Creare una Answer</a>
-                        <br>
-                        <a href="http://localhost:1337/api/test-plugin/search-test-Execution" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla creazione del Test</a>
-                    </div>
-                </body>
-            </html>`;
-			ctx.type = "html";
-		} catch (error) {
-			ctx.body = { error: error.message };
-		}
-	},
-
 	// Endpoint per modificare una Question
 	async modifyQuestion(ctx: Context) {
 		try {

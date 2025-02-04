@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import QuizSetupStep from "../components/quizSetupStep";
-import type { Question } from "../components/questionModal";
+import QuizSetupStep from "../components/QuizSetupStep";
+import type { Question } from "../components/QuestionModal";
 import QuestionSelectionStep from "../components/QuizSelectionStep";
 
 type QuizData = {
