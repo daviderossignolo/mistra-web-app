@@ -4,6 +4,12 @@ import categoryService from "../services/category";
 const { v4: uuidv4 } = require("uuid");
 
 export default {
+
+	/**
+	 * Endpoint that create a category.
+	 * @param ctx
+	 * @returns
+	 */
 	async createCategory(ctx: Context) {
 		const { id_category, name } = ctx.request.body;
 		console.log(ctx.request.body);
@@ -34,7 +40,11 @@ export default {
 		return id;
 	},
 
-
+	/**
+	 * Endpoint to get a category.
+	 * @param ctx
+	 * @returns filtredData
+	 */
 	async modifyCategory(ctx: Context) {
 		try {
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query
@@ -76,7 +86,11 @@ export default {
 		}
 	},
 
-	// funzione per gestire la PUT
+	/**
+	 * Endpoint to submit the modified category.
+	 * @param ctx
+	 * @returns
+	 */
 	async submitModifyCategory(ctx: Context) {
 		try {
 
@@ -111,6 +125,11 @@ export default {
 		}
 	},
 
+	/**
+	 * Endpoint to delete a category.
+	 * @param ctx
+	 * @returns
+	 */
 	async deleteCategory(ctx: Context) {
 		try {
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query

@@ -45,14 +45,31 @@ export default {
 		return ctx;
 	},
 
-	// Endpoint per modificare una Question
+	/**
+	 * Endpoint per la visualizzazione di una domanda.
+	 * @param ctx
+	 * @returns filtredData
+	 */
 	async modifyQuestion(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
-			const response = await axios.get(
-				`http://localhost:1337/api/questions/${documentId}?populate=*`,
-			);
-			const data = response.data.data;
+
+			const response = await fetch(`http://localhost:1337/api/questions/${documentId}?populate=*`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nel caricamento della domanda" };
+				return ctx;
+			}
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const responseData : any = await response.json();
+			const data = responseData.data;
 
 			// Filtro i dati
 			const filteredData = {
@@ -61,176 +78,151 @@ export default {
 				id_question: data.id_question,
 				name: data.name,
 				text: data.text,
-				id_category: data.id_category
+				id_category: data.category_id
 					? {
-							id: data.id_category.id,
-							documentId: data.id_category.documentId,
-							id_category: data.id_category.id_category,
-							name: data.id_category.name,
+							id: data.category_id.id,
+							documentId: data.category_id.documentId,
+							id_category: data.category_id.id_category,
+							name: data.category_id.name,
 						}
 					: null,
-				answers: data.answers
-					? data.answers.map((answer) => ({
-							id: answer.id,
-							documentId: answer.documentId,
-							id_answer: answer.id_answer,
-							text: answer.text,
-							score: answer.score,
-							correction: answer.correction,
-						}))
-					: [],
-				question_in_tests: data.question_in_tests
-					? data.question_in_tests.map((test) => ({
-							id: test.id,
-							documentId: test.documentId,
-						}))
-					: [],
 			};
 
 			console.log(filteredData);
 
-			const answers = Array.isArray(data.answers) ? data.answers : [];
+			ctx.status = 200;
+			ctx.body = filteredData;
 
-			ctx.body = `
-			<html>
-				<head>
-					<title>Modifica Question</title>
-					<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-				</head>
-				<body class="bg-gray-100 font-sans">
-					<div class="max-w-3xl mx-auto p-8">
-						<h1 class="text-3xl font-semibold text-gray-800 mb-6">Modifica Question</h1>
-						<form action="http://localhost:1337/api/test-plugin/submit-modify-question/?documentId=${documentId}" method="POST" class="bg-white p-6 rounded-lg shadow-lg">
-							<label for="name" class="block text-lg text-gray-800 mb-2">Name:</label>
-							<input type="text" name="name" id="name" value="${data.name || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<label for="text" class="block text-lg text-gray-800 mb-2">Text:</label>
-							<input type="text" name="text" id="text" value="${data.text || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<label for="id_category" class="block text-lg text-gray-800 mb-2">Category:</label>
-							<input type="text" name="id_category" id="id_category" value="${data.id_category.documentId || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<label for="answer" class="block text-lg text-gray-800 mb-2">Answer ids:</label>
-							<input type="text" name="answer" id="answer" value="${answers.map((answer) => answer.documentId).join(",")}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Modifica Question</button>
-                            <a href="/api/test-plugin/display-question" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione delle Question</a>
-						</form>
-					</div>
-				</body>
-			</html>`;
-			ctx.type = "html";
+			//return ctx;
+			return filteredData;
+			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
 	},
 
-	// Endpoint per sottoporre la modifica di una Question
+	/**
+	 * Endpoint per la modifica di una domanda.
+	 * @param ctx
+	 * @returns
+	 */
 	async submitModifyQuestion(ctx: Context) {
 		try {
+			
 			const { documentId } = ctx.query;
-			const { name, text, id_category, answer } = ctx.request.body;
-			const answers = answer.split(",").map((answer) => answer.trim());
+			const { name, text, category_id } = ctx.request.body;
 			console.log(ctx.request.body);
 
+			//si può passare solo documentId come category_id (occhio che è cambiato da id_category a category_id)
 			const payload = {
 				data: {
 					name,
 					text,
-					id_category,
-					answers,
+					category_id,
 				},
 			};
 
-			await axios.put(
-				`http://localhost:1337/api/questions/${documentId}`,
-				payload,
-			);
+			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(payload),
+			});
 
-			ctx.body = `
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-question">
-                    <title>Redirect</title>
-                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                </head>
-                <body class="bg-gray-100 text-center p-8">
-                    <h1 class="text-4xl font-bold text-green-600">Question modificata con successo</h1>
-                    <p class="text-xl mt-4">Stai per essere reindirizzato...</p>
-                </body>
-            </html>`;
-			ctx.type = "html";
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nella modifica della domanda" };
+				return ctx;
+			}
+
+			ctx.status = 200;
+			ctx.body = { message: "Questiom modified successfully" };
+
+			return ctx;
+			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
 	},
 
-	// Endpoint per eliminare una Question
+	/**
+	 * Endpoint per l'eliminazione di una domanda.
+	 * @param ctx
+	 * @returns
+	 */
 	async deleteQuestion(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 
-			await axios.delete(`http://localhost:1337/api/questions/${documentId}`);
+			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
 
-			ctx.body = `
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-question">
-                    <title>Redirect</title>
-                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                </head>
-                <body class="bg-gray-100 text-center p-8">
-                    <h1 class="text-4xl font-bold text-red-600">Question eliminata con successo</h1>
-                    <p class="text-xl mt-4">Stai per essere reindirizzato...</p>
-                </body>
-            </html>`;
-			ctx.type = "html";
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nell'eliminazione della domanda" };
+				return ctx;
+			}
+			
+			ctx.status = 200;
+			ctx.body = { message: "Question deleted successfully" };
+			return ctx;
+
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
 	},
 
-	async getQuestions() {
+	/**
+	 * Endpoint per ottenere le domande.
+	 * @param ctx
+	 * @returns
+	 */
+	async getQuestions(ctx) {
 		try {
-			const response = await axios.get(
-				"http://localhost:1337/api/questions?populate=*",
-			);
-			const filteredAnswers = response.data.data.map((data) => ({
-				id: data.id ? data.id : null,
+			const response = await fetch("http://localhost:1337/api/questions?populate=*", {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nel caricamento delle domande" };
+				return ctx;
+			}
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const responseData : any = await response.json();
+
+			const data = responseData.data;
+			
+			const filteredAnswers = responseData.data.map((data) => ({
+				id: data.id ?? null, // Usa ?? per maggiore sicurezza
 				documentId: data.documentId,
 				id_question: data.id_question,
 				name: data.name,
 				text: data.text,
-				id_category: data.id_category
+				id_category: data.category_id
 					? {
-							id: data.id_category.id ? data.id_category.id : null,
-							documentId: data.id_category.documentId,
-							id_category: data.id_category.id_category,
-							name: data.id_category.name,
+							id: data.category_id.id ?? null,
+							documentId: data.category_id.documentId,
+							id_category: data.category_id.id_category,
+							name: data.category_id.name,
 						}
 					: null,
-				answers: data.answers
-					? data.answers.map((answer) => ({
-							id: answer.id ? answer.id : null,
-							documentId: answer.documentId,
-							id_answer: answer.id_answer,
-							text: answer.text,
-							score: answer.score,
-							correction: answer.correction,
-						}))
-					: [],
-				question_in_tests: data.question_in_tests
-					? data.question_in_tests.map((test) => ({
-							id: test.id ? test.id : null,
-							documentId: test.documentId,
-						}))
-					: [],
 			}));
-
+			
 			console.log(filteredAnswers);
-			return response.data.data;
+			return filteredAnswers;		
+
 		} catch (error) {
-			return `<li>Errore nel caricamento delle questions: ${error.message}</li>`;
+			ctx.body = { error: error.message };
 		}
 	},
 };
