@@ -26,7 +26,7 @@ const Login: React.FC = () => {
 			const data = await response.json();
 			if (data.jwt) {
 				localStorage.setItem("token", data.jwt);
-				window.location.href = "/test";
+				window.location.href = "/home";
 			} else {
 				setError("Invalid credentials");
 			}

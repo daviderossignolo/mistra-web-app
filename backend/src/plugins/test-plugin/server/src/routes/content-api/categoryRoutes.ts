@@ -1,13 +1,5 @@
 export default [
     {
-        method: 'GET',
-        path: '/display-category', // Questa rotta genera un test casuale
-        handler: 'category.categoryManagement', // Aggiungi il controller per ottenere il test
-        config: {
-        	auth: false, // Nessuna autenticazione per il test
-        },
-    },
-    {
       	method: 'POST',
       	path: '/create-category', // Questa rotta genera un test casuale
       	handler: 'category.createCategory', // Aggiungi il controller per ottenere il test
