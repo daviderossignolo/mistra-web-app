@@ -2,6 +2,8 @@ import type { Context } from "koa";
 const { v4: uuidv4 } = require("uuid");
 import axios from "axios";
 import testService from "../services/testExecution";
+import test from "node:test";
+import question from "./question";
 
 // Tipi TypeScript
 export type Answer = {
@@ -29,6 +31,34 @@ export type Question = {
 export type Category = {
 	id_category: string;
 	name: string;
+};
+
+type TestExecution = {
+	test_info: {
+		documentId: string;
+		test_name: string;
+		test_description: string;
+		score: number;
+		execution_time: string;
+		revision_date: string;
+		note: string;
+		user_info: {
+			age: number;
+			sex: string;
+			ip: string;
+		};
+	};
+	questions: {
+		category_name: string;
+		question_name: string;
+		question_text: string;
+		answers: {
+			documentId: string;
+			answer_text: string;
+			answer_correction: string;
+			user_selected: boolean;
+		}[];
+	}[];
 };
 
 export default {
@@ -312,113 +342,180 @@ export default {
 		return ctx;
 	},
 
+	/**
+	 * Funzione che ritorna un test eseguito.
+	 * @param ctx
+	 */
 	async getTestExecution(ctx: Context) {
-		const { testExecutionId } = ctx.query;
+		console.log("getTestExecution");
+		const host = process.env.HOST;
+		const port = process.env.PORT;
 
-		console.log(testExecutionId);
+		// Recupero il body della richiesta
+		const body = ctx.request.body;
+		const documentId = body.execDocId;
 
-		const testExecution = await axios.get(
-			`http://localhost:1337/api/test-executions/${testExecutionId}?pLevel=4`,
-		);
-		const entryTestExecution = testExecution.data.data;
-
-		console.log(entryTestExecution);
-		console.log(
-			"______________________________________________________________________________________________",
-		);
-
-		const filteredData = {
-			id: entryTestExecution.id,
-			documentId: entryTestExecution.documentId,
-			id_textexecution: entryTestExecution.id_textexecution,
-			execution_time: entryTestExecution.execution_time,
-			age: entryTestExecution.age,
-			score: entryTestExecution.score,
-			IP: entryTestExecution.IP,
-			revision_date: entryTestExecution.revision_date,
-			note: entryTestExecution.note,
-			test: entryTestExecution.test
-				? {
-						id: entryTestExecution.test.id,
-						documentId: entryTestExecution.test.documentId,
-						id_test: entryTestExecution.test.id_test,
-						name_test: entryTestExecution.test.name_test,
-						description_test: entryTestExecution.test.description_test,
-						question_in_tests: entryTestExecution.test.question_in_tests
-							? entryTestExecution.test.question_in_tests.map((question) => ({
-									id: question.id,
-									documentId: question.documentId,
-									id_question: question.id_question
-										? {
-												id: question.id_question.id,
-												documentId: question.id_question.documentId,
-												id_question: question.id_question.id_question,
-												name: question.id_question.name,
-												text: question.id_question.text,
-											}
-										: null,
-									id_test: question.id_test
-										? {
-												id: question.id_test.id,
-												documentId: question.id_test.documentId,
-												id_test: question.id_test.id_test,
-												name_test: question.id_test.name_test,
-												description_test: question.id_test.description_test,
-											}
-										: null,
-								}))
-							: [],
-					}
-				: null,
-			sex: entryTestExecution.sex
-				? {
-						id: entryTestExecution.sex.id,
-						documentId: entryTestExecution.sex.documentId,
-						sex_id: entryTestExecution.sex.sex_id,
-						name: entryTestExecution.sex.name,
-					}
-				: null,
-			given_answers: entryTestExecution.given_answers
-				? entryTestExecution.given_answers.map((answer) => ({
-						id: answer.id,
-						documentId: answer.documentId,
-						id_answer: answer.id_answer
-							? {
-									id: answer.id_answer.id,
-									documentId: answer.id_answer.documentId,
-									id_answer: answer.id_answer.id_answer,
-									text: answer.id_answer.text,
-									score: answer.id_answer.score,
-									correction: answer.id_answer.correction,
-									id_question: answer.id_answer.id_question
-										? {
-												id: answer.id_answer.id_question.id,
-												documentId: answer.id_answer.id_question.documentId,
-												id_question: answer.id_answer.id_question.id_question,
-												name: answer.id_answer.id_question.name,
-												text: answer.id_answer.id_question.text,
-											}
-										: null,
-								}
-							: null,
-						id_test_execution: answer.id_test_execution
-							? {
-									id: answer.id_test_execution.id,
-									documentId: answer.id_test_execution.documentId,
-									id_textexecution: answer.id_test_execution.id_textexecution,
-									execution_time: answer.id_test_execution.execution_time,
-									age: answer.id_test_execution.age,
-									score: answer.id_test_execution.score,
-									IP: answer.id_test_execution.IP,
-									revision_date: answer.id_test_execution.revision_date,
-									note: answer.id_test_execution.note,
-								}
-							: null,
-					}))
-				: [],
+		// Definisco la struttura dati che rappresenta il test eseguito
+		const toReturn: TestExecution = {
+			test_info: {
+				documentId: "",
+				test_name: "",
+				test_description: "",
+				score: 0,
+				execution_time: "",
+				revision_date: "",
+				note: "",
+				user_info: {
+					age: 0,
+					sex: "",
+					ip: "",
+				},
+			},
+			questions: [],
 		};
 
-		console.log(filteredData);
-		return filteredData;
+		// Recupero le informazioni riguardo al test eseguito
+		const testExecutionResponse = await fetch(
+			`http://${host}:${port}/api/test-executions?filters[documentId][$eq]=${documentId}&pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		if (!testExecutionResponse.ok) {
+			ctx.status = testExecutionResponse.status;
+			ctx.body = "Errore nel recupero del test eseguito";
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const testExecutionData = (await testExecutionResponse.json()) as any;
+
+		// Setto le informazioni riguardo al test eseguito
+		toReturn.test_info.documentId = testExecutionData.data[0].documentId;
+		toReturn.test_info.execution_time =
+			testExecutionData.data[0].execution_time;
+		toReturn.test_info.note = testExecutionData.data[0].note;
+		toReturn.test_info.revision_date = testExecutionData.data[0].revision_date;
+		toReturn.test_info.score = testExecutionData.data[0].score;
+		toReturn.test_info.test_name = testExecutionData.data[0].id_test.name_test;
+		toReturn.test_info.test_description =
+			testExecutionData.data[0].id_test.description_test;
+
+		// Setto le informazioni riguardo all'utente
+		toReturn.test_info.user_info.age = testExecutionData.data[0].age;
+		toReturn.test_info.user_info.ip = testExecutionData.data[0].ip;
+		toReturn.test_info.user_info.sex = testExecutionData.data[0].id_sex.name;
+
+		// Recupero le domande di questo test
+		const strapiTestId = testExecutionData.data[0].id_test.id;
+		const questionsInTestResponse = await fetch(
+			`http://${host}:${port}/api/question-in-tests?filters[test_id][$eq]=${strapiTestId}&pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		if (!questionsInTestResponse.ok) {
+			ctx.status = questionsInTestResponse.status;
+			ctx.body = "Errore nel recupero delle domande del test";
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const questionsInTestData = (await questionsInTestResponse.json()) as any;
+		console.log(questionsInTestData.data[0].question_id);
+
+		for (const row of questionsInTestData.data) {
+			const question = row.question_id;
+
+			// Recupero le risposte dalla domanda
+			const answersResponse = await fetch(
+				`http://${host}:${port}/api/answers?filters[question_id][$eq]=${question.id}`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
+			if (!answersResponse.ok) {
+				ctx.status = answersResponse.status;
+				ctx.body = "Errore nel recupero delle risposte";
+				return ctx;
+			}
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const answersData = (await answersResponse.json()) as any;
+			const answersList: {
+				documentId: string;
+				answer_text: string;
+				answer_correction: string;
+				user_selected: boolean;
+			}[] = [];
+			// Itero sulle risposte per costuire la struttura dati
+			for (const row of answersData.data) {
+				answersList.push({
+					documentId: row.documentId,
+					answer_text: row.text,
+					answer_correction: row.correction,
+					user_selected: false,
+				});
+			}
+
+			// Recupero le risposte date
+			const givenAnswersResponse = await fetch(
+				`http://${host}:${port}/api/given-answers?filters[id_testExecution][$eq]=${testExecutionData.data[0].id}&pLevel`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
+			if (!givenAnswersResponse.ok) {
+				ctx.status = givenAnswersResponse.status;
+				ctx.body = "Errore nel recupero delle risposte date";
+				return ctx;
+			}
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const givenAnswersData = (await givenAnswersResponse.json()) as any;
+			const givenAnswers = givenAnswersData.data;
+
+			// Itero sulle risposte date per settare il campo user_selected
+			for (const givenAnswer of givenAnswers) {
+				// se la risposta è legata alla domanda corrente
+				if (
+					givenAnswer.id_answer.question_id.documentId === question.documentId
+				) {
+					// cerco la risposta data dall'utente
+					const answerIndex = answersList.findIndex(
+						(answer) => answer.documentId === givenAnswer.id_answer.documentId,
+					);
+					answersList[answerIndex].user_selected = true;
+				}
+			}
+
+			// Inserisco i dati sulla domanda
+			toReturn.questions.push({
+				category_name: question.category_id.name,
+				question_name: question.name,
+				question_text: question.text,
+				answers: answersList,
+			});
+		}
+
+		ctx.status = 200;
+		ctx.body = toReturn;
+		return ctx;
 	},
 };

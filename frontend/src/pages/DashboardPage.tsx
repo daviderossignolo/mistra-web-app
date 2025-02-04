@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import QuizSetupStep from "../components/quizSetupStep";
 import QuestionSelectionStep, {
 	type QuizData,
 } from "../components/QuizSelectionStep";
+import { formatTime } from "../utils";
 
 type Test = {
 	id: number;
@@ -14,6 +15,50 @@ type Test = {
 	created_at: string;
 	updated_at: string;
 	published_at: string;
+};
+
+type ExecutedTest = {
+	id: number;
+	documentId: string;
+	age: number;
+	score: number;
+	execution_time: string;
+	revision_date: string;
+	note: string;
+	test_execution_id: string;
+	ip: string;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	id_sex: any;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	id_test: any;
+};
+
+type ExecutedTestFull = {
+	test_info: {
+		documentId: string;
+		test_name: string;
+		test_description: string;
+		score: number;
+		execution_time: string;
+		revision_date: string;
+		note: string;
+		user_info: {
+			age: number;
+			sex: string;
+			ip: string;
+		};
+	};
+	questions: {
+		category_name: string;
+		question_name: string;
+		question_text: string;
+		answers: {
+			documentId: string;
+			answer_text: string;
+			answer_correction: string;
+			user_selected: boolean;
+		}[];
+	}[];
 };
 
 const Sidebar = ({ onSelect }: { onSelect: (section: string) => void }) => {
@@ -40,20 +85,17 @@ const Sidebar = ({ onSelect }: { onSelect: (section: string) => void }) => {
 	);
 };
 
-const DashboardPage = () => {
+const DashboardPage: React.FC = () => {
+	// Variabili d'ambiente
 	const host = process.env.REACT_APP_BACKEND_HOST;
 	const port = process.env.REACT_APP_BACKEND_PORT;
 
-	const [executedTests, setExecutedTests] = useState([
-		{ id: 1, name: "Test Cognitivo", responses: ["Risposta 1", "Risposta 2"] },
-		{ id: 2, name: "Test Fisico", responses: ["Risposta 3", "Risposta 4"] },
-	]);
-
+	const [executedTests, setExecutedTests] = useState<ExecutedTest[]>([]);
 	const [tests, setTests] = useState<Test[]>([]);
-	const [selectedTest, setSelectedTest] = useState<QuizData | null>(null); // Tiene traccia del test selezionato
+	const [selectedTest, setSelectedTest] = useState<QuizData | null>(null);
 	const [selectedSection, setSelectedSection] = useState<
-		"executedTests" | "createTest" | "editTest" | "testTemplates"
-	>("executedTests");
+		"executedTests" | "createTest" | "editTest" | "testTemplates" | "viewTest"
+	>("testTemplates");
 	const [newTemplate, setNewTemplate] = useState<QuizData>({
 		id: uuidv4(),
 		documentId: "",
@@ -61,6 +103,9 @@ const DashboardPage = () => {
 		description: "",
 		questions: [],
 	});
+	const [searchTerm, setSearchTerm] = useState("");
+	const [selectedExecution, setSelectedExecution] =
+		useState<ExecutedTestFull | null>(null);
 
 	// Effettua il fetch dei test
 	useEffect(() => {
@@ -81,7 +126,30 @@ const DashboardPage = () => {
 			setTests(data.data);
 		};
 
+		const fetchExecutedTests = async () => {
+			const response = await fetch(
+				`${host}:${port}/api/test-executions?pLevel`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
+			if (!response.ok) {
+				alert(
+					`Errore nel recupero dei test eseguiti - status: ${response.status}`,
+				);
+				return;
+			}
+
+			const data = await response.json();
+			setExecutedTests(data.data);
+		};
+
 		fetchTest();
+		fetchExecutedTests();
 	}, [host, port]);
 
 	// Recupero i dati del test selezionato
@@ -105,6 +173,36 @@ const DashboardPage = () => {
 		const data = await getTestResponse.json();
 
 		return data;
+	};
+
+	// Funzione per gestire la ricerca dei test
+	const handleSearch = async () => {
+		// Se il termine è vuoto allora recupero tutti i test
+		if (searchTerm === "") {
+			const fetchTest = async () => {
+				const response = await fetch(`${host}:${port}/api/tests?pLevel`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
+
+				if (!response.ok) {
+					alert(`Errore nel recupero dei test - status: ${response.status}`);
+					return;
+				}
+
+				const data = await response.json();
+				setTests(data.data);
+			};
+
+			fetchTest();
+			return;
+		}
+
+		// Altrimenti filtro i test in base al termine di ricerca
+		setTests(tests.filter((test) => test.name_test.includes(searchTerm)));
+		setSearchTerm("");
 	};
 
 	// Funzione per gestire l'eliminazione di un test
@@ -133,6 +231,29 @@ const DashboardPage = () => {
 		window.location.reload();
 	};
 
+	const findSelectedExecutionTest = async (documentId: string) => {
+		const getTestResponse = await fetch(
+			`${host}:${port}/api/test-plugin/get-test-execution`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ execDocId: documentId }),
+			},
+		);
+
+		if (!getTestResponse.ok) {
+			alert(`Errore nel recupero dei test - status: ${getTestResponse.status}`);
+			return;
+		}
+
+		const data = await getTestResponse.json();
+		console.log(data);
+
+		return data;
+	};
+
 	return (
 		<div className="flex flex-col lg:flex-row gap-6 p-6 bg-gray-100 min-h-75">
 			<Sidebar
@@ -151,20 +272,79 @@ const DashboardPage = () => {
 			{selectedSection === "executedTests" && (
 				<div className="flex-1 bg-white p-6 shadow-md rounded">
 					<h2 className="text-xl font-semibold mb-4">Test Eseguiti</h2>
-					<ul>
-						{executedTests.map((test) => (
-							<li
-								key={test.id}
-								className="cursor-pointer p-2 hover:bg-gray-200 rounded"
-							>
-								{test.name}
-							</li>
-						))}
-					</ul>
+					<div className="overflow-x-auto">
+						<table className="min-w-full bg-white border text-sm">
+							<thead>
+								<tr>
+									{[
+										"ID",
+										"Punteggio",
+										"Sesso",
+										"Nome test",
+										"Revisionato",
+										"Azioni",
+									].map((header) => (
+										<th key={header} className="py-2 border w-1/10 text-center">
+											{header}
+										</th>
+									))}
+								</tr>
+							</thead>
+							<tbody>
+								{executedTests.map((test) => (
+									<tr key={test.id} className="hover:bg-gray-200">
+										<td className="py-2 text-center">
+											{test.test_execution_id}
+										</td>
+										<td className="py-2 text-center">{test.score}</td>
+										<td className="py-2 text-center">{test.id_sex.name}</td>
+										<td className="py-2 text-center">
+											{test.id_test.name_test}
+										</td>
+										<td className="py-2 text-center">
+											<input
+												type="checkbox"
+												checked={test.revision_date !== null}
+											/>
+										</td>
+										<td className="py-2 text-center">
+											<button
+												type="button"
+												className="bg-blue-500 text-white py-1 px-2 rounded"
+												onClick={async () => {
+													const data = await findSelectedExecutionTest(
+														test.documentId,
+													);
+													setSelectedExecution(data);
+													setSelectedSection("viewTest");
+												}}
+											>
+												<div className="flex items-center space-x-1">
+													<span>Visualizza</span>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														fill="currentColor"
+														className="bi bi-eye"
+														viewBox="0 0 16 16"
+													>
+														<title>Visualizza</title>
+														<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zm-8 4a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+														<path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+													</svg>
+												</div>
+											</button>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			)}
 
-			{/* Sezione "Modelli di Test" */}
+			{/* Sezione "Gestione Modelli di Test" */}
 			{selectedSection === "testTemplates" && (
 				<div className="flex-1 bg-white p-6 shadow-md rounded">
 					<div className="w-full bg-navbar-hover px-4 py-4">
@@ -173,14 +353,25 @@ const DashboardPage = () => {
 						</h2>
 					</div>
 					<div className="flex gap-2 mb-4 mt-4">
-						<input
-							type="text"
-							placeholder="Cerca test..."
-							className="flex-1 px-4 py-2 border rounded"
-						/>
+						<div className="flex-1 flex items-center border rounded">
+							<input
+								type="text"
+								placeholder="Cerca test..."
+								className="flex-1 px-4 py-2 border-none rounded-l"
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+							<button
+								type="button"
+								className="bg-navbar text-white px-4 py-2 rounded-r"
+								onClick={() => handleSearch()}
+							>
+								Cerca
+							</button>
+						</div>
 						<button
 							type="button"
-							className="bg-blue-500 text-white px-4 py-2 rounded"
+							className="bg-navbar text-white px-4 py-2 rounded"
 							onClick={() => setSelectedSection("createTest")}
 						>
 							Crea Nuovo Modello di Test
@@ -198,10 +389,10 @@ const DashboardPage = () => {
 									className="flex justify-between items-center p-2 rounded cursor-pointer"
 								>
 									<span>{test.name_test}</span>
-									<div className="flex gap-2">
+									<div className="flex space-x-2">
 										<button
 											type="button"
-											className="bg-yellow-500 text-white px-2 py-1 rounded"
+											className="bg-navbar-hover text-white py-1 px-2 rounded"
 											onClick={async () => {
 												const data = await findSelectedTest(test.documentId);
 												setSelectedTest(data);
@@ -215,11 +406,28 @@ const DashboardPage = () => {
 												}
 											}}
 										>
-											Modifica
+											<div className="flex items-center space-x-1">
+												<span>Modifica</span>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													fill="currentColor"
+													className="bi bi-pencil-square"
+													viewBox="0 0 16 16"
+												>
+													<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+													<path
+														fill-rule="evenodd"
+														d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+													/>
+													<title>Modifica</title>
+												</svg>
+											</div>
 										</button>
 										<button
 											type="button"
-											className="bg-red-500 text-white px-2 py-1 rounded"
+											className="text-white bg-red-600 py-1 px-2 rounded"
 											onClick={async () => {
 												handleDelete(test.documentId);
 											}}
@@ -229,7 +437,20 @@ const DashboardPage = () => {
 												}
 											}}
 										>
-											Elimina
+											<div className="flex items-center space-x-1">
+												<span>Elimina</span>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													fill="currentColor"
+													className="bi bi-trash-fill"
+													viewBox="0 0 16 16"
+												>
+													<title>Elimina</title>
+													<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
+												</svg>
+											</div>
 										</button>
 									</div>
 								</li>
@@ -263,6 +484,177 @@ const DashboardPage = () => {
 						quizData={selectedTest ?? newTemplate}
 						edit={true}
 					/>
+				</div>
+			)}
+
+			{/* Sezione per la visualizzazione del test */}
+			{selectedSection === "viewTest" && (
+				<div className="flex-1 font-poppins text-navbar-hover">
+					<div className="flex flex-col w-full bg-white p-6 shadow-md rounded">
+						{/* Informazioni sul test da eseguire */}
+						{selectedExecution && (
+							<>
+								<div className="w-full bg-navbar-hover px-4 py-4">
+									<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+										Risultati del Test
+									</h2>
+								</div>
+								{/* Sezione informazioni */}
+								<div className="mt-2 py-4 mb-6 p-4">
+									<h2 className="text-2xl font-bold mb-2 text-navbar-hover">
+										Informazioni sul test
+									</h2>
+									<hr className="mb-4" />
+									<div className="mb-4">
+										{/* Nome del test e data di esecuaione */}
+										<div className="flex items-center mb-2 justify-between">
+											<div className="flex items-center mb-2">
+												<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+													Nome del Test:
+												</h3>
+												<h3 className="text-lg text-navbar-hover">
+													{selectedExecution.test_info.test_name}
+												</h3>
+											</div>
+											<div className="flex items-center mb-2">
+												<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+													Eseguito il:
+												</h3>
+												<h3 className="text-lg text-navbar-hover">
+													{formatTime(
+														selectedExecution.test_info.execution_time,
+													)}
+												</h3>
+											</div>
+										</div>
+
+										{/* Descrizione del test */}
+										<div className="flex flex-col items-left mb-2">
+											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+												Descrizione:
+											</h3>
+											<textarea
+												className="w-full p-2 border rounded-lg"
+												value={selectedExecution.test_info.test_description}
+												readOnly
+											/>
+										</div>
+
+										{/* Note e data visualizzazione */}
+										<div className="flex flex-col mb-4">
+											<h3 className="text-lg font-semibold text-navbar-hover mb-2">
+												Note:
+											</h3>
+											<textarea
+												className="w-full p-2 border rounded-lg mb-4"
+												value={selectedExecution.test_info.note}
+												readOnly
+											/>
+											<h3 className="text-lg font-semibold text-navbar-hover mb-2">
+												Visionato il:
+											</h3>
+											<p className="text-lg text-navbar-hover">
+												{formatTime(selectedExecution.test_info.revision_date)}
+											</p>
+										</div>
+										<div className="flex">
+											<button
+												type="button"
+												className="bg-navbar-hover text-white py-2 px-4 rounded"
+												onClick={() => {}}
+											>
+												Inserisci nota
+											</button>
+										</div>
+
+										{/* Punteggio del test */}
+										<div className="flex justify-end mb-2">
+											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+												Punteggio:
+											</h3>
+											<h3 className="text-lg text-navbar-hover">
+												{selectedExecution.test_info.score}
+											</h3>
+										</div>
+									</div>
+									<h2 className="text-2xl font-bold mb-2 text-navbar-hover">
+										Informazioni sull'utente
+									</h2>
+									<hr className="mb-4" />
+									<div className="mb-4">
+										<div className="flex items-center mb-2">
+											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+												Età:
+											</h3>
+											<h3 className="text-lg text-navbar-hover">
+												{selectedExecution.test_info.user_info.age}
+											</h3>
+										</div>
+										<div className="flex items-center mb-2">
+											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+												Sesso:
+											</h3>
+											<h3 className="text-lg text-navbar-hover">
+												{selectedExecution.test_info.user_info.sex}
+											</h3>
+										</div>
+										<div className="flex items-center mb-2">
+											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+												IP:
+											</h3>
+											<h3 className="text-lg text-navbar-hover">
+												{selectedExecution.test_info.user_info.ip}
+											</h3>
+										</div>
+									</div>
+								</div>
+							</>
+						)}
+
+						{/* Sezione domande del test */}
+						{selectedExecution?.questions.map((question, index) => {
+							return (
+								<div
+									key={question.question_name}
+									className="py-4 p-4 shadow-sm"
+								>
+									<h2 className="text-2xl font-bold mb-2 text-navbar-hover">
+										Domande
+									</h2>
+									<hr className="mb-4" />
+									<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-poppins">
+										<p className="text-sm text-gray-600 mb-2">
+											Categoria: {question.category_name}
+										</p>
+										<h2 className="text-lg font-medium mb-2">
+											{index + 1}. {question.question_name}:{" "}
+											{question.question_text}
+										</h2>
+										<div className="flex flex-col space-y-2">
+											{question.answers.map((answer) => (
+												<label
+													key={answer.documentId}
+													className="flex items-center space-x-2"
+												>
+													<input
+														type="radio"
+														name={`question-${question.question_name}`}
+														value={answer.documentId}
+														checked={answer.user_selected}
+														disabled
+														className="form-radio text-navbar"
+													/>
+													<span className="text-navbar-hover">
+														{answer.answer_text}
+													</span>
+												</label>
+											))}
+										</div>
+									</div>
+								</div>
+							);
+						})}
+					</div>
 				</div>
 			)}
 		</div>

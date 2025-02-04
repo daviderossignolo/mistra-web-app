@@ -24,7 +24,7 @@ export default [
 		},
 	},
 	{
-		method: "GET",
+		method: "POST",
 		path: "/get-test-execution",
 		handler: "testExecution.getTestExecution",
 		config: {
