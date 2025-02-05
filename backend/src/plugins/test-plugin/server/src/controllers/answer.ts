@@ -7,7 +7,7 @@ export default {
 	/**
 	 * Endpoin per la creazione di una risposta.
 	 * @param ctx
-	 * @returns
+	 * @returns answer_id
 	 */
 	async createAnswer(ctx: Context) {
 		const { id_answer, text, correction, score, question_id } =
@@ -46,6 +46,11 @@ export default {
 		return ctx;
 	},
 
+	/**
+	 * Endpoin per la visualizzazione di una risposta.
+	 * @param ctx
+	 * @returns filtredData
+	 */
 	async modifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
@@ -97,6 +102,11 @@ export default {
 		}
 	},
 
+	/**
+	 * Endpoin per la modifica di una risposta.
+	 * @param ctx
+	 * @returns
+	 */
 	async submitModifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
@@ -132,6 +142,11 @@ export default {
 		}
 	},
 
+	/**
+	 * Endpoin per la cancellazione di una risposta.
+	 * @param ctx
+	 * @returns
+	 */
 	async deleteAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
@@ -158,6 +173,11 @@ export default {
 		}
 	},
 
+	/**
+	 * Endpoin per la visualizzazione di tutte le risposte.
+	 * @param ctx
+	 * @returns filteredAnswers
+	 */
 	async getAnswers(ctx: Context) {
 		try {
 			const response = await fetch("http://localhost:1337/api/answers?populate=*", {
