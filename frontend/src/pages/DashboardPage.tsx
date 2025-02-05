@@ -249,7 +249,6 @@ const DashboardPage: React.FC = () => {
 		}
 
 		const data = await getTestResponse.json();
-		console.log(data);
 
 		return data;
 	};
@@ -310,7 +309,7 @@ const DashboardPage: React.FC = () => {
 										<td className="py-2 text-center">
 											<button
 												type="button"
-												className="bg-blue-500 text-white py-1 px-2 rounded"
+												className="bg-navbar-hover text-white py-1 px-2 rounded"
 												onClick={async () => {
 													const data = await findSelectedExecutionTest(
 														test.documentId,

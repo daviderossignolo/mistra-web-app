@@ -278,6 +278,7 @@ export default {
 	async insertTest(ctx: Context) {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
+		process.env.API_KEY;
 		const body = ctx.request.body;
 
 		// inserisco il test eseguito
