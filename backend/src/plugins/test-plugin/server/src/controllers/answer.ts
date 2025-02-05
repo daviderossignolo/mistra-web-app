@@ -2,6 +2,27 @@ import type { Context } from "koa";
 import answerService from "../services/answer";
 const { v4: uuidv4 } = require("uuid");
 import axios from "axios";
+type CategoryResp = {
+	data: {
+		id: number;
+		documentId: string;
+		id_answer: string;
+		text: string;
+		score: number;
+		correction: string;
+		createdAt: string;
+		updatedAt: string;
+		publishedAt: string;
+	}[];
+	meta: {
+		pagination: {
+			page: number;
+			pageSize: number;
+			pageCount: number;
+			total: number;
+		};
+	};
+};
 
 export default {
 	/**
@@ -36,9 +57,8 @@ export default {
 			return ctx;
 		}
 
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		const answerData: any = await response.json();
-		const id = answerData.data.documentId;
+		const answerData = (await response.json()) as CategoryResp;
+		const id = answerData.data[0].documentId;
 
 		ctx.status = 200;
 		ctx.body = { answer_id: id };
@@ -54,12 +74,15 @@ export default {
 	async modifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
-			const response = await fetch(`http://localhost:1337/api/answers/${documentId}?populate=*`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`http://localhost:1337/api/answers/${documentId}?populate=*`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
@@ -68,7 +91,7 @@ export default {
 			}
 
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const answerData : any = await response.json();
+			const answerData: any = await response.json();
 			const data = answerData.data;
 
 			const filteredData = {
@@ -93,10 +116,9 @@ export default {
 
 			ctx.status = 200;
 			ctx.body = filteredData;
-			
+
 			// return ctx;
 			return filteredData;
-			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
@@ -112,19 +134,22 @@ export default {
 			const { documentId } = ctx.query;
 			const { text, score, correction } = ctx.request.body;
 			console.log(ctx.request.body);
-			const response = await fetch(`http://localhost:1337/api/answers/${documentId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					data: {
-						text,
-						score,
-						correction,
+			const response = await fetch(
+				`http://localhost:1337/api/answers/${documentId}`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
 					},
-				}),
-			});
+					body: JSON.stringify({
+						data: {
+							text,
+							score,
+							correction,
+						},
+					}),
+				},
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
@@ -136,7 +161,6 @@ export default {
 			ctx.body = { message: "Risposta modificata con successo!" };
 
 			return ctx;
-			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
@@ -151,13 +175,16 @@ export default {
 		try {
 			const { documentId } = ctx.query;
 
-			const response = await fetch(`http://localhost:1337/api/answers/${documentId}`, {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`http://localhost:1337/api/answers/${documentId}`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
-			
+			);
+
 			if (!response.ok) {
 				ctx.status = response.status;
 				ctx.body = { error: "Errore nella cancellazione della risposta" };
@@ -166,8 +193,7 @@ export default {
 
 			ctx.status = 200;
 			ctx.body = { message: "Risposta eliminata con successo!" };
-			return ctx
-			
+			return ctx;
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
@@ -180,18 +206,21 @@ export default {
 	 */
 	async getAnswers(ctx: Context) {
 		try {
-			const response = await fetch("http://localhost:1337/api/answers?populate=*", {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				"http://localhost:1337/api/answers?populate=*",
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
-			
+			);
+
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const responseData : any = await response.json(); // Converte la risposta in JSON
-			
+			const responseData: any = await response.json(); // Converte la risposta in JSON
+
 			const filteredAnswers = responseData.data.map((answer) => ({
-				id: answer.id ?? null, 
+				id: answer.id ?? null,
 				documentId: answer.documentId,
 				id_answer: answer.id_answer,
 				text: answer.text,
@@ -207,13 +236,12 @@ export default {
 						}
 					: null,
 			}));
-			
+
 			ctx.status = 200;
 			ctx.body = filteredAnswers;
-			
-			// return ctx;
-			return filteredAnswers;		
 
+			// return ctx;
+			return filteredAnswers;
 		} catch (error) {
 			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
 		}
@@ -221,22 +249,27 @@ export default {
 
 	async getFreeAnswers(ctx: Context) {
 		try {
-			const response = await fetch("http://localhost:1337/api/answers/?populate=*", {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				"http://localhost:1337/api/answers/?populate=*",
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
-			
+			);
+
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation
-			const responseData : any = await response.json();
+			const responseData: any = await response.json();
 			const answers = responseData.data;
-			
+
 			// Filtra le answers con id_question null
-			const FreeAnswers = answers.filter((answer) => answer.question_id === null);
-			
+			const FreeAnswers = answers.filter(
+				(answer) => answer.question_id === null,
+			);
+
 			const filteredAnswers = FreeAnswers.map((answer) => ({
-				id: answer.id ?? null, 
+				id: answer.id ?? null,
 				documentId: answer.documentId,
 				id_answer: answer.id_answer,
 				text: answer.text,
@@ -250,14 +283,14 @@ export default {
 							name: answer.question_id.name,
 							text: answer.question_id.text,
 						}
-					: null, 
+					: null,
 			}));
-			
+
 			ctx.status = 200;
 			ctx.body = filteredAnswers;
 
 			//return ctx;
-			return filteredAnswers;			
+			return filteredAnswers;
 		} catch (error) {
 			console.error(`Errore nel caricamento delle answers: ${error.message}`);
 			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
