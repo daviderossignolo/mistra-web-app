@@ -509,6 +509,7 @@ export default {
 		// che servirà per le relazioni
 		const testData = (await testResponse.json()) as TestResponse;
 		const testId = testData.data.documentId;
+		console.log("TEST ID: ", testId);
 
 		// Processo le domande del quiz
 		for (const question of quiz.questions) {

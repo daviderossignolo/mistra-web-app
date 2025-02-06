@@ -46,6 +46,7 @@ export default {
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const questionData: any = await response.json();
 		const id = questionData.data.documentId;
+		console.log("QUESRION ID: ", id);
 
 		ctx.status = 200;
 		ctx.body = { question_id: id };
@@ -74,7 +75,6 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
 				},
 			});
 
@@ -85,7 +85,7 @@ export default {
 			}
 
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const responseData : any = await response.json();
+			const responseData: any = await response.json();
 			const data = responseData.data;
 
 			// Filtro i dati
@@ -112,7 +112,6 @@ export default {
 
 			//return ctx;
 			return filteredData;
-			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
@@ -125,7 +124,6 @@ export default {
 	 */
 	async submitModifyQuestion(ctx: Context) {
 		try {
-			
 			const { documentId } = ctx.query;
 			const { name, text, category_id } = ctx.request.body;
 
@@ -152,7 +150,6 @@ export default {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify(payload),
 			});
@@ -167,7 +164,6 @@ export default {
 			ctx.body = { message: "Questiom modified successfully" };
 
 			return ctx;
-			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
@@ -182,35 +178,41 @@ export default {
 		try {
 			const { documentId } = ctx.query;
 
-			const token = process.env.SERVICE_KEY;
-
-			if (!token) {
-				ctx.status = 401;
-				ctx.body = { error: "Unauthorized" };
-				return ctx;
-			}
-
 			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
 					"Authorization": `Bearer ${token}`,
 				},
-			});
+			},
+		);
 
-			if (!response.ok) {
-				ctx.status = response.status;
-				ctx.body = { error: "Errore nell'eliminazione della domanda" };
-				return ctx;
-			}
-			
-			ctx.status = 200;
-			ctx.body = { message: "Question deleted successfully" };
+		if (!response.ok) {
+			ctx.status = response.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
 			return ctx;
-
-		} catch (error) {
-			ctx.body = { error: error.message };
 		}
+
+		// Elimino la riga da question-in-tests
+		const deleteResponse = await fetch(
+			`http://localhost:1337/api/question-in-tests/${questionIntest}`,
+			{
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		if (!deleteResponse.ok) {
+			ctx.status = deleteResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		ctx.status = 200;
+		ctx.body = { message: "Question deleted successfully" };
+		return ctx;
 	},
 
 	/**
@@ -220,20 +222,10 @@ export default {
 	 */
 	async getQuestions(ctx) {
 		try {
-
-			const token = process.env.SERVICE_KEY;
-
-			if (!token) {
-				ctx.status = 401;
-				ctx.body = { error: "Unauthorized" };
-				return ctx;
-			}
-
 			const response = await fetch("http://localhost:1337/api/questions?populate=*", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
 				},
 			});
 
@@ -244,10 +236,10 @@ export default {
 			}
 
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const responseData : any = await response.json();
+			const responseData: any = await response.json();
 
 			const data = responseData.data;
-			
+
 			const filteredAnswers = responseData.data.map((data) => ({
 				id: data.id ?? null, // Usa ?? per maggiore sicurezza
 				documentId: data.documentId,
@@ -263,10 +255,9 @@ export default {
 						}
 					: null,
 			}));
-			
-			console.log(filteredAnswers);
-			return filteredAnswers;		
 
+			console.log(filteredAnswers);
+			return filteredAnswers;
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}

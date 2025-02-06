@@ -48,15 +48,38 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 		setModalOpen(false);
 	};
 
+	// Variabili d'ambiente
+	const host = process.env.REACT_APP_BACKEND_HOST;
+	const port = process.env.REACT_APP_BACKEND_PORT;
+
 	// Elimina la domanda dalla lista
-	const handleDeleteQuestion = (id: string) => {
+	const handleDeleteQuestion = async (id: string) => {
 		setQuestions((prev: Question[]) =>
 			prev.filter((question) => question.id !== id),
 		);
 
 		if (edit) {
 			// Faccio la chiamata API per eliminare la domanda dal database
-			// TODO: Completare la chiamata
+			const deletedQuestions = await fetch(
+				`${host}:${port}/api/test-plugin/delete-question`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						documentId: id,
+					}),
+				},
+			);
+
+			if (!deletedQuestions.ok) {
+				alert("Errore durante l'eliminazione della domanda.");
+			}
+
+			if (deletedQuestions.ok) {
+				alert("Domanda eliminata con successo.");
+			}
 		}
 	};
 
@@ -244,7 +267,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 								<button
 									type="button"
 									className="text-white bg-red-600 py-1 px-2 rounded"
-									onClick={() => handleDeleteQuestion(question.id)}
+									onClick={() => handleDeleteQuestion(question.documentId)}
 								>
 									<div className="flex items-center space-x-1">
 										<span>Elimina</span>

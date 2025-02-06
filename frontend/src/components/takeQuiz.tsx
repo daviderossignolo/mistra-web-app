@@ -176,7 +176,7 @@ const TakeQuiz: React.FC = () => {
 				(a) => a.documentId === selectedAnswerId,
 			);
 
-			if (selectedAnswer?.score === 1) {
+			if (selectedAnswer) {
 				totalScore += selectedAnswer.score;
 			}
 		}

@@ -107,6 +107,8 @@ const DashboardPage: React.FC = () => {
 	const [selectedExecution, setSelectedExecution] =
 		useState<ExecutedTestFull | null>(null);
 
+	const [notes, setNotes] = useState("");
+
 	// Effettua il fetch dei test
 	useEffect(() => {
 
@@ -216,6 +218,42 @@ const DashboardPage: React.FC = () => {
 		setSearchTerm("");
 	};
 
+	const handleSearchExecutions = async () => {
+		// Se il termine è vuoto allora recupero tutti i test
+		if (searchTerm === "") {
+			const fetchTest = async () => {
+				const response = await fetch(
+					`${host}:${port}/api/test-executions?pLevel`,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					},
+				);
+
+				if (!response.ok) {
+					alert(`Errore nel recupero dei test - status: ${response.status}`);
+					return;
+				}
+
+				const data = await response.json();
+				setExecutedTests(data.data);
+			};
+
+			fetchTest();
+			return;
+		}
+
+		// Altrimenti filtro i test in base al termine di ricerca
+		setExecutedTests(
+			executedTests.filter((test) =>
+				test.test_execution_id.includes(searchTerm),
+			),
+		);
+		setSearchTerm("");
+	};
+
 	// Funzione per gestire l'eliminazione di un test
 	const handleDelete = async (selectedDocId: string) => {
 
@@ -272,6 +310,35 @@ const DashboardPage: React.FC = () => {
 		return data;
 	};
 
+	const handleInsertNote = async (documentId: string) => {
+		console.log(documentId);
+		console.log(notes);
+
+		const revisionResponse = await fetch(
+			`${host}:${port}/api/test-executions/${documentId}`,
+			{
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					data: {
+						note: notes,
+						revision_date: new Date().toISOString().split("T")[0],
+					},
+				}),
+			},
+		);
+
+		console.log(revisionResponse);
+
+		if (!revisionResponse.ok) {
+			alert("Non è stato possibile inserire le note");
+		}
+
+		if (revisionResponse.ok) {
+			alert("Note inserite correttamente");
+		}
+	};
+
 	return (
 		<div className="flex flex-col lg:flex-row gap-6 p-6 bg-gray-100 min-h-75">
 			<Sidebar
@@ -289,9 +356,29 @@ const DashboardPage: React.FC = () => {
 			{/* Sezione "Test Eseguiti" */}
 			{selectedSection === "executedTests" && (
 				<div className="flex-1 bg-white p-6 shadow-md rounded">
-					<h2 className="text-xl font-semibold mb-4">Test Eseguiti</h2>
+					<div className="w-full bg-navbar-hover px-4 py-4">
+						<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+							Test Eseguiti
+						</h2>
+					</div>
+					<div className="flex-1 flex items-center border rounded mt-3">
+						<input
+							type="text"
+							placeholder="Cerca test..."
+							className="flex-1 px-4 py-2 border-none rounded-l"
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+						/>
+						<button
+							type="button"
+							className="bg-navbar text-white px-4 py-2 rounded-r"
+							onClick={() => handleSearchExecutions()}
+						>
+							Cerca
+						</button>
+					</div>
 					<div className="overflow-x-auto">
-						<table className="min-w-full bg-white border text-sm">
+						<table className="min-w-full bg-white border text-sm mt-4">
 							<thead>
 								<tr>
 									{[
@@ -565,8 +652,8 @@ const DashboardPage: React.FC = () => {
 											</h3>
 											<textarea
 												className="w-full p-2 border rounded-lg mb-4"
-												value={selectedExecution.test_info.note}
-												readOnly
+												value={notes}
+												onChange={(e) => setNotes(e.target.value)}
 											/>
 											<h3 className="text-lg font-semibold text-navbar-hover mb-2">
 												Visionato il:
@@ -579,7 +666,11 @@ const DashboardPage: React.FC = () => {
 											<button
 												type="button"
 												className="bg-navbar-hover text-white py-2 px-4 rounded"
-												onClick={() => {}}
+												onClick={() =>
+													handleInsertNote(
+														selectedExecution.test_info.documentId,
+													)
+												}
 											>
 												Inserisci nota
 											</button>

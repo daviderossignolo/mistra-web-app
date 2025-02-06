@@ -14,7 +14,7 @@ export default [
 		config: {
 			  auth: { required: true },
 		},
-  	},
+	},
 	{
 		method: 'POST',
 		path: '/submit-modify-question', // Questa rotta permette modificare una domanda
