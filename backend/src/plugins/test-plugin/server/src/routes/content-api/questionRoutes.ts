@@ -24,7 +24,7 @@ export default [
 		},
   	},
   	{
-		method: 'GET',
+		method: 'POST',
 		path: '/delete-question', // Questa rotta permette eliminare una domanda
 		handler: 'question.deleteQuestion', // Controller per eliminare una domanda
 		config: {

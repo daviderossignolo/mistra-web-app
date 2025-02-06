@@ -20,6 +20,7 @@ type ServicePageData = {
 };
 
 const ServicesListPage: React.FC = () => {
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	const [pageData, setPageData] = useState<any | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);

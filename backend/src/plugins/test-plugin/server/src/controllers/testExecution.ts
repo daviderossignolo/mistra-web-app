@@ -287,6 +287,9 @@ export default {
 		const port = process.env.PORT;
 		const body = ctx.request.body;
 
+		console.log(body);
+		console.log(body.id_test)
+
 		const token = process.env.SERVICE_KEY;
 
 		// inserisco il test eseguito

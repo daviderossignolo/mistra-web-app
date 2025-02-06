@@ -198,6 +198,8 @@ const TakeQuiz: React.FC = () => {
 
 		//const token = localStorage.getItem("token");
 
+		console.log("stampa", compiledQuiz);
+
 		const response = await fetch(
 			`${host}:${port}/api/test-plugin/insert-test-execution`,
 			{

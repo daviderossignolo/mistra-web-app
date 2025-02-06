@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import CategoryModal from "./categoryModal";
+import CategoryModal from "./CategoryModal";
 
 // Tipi TypeScript
 export type Answer = {
@@ -124,12 +124,17 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 			prevAnswers.filter((answer) => answer.id !== id),
 		);
 
+		const token = localStorage.getItem("token");
+
 		if (edit) {
 			const answerResponse = await fetch(
 				`${host}:${port}/api/answers/${documentId}`,
 				{
 					method: "DELETE",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
 				},
 			);
 

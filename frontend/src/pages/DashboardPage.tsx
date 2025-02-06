@@ -219,6 +219,9 @@ const DashboardPage: React.FC = () => {
 	};
 
 	const handleSearchExecutions = async () => {
+
+		const token = localStorage.getItem("token");
+
 		// Se il termine è vuoto allora recupero tutti i test
 		if (searchTerm === "") {
 			const fetchTest = async () => {
@@ -228,6 +231,7 @@ const DashboardPage: React.FC = () => {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
 						},
 					},
 				);
@@ -314,11 +318,16 @@ const DashboardPage: React.FC = () => {
 		console.log(documentId);
 		console.log(notes);
 
+		const token = localStorage.getItem("token");
+
 		const revisionResponse = await fetch(
 			`${host}:${port}/api/test-executions/${documentId}`,
 			{
 				method: "PUT",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json", 
+					"Authorization": `Bearer ${token}`,
+				},
 				body: JSON.stringify({
 					data: {
 						note: notes,
