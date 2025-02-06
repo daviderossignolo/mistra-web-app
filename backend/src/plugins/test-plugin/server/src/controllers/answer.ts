@@ -57,8 +57,9 @@ export default {
 			return ctx;
 		}
 
-		const answerData = (await response.json()) as CategoryResp;
-		const id = answerData.data[0].documentId;
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const answerData = (await response.json()) as any;
+		const id = answerData.data.documentId;
 
 		ctx.status = 200;
 		ctx.body = { answer_id: id };

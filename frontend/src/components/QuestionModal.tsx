@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import CategoryModal from "./CategoryModal";
+import CategoryModal from "./categoryModal";
 
 // Tipi TypeScript
 export type Answer = {
@@ -67,6 +67,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	]);
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
+	const host = process.env.REACT_APP_BACKEND_HOST;
+	const port = process.env.REACT_APP_BACKEND_PORT;
+
 	// Funzione per recuperare le categorie disponibili da STRAPI
 	useEffect(() => {
 		const fetchCategories = async () => {
@@ -107,14 +110,23 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	};
 
 	// Rimuove una risposta quando si clicca sul pulsante
-	const removeAnswer = (id: string) => {
+	const removeAnswer = async (id: string, documentId: string) => {
 		setAnswers((prevAnswers) =>
 			prevAnswers.filter((answer) => answer.id !== id),
 		);
 
 		if (edit) {
-			// Faccio la chiamata API per eliminare la risposta dal database
-			// TODO: Completare la chiamata
+			const answerResponse = await fetch(
+				`${host}:${port}/api/answers/${documentId}`,
+				{
+					method: "DELETE",
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+
+			if (!answerResponse.ok) {
+				alert("Errore nell'eliminazione della risposta");
+			}
 		}
 	};
 
@@ -285,7 +297,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 									{/* Pulsante per rimuovere la risposta con icona cestino */}
 									<button
 										type="button"
-										onClick={() => removeAnswer(answer.id)}
+										onClick={() => removeAnswer(answer.id, answer.documentId)}
 										className="text-red-600"
 									>
 										<svg

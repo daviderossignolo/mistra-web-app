@@ -38,6 +38,7 @@ export default {
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const questionData: any = await response.json();
 		const id = questionData.data.documentId;
+		console.log("QUESRION ID: ", id);
 
 		ctx.status = 200;
 		ctx.body = { question_id: id };
@@ -54,12 +55,15 @@ export default {
 		try {
 			const { documentId } = ctx.query;
 
-			const response = await fetch(`http://localhost:1337/api/questions/${documentId}?populate=*`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`http://localhost:1337/api/questions/${documentId}?populate=*`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
@@ -68,7 +72,7 @@ export default {
 			}
 
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const responseData : any = await response.json();
+			const responseData: any = await response.json();
 			const data = responseData.data;
 
 			// Filtro i dati
@@ -95,7 +99,6 @@ export default {
 
 			//return ctx;
 			return filteredData;
-			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
@@ -108,7 +111,6 @@ export default {
 	 */
 	async submitModifyQuestion(ctx: Context) {
 		try {
-			
 			const { documentId } = ctx.query;
 			const { name, text, category_id } = ctx.request.body;
 			console.log(ctx.request.body);
@@ -122,13 +124,16 @@ export default {
 				},
 			};
 
-			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`http://localhost:1337/api/questions/${documentId}`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(payload),
 				},
-				body: JSON.stringify(payload),
-			});
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
@@ -140,7 +145,6 @@ export default {
 			ctx.body = { message: "Questiom modified successfully" };
 
 			return ctx;
-			
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
@@ -152,29 +156,72 @@ export default {
 	 * @returns
 	 */
 	async deleteQuestion(ctx: Context) {
-		try {
-			const { documentId } = ctx.query;
+		const body = ctx.request.body;
+		const documentId = body.documentId;
 
-			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
+		const host = process.env.HOST;
+		const port = process.env.PORT;
+
+		// Devo recupera il document id della riga di question in test, se faccio la delete specificando solo il documentId della relazione question
+		// viene eliminata solo la relazione e non tutta la riga
+		const testResponse = await fetch(
+			`http://${host}:${port}/api/question-in-tests?filters[question_id][documentId][$eq]=${documentId}&pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		if (!testResponse.ok) {
+			ctx.status = testResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const testResponseData = (await testResponse.json()) as any;
+		console.log(testResponseData);
+		const questionIntest = testResponseData.data[0].documentId;
+
+		// Elimino la domanda
+		const response = await fetch(
+			`http://localhost:1337/api/questions/${documentId}`,
+			{
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
 				},
-			});
+			},
+		);
 
-			if (!response.ok) {
-				ctx.status = response.status;
-				ctx.body = { error: "Errore nell'eliminazione della domanda" };
-				return ctx;
-			}
-			
-			ctx.status = 200;
-			ctx.body = { message: "Question deleted successfully" };
+		if (!response.ok) {
+			ctx.status = response.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
 			return ctx;
-
-		} catch (error) {
-			ctx.body = { error: error.message };
 		}
+
+		// Elimino la riga da question-in-tests
+		const deleteResponse = await fetch(
+			`http://localhost:1337/api/question-in-tests/${questionIntest}`,
+			{
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+
+		if (!deleteResponse.ok) {
+			ctx.status = deleteResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		ctx.status = 200;
+		ctx.body = { message: "Question deleted successfully" };
+		return ctx;
 	},
 
 	/**
@@ -184,12 +231,15 @@ export default {
 	 */
 	async getQuestions(ctx) {
 		try {
-			const response = await fetch("http://localhost:1337/api/questions?populate=*", {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				"http://localhost:1337/api/questions?populate=*",
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
@@ -198,10 +248,10 @@ export default {
 			}
 
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const responseData : any = await response.json();
+			const responseData: any = await response.json();
 
 			const data = responseData.data;
-			
+
 			const filteredAnswers = responseData.data.map((data) => ({
 				id: data.id ?? null, // Usa ?? per maggiore sicurezza
 				documentId: data.documentId,
@@ -217,10 +267,9 @@ export default {
 						}
 					: null,
 			}));
-			
-			console.log(filteredAnswers);
-			return filteredAnswers;		
 
+			console.log(filteredAnswers);
+			return filteredAnswers;
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
