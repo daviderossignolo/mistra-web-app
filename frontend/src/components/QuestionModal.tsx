@@ -71,8 +71,17 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	useEffect(() => {
 		const fetchCategories = async () => {
 			try {
+				const token = localStorage.getItem("token");
+
 				const response = await fetch(
 					"http://localhost:1337/api/test-plugin/get-categories",
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
+					},
 				);
 				const data = await response.json();
 				console.log(data);

@@ -12,12 +12,20 @@ export default {
 	 */
 	async createQuestion(ctx: Context) {
 		const { id_question, name, text, category_id } = ctx.request.body;
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
 
 		// Faccio la chiamata API a Strapi per creare la Question
 		const response = await fetch("http://localhost:1337/api/questions", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				"Authorization": `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -54,10 +62,19 @@ export default {
 		try {
 			const { documentId } = ctx.query;
 
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			const response = await fetch(`http://localhost:1337/api/questions/${documentId}?populate=*`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			});
 
@@ -111,6 +128,15 @@ export default {
 			
 			const { documentId } = ctx.query;
 			const { name, text, category_id } = ctx.request.body;
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			console.log(ctx.request.body);
 
 			//si può passare solo documentId come category_id (occhio che è cambiato da id_category a category_id)
@@ -126,6 +152,7 @@ export default {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify(payload),
 			});
@@ -155,10 +182,19 @@ export default {
 		try {
 			const { documentId } = ctx.query;
 
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			});
 
@@ -184,10 +220,20 @@ export default {
 	 */
 	async getQuestions(ctx) {
 		try {
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			const response = await fetch("http://localhost:1337/api/questions?populate=*", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			});
 

@@ -34,11 +34,20 @@ export default {
 		const { id_answer, text, correction, score, question_id } =
 			ctx.request.body;
 
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
+
 		// Faccio la chiamata API a Strapi per creare la Question
 		const response = await fetch("http://localhost:1337/api/answers", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				"Authorization": `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -57,8 +66,12 @@ export default {
 			return ctx;
 		}
 
-		const answerData = (await response.json()) as CategoryResp;
-		const id = answerData.data[0].documentId;
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const answerData : any = (await response.json()) as CategoryResp;
+
+		console.log(answerData);
+
+		const id = answerData.data.documentId;
 
 		ctx.status = 200;
 		ctx.body = { answer_id: id };
@@ -74,12 +87,22 @@ export default {
 	async modifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			const response = await fetch(
 				`http://localhost:1337/api/answers/${documentId}?populate=*`,
 				{
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -133,6 +156,15 @@ export default {
 		try {
 			const { documentId } = ctx.query;
 			const { text, score, correction } = ctx.request.body;
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			console.log(ctx.request.body);
 			const response = await fetch(
 				`http://localhost:1337/api/answers/${documentId}`,
@@ -140,6 +172,7 @@ export default {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 					body: JSON.stringify({
 						data: {
@@ -175,12 +208,21 @@ export default {
 		try {
 			const { documentId } = ctx.query;
 
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			const response = await fetch(
 				`http://localhost:1337/api/answers/${documentId}`,
 				{
 					method: "DELETE",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -206,12 +248,22 @@ export default {
 	 */
 	async getAnswers(ctx: Context) {
 		try {
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			const response = await fetch(
 				"http://localhost:1337/api/answers?populate=*",
 				{
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -249,12 +301,22 @@ export default {
 
 	async getFreeAnswers(ctx: Context) {
 		try {
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
 			const response = await fetch(
 				"http://localhost:1337/api/answers/?populate=*",
 				{
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);

@@ -1,42 +1,42 @@
 export default [
     {
       	method: 'POST',
-      	path: '/create-category', // Questa rotta genera un test casuale
-      	handler: 'category.createCategory', // Aggiungi il controller per ottenere il test
+      	path: '/create-category', // Questa rotta permette di creare una categoria
+      	handler: 'category.createCategory', // Controller per creare una categoria
       	config: {
-      	  	auth: false, // Nessuna autenticazione per il test
+      	  	auth: { required: true },
       	},
     },
     {
       	method: 'GET',
-      	path: '/modify-category', // Questa rotta genera un test casuale
-      	handler: 'category.modifyCategory', // Aggiungi il controller per ottenere il test
+      	path: '/modify-category', // Questa rotta permette di visualizzare una categoria
+      	handler: 'category.modifyCategory', // Controller per visualizzare una categoria
       	config: {
-      	  	auth: false, // Nessuna autenticazione per il test
+      	  	auth: { required: true },
       	},
     },
     {
       	method: 'POST',
-      	path: '/submit-modify-category',
-      	handler: 'category.submitModifyCategory',
+      	path: '/submit-modify-category', // Questa rotta permette di modificare una categoria
+      	handler: 'category.submitModifyCategory', // Controller per modificare una categoria
       	config: {
-      	  	auth: false, // Nessuna autenticazione per il test
+      	  	auth: { required: true },
       	},
     },
     {
       	method: 'GET',
-      	path: '/delete-category',
-      	handler: 'category.deleteCategory',
+      	path: '/delete-category', // Questa rotta permette di eliminare una categoria
+      	handler: 'category.deleteCategory', // Controller per eliminare una categoria
       	config: {
-      	  	auth: false, // Nessuna autenticazione per il test
+      	  	auth: { required: true },
       	},
     },
 	{
         method: 'GET',
-        path: '/get-categories', // Questa rotta genera un test casuale
-        handler: 'category.getCategories', // Aggiungi il controller per ottenere il test
+        path: '/get-categories', // Questa rotta permette di ottenere tutte le categorie
+        handler: 'category.getCategories', // Controller per ottenere tutte le categorie
         config: {
-        	auth: false, // Nessuna autenticazione per il test
+        	auth: { required: true },
         },
     },
 ]

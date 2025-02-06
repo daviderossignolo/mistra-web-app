@@ -83,12 +83,16 @@ const TakeQuiz: React.FC = () => {
 		// Funzione per recuperare un test casuale dal database
 		const fetchRandomTest = async () => {
 			try {
+
+				const token = localStorage.getItem("token");
+
 				const randomTestResponse = await fetch(
 					`${host}:${port}/api/test-plugin/random-test`,
 					{
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
 						},
 					},
 				);
@@ -108,6 +112,7 @@ const TakeQuiz: React.FC = () => {
 		// Funzione per recuperare i dati sul sesso
 		const fetchSexData = async () => {
 			try {
+
 				const response = await fetch(`${host}:${port}/api/sexes`, {
 					method: "GET",
 					headers: {
@@ -190,12 +195,16 @@ const TakeQuiz: React.FC = () => {
 		};
 
 		// chiamata al backend per salvare il test
+
+		//const token = localStorage.getItem("token");
+
 		const response = await fetch(
 			`${host}:${port}/api/test-plugin/insert-test-execution`,
 			{
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					//"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify(compiledQuiz),
 			},

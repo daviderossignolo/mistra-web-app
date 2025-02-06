@@ -9,10 +9,10 @@ export default [
 	},
 	{
 		method: "GET",
-		path: "/search-test-Execution-by-id",
-		handler: "testExecution.searchById",
+		path: "/search-test-Execution-by-id", // Questa rotta permette di cercare un testExecution per id
+		handler: "testExecution.searchById", // Controller per cercare un testExecution per id
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{
@@ -25,10 +25,10 @@ export default [
 	},
 	{
 		method: "POST",
-		path: "/get-test-execution",
-		handler: "testExecution.getTestExecution",
+		path: "/get-test-execution", // Questa rotta permette di ottenere un testExecution
+		handler: "testExecution.getTestExecution", // Controller per ottenere un testExecution
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{

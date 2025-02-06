@@ -84,12 +84,16 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 			// chiamata API per salvare il quiz
 			try {
+
+				const token = localStorage.getItem("token");
+
 				const response = await fetch(
 					"http://localhost:1337/api/test-plugin/create-test",
 					{
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},
@@ -123,12 +127,16 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 			// chiamata API per salvare il quiz
 			try {
+
+				const token = localStorage.getItem("token");
+
 				const response = await fetch(
 					"http://localhost:1337/api/test-plugin/submit-modify-test",
 					{
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},

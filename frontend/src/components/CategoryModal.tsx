@@ -23,12 +23,16 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 			// Eseguo la chiamata API al plugin per salvare la categoria
 			const category_id = uuidv4();
 			const name = categoryName.trim();
+
+			const token = localStorage.getItem("token");
+
 			const response = await fetch(
 				"http://localhost:1337/api/test-plugin/create-category",
 				{
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
 					},
 					body: JSON.stringify({ id_category: category_id, name: name }),
 				},

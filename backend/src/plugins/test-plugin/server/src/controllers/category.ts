@@ -14,10 +14,19 @@ export default {
 		const { id_category, name } = ctx.request.body;
 		console.log(ctx.request.body);
 
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return;
+		}
+
 		const response = await fetch("http://localhost:1337/api/categories", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				"Authorization": `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -49,11 +58,19 @@ export default {
 		try {
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query
 
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return;
+			}
 			
 			const response = await fetch(`http://localhost:1337/api/categories/${documentId}`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			});
 			
@@ -96,6 +113,15 @@ export default {
 
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query
 			const { name } = ctx.request.body; // Ottieni il nuovo valore di "name" dal body della richiesta
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return;
+			}
+
 			console.log(ctx.request.body);
 
 			// Effettua la richiesta PUT al server
@@ -103,6 +129,7 @@ export default {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({
 					data: { name },
@@ -134,10 +161,19 @@ export default {
 		try {
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query
 
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return;
+			}
+
 			const response = await fetch(`http://localhost:1337/api/categories/${documentId}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			});
 
@@ -160,17 +196,42 @@ export default {
 	 * Function that calls strapi API to get all categories.
 	 * @returns {Promise<{id: string, id_category: string, name: string}[] | {error: string}>}
 	 */
-	async getCategories() {
+	async getCategories(ctx : Context) {
 		try {
-			const response = await axios.get("http://localhost:1337/api/categories");
-			const filteredCategories = response.data.data.map((category) => ({
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return;
+			}
+
+			const response = await fetch("http://localhost:1337/api/categories", {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
+				},
+			});
+		
+			if (!response.ok) {
+				throw new Error(`Errore nella richiesta: ${response.status} ${response.statusText}`);
+			}
+			
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const responseData : any = await response.json();
+
+			const filteredCategories = responseData.data.map((category) => ({
 				documentId: category.documentId,
 				id_category: category.id_category,
 				name: category.name,
 			}));
+		
 			return filteredCategories;
 		} catch (error) {
 			return { error: error.message };
 		}
+		
 	},
 };

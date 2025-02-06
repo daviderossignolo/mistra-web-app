@@ -1,42 +1,42 @@
 export default [
     {	
       	method: 'POST',
-      	path: '/create-question', // Questa rotta genera un test casuale
-      	handler: 'question.createQuestion', // Aggiungi il controller per ottenere il test
+      	path: '/create-question', // Questa rotta permette creare una domanda
+      	handler: 'question.createQuestion', // Controller per creare una domanda
       	config: {
-      		auth: false, // Nessuna autenticazione per il test
+      		auth: { required: true },
       	},
     },
 	{
 		method: 'GET',
-		path: '/modify-question', // Questa rotta genera un test casuale
-		handler: 'question.modifyQuestion', // Aggiungi il controller per ottenere il test
+		path: '/modify-question', // Questa rotta permette visualizzare una domanda
+		handler: 'question.modifyQuestion', // Controller per visualizzare una domanda
 		config: {
-			  auth: false, // Nessuna autenticazione per il test
+			  auth: { required: true },
 		},
   	},
 	{
 		method: 'POST',
-		path: '/submit-modify-question',
-		handler: 'question.submitModifyQuestion',
+		path: '/submit-modify-question', // Questa rotta permette modificare una domanda
+		handler: 'question.submitModifyQuestion', // Controller per modificare una domanda
 		config: {
-			  auth: false, // Nessuna autenticazione per il test
+			  auth: { required: true },
 		},
   	},
   	{
 		method: 'GET',
-		path: '/delete-question',
-		handler: 'question.deleteQuestion',
+		path: '/delete-question', // Questa rotta permette eliminare una domanda
+		handler: 'question.deleteQuestion', // Controller per eliminare una domanda
 		config: {
-			  auth: false, // Nessuna autenticazione per il test
+			  auth: { required: true },
 		},
   	},
 	  {
         method: 'GET',
-        path: '/get-questions', // Questa rotta genera un test casuale
-        handler: 'question.getQuestions', // Aggiungi il controller per ottenere il test
+        path: '/get-questions', // Questa rotta permette ottenere tutte le domande
+        handler: 'question.getQuestions', // Controller per ottenere tutte le domande
         config: {
-        	auth: false, // Nessuna autenticazione per il test
+        	auth: { required: true },
         },
     },
 ]

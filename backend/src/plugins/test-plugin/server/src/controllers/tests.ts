@@ -51,12 +51,23 @@ export default {
 		const port = process.env.PORT;
 		const quiz = ctx.request.body as Quiz;
 
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
+
 		// Modifico il test all'interno del database
 		const testResponse = await fetch(
 			`http://${host}:${port}/api/tests/${quiz.documentId}`,
 			{
 				method: "PUT",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
+				},
 				body: JSON.stringify({
 					data: {
 						name_test: quiz.name,
@@ -83,7 +94,10 @@ export default {
 			if (question.documentId === "") {
 				questionResponse = await fetch(`http://${host}:${port}/api/questions`, {
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
 					body: JSON.stringify({
 						data: {
 							id_question: question.id,
@@ -98,7 +112,10 @@ export default {
 					`http://${host}:${port}/api/questions/${question.documentId}`,
 					{
 						method: "PUT",
-						headers: { "Content-Type": "application/json" },
+						headers: { 
+							"Content-Type": "application/json", 
+							"Authorization": `Bearer ${token}`,
+						},
 						body: JSON.stringify({
 							data: {
 								name: question.name,
@@ -129,7 +146,10 @@ export default {
 					`http://${host}:${port}/api/question-in-tests`,
 					{
 						method: "POST",
-						headers: { "Content-Type": "application/json" },
+						headers: { 
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
 						body: JSON.stringify({
 							data: {
 								question_id: questionId,
@@ -154,7 +174,10 @@ export default {
 				if (answer.documentId === "") {
 					answerResponse = await fetch(`http://${host}:${port}/api/answers`, {
 						method: "POST",
-						headers: { "Content-Type": "application/json" },
+						headers: { 
+							"Content-Type": "application/json", 
+							"Authorization": `Bearer ${token}`,
+						},
 						body: JSON.stringify({
 							data: {
 								id_answer: answer.id,
@@ -170,7 +193,10 @@ export default {
 						`http://${host}:${port}/api/answers/${answer.documentId}`,
 						{
 							method: "PUT",
-							headers: { "Content-Type": "application/json" },
+							headers: { 
+								"Content-Type": "application/json", 
+								"Authorization": `Bearer ${token}`,
+							},
 							body: JSON.stringify({
 								data: {
 									text: answer.text,
@@ -205,12 +231,23 @@ export default {
 		const body = ctx.request.body;
 		const quiz = body.quiz as Quiz;
 
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
+
 		// Elimino il test dalla tabella tests
 		const testResponse = await fetch(
 			`http://localhost:1337/api/tests/${quiz.documentId}`,
 			{
 				method: "DELETE",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json", 
+					"Authorization": `Bearer ${token}`,
+				},
 			},
 		);
 
@@ -226,7 +263,10 @@ export default {
 				`http://localhost:1337/api/questions/${question.documentId}`,
 				{
 					method: "DELETE",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
 				},
 			);
 
@@ -242,7 +282,10 @@ export default {
 					`http://localhost:1337/api/answers/${answer.documentId}`,
 					{
 						method: "DELETE",
-						headers: { "Content-Type": "application/json" },
+						headers: { 
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
 					},
 				);
 
@@ -258,7 +301,10 @@ export default {
 				`http://localhost:1337/api/question-in-tests?filters[question_id][$eq]=${question.id}`,
 				{
 					method: "GET",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
 				},
 			);
 
@@ -275,7 +321,10 @@ export default {
 					`http://localhost:1337/api/question-in-tests/${questionInTest.documentId}`,
 					{
 						method: "DELETE",
-						headers: { "Content-Type": "application/json" },
+						headers: { 
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
 					},
 				);
 
@@ -301,6 +350,15 @@ export default {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
 		const body = ctx.request.body;
+
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
+
 		const returnData: Quiz = {
 			id: "",
 			name: "",
@@ -314,7 +372,10 @@ export default {
 			`http://${host}:${port}/api/tests?filters[documentId][$eq]=${body.testDocId}`,
 			{
 				method: "GET",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json",
+					"AUthorization": `Bearer ${token}`,
+				},
 			},
 		);
 
@@ -336,7 +397,10 @@ export default {
 			`http://${host}:${port}/api/question-in-tests?filters[test_id][$eq]=${testData.data[0].id}&pLevel`,
 			{
 				method: "GET",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
+				},
 			},
 		);
 
@@ -357,7 +421,10 @@ export default {
 				`http://${host}:${port}/api/answers?filters[question_id][$eq]=${questionId}&pLevel`,
 				{
 					method: "GET",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
 				},
 			);
 
@@ -407,10 +474,21 @@ export default {
 	async createTest(ctx: Context) {
 		const quiz = ctx.request.body as Quiz;
 
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
+
 		// Inserisco il test all'interno del database
 		const testResponse = await fetch("http://localhost:1337/api/tests", {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: { 
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${token}`,
+			},
 			body: JSON.stringify({
 				data: {
 					id_test: quiz.id,
@@ -448,7 +526,10 @@ export default {
 				"http://localhost:1337/api/test-plugin/create-question",
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
 					body: JSON.stringify({
 						id_question: question.id,
 						name: question.name,
@@ -476,7 +557,10 @@ export default {
 					"http://localhost:1337/api/test-plugin/create-answer",
 					{
 						method: "POST",
-						headers: { "Content-Type": "application/json" },
+						headers: { 
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
 						body: JSON.stringify({
 							id_answer: answer.id,
 							text: answer.text,
@@ -499,7 +583,10 @@ export default {
 				"http://localhost:1337/api/question-in-tests",
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json", 
+						"Authorization": `Bearer ${token}`,
+					},
 					body: JSON.stringify({
 						data: {
 							question_id: questionId,
@@ -525,12 +612,20 @@ export default {
 
 async function getCategory(category_id: string) {
 	try {
+
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			throw new Error("Unauthorized");
+		}
+
 		const response = await fetch(
 			"http://localhost:1337/api/test-plugin/get-categories",
 			{
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);

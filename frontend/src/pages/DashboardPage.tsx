@@ -109,11 +109,15 @@ const DashboardPage: React.FC = () => {
 
 	// Effettua il fetch dei test
 	useEffect(() => {
+
+		const token = localStorage.getItem("token");
+
 		const fetchTest = async () => {
 			const response = await fetch(`${host}:${port}/api/tests?pLevel`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			});
 
@@ -133,6 +137,7 @@ const DashboardPage: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -154,12 +159,15 @@ const DashboardPage: React.FC = () => {
 
 	// Recupero i dati del test selezionato
 	const findSelectedTest = async (selectedDocId: string) => {
+		const token = localStorage.getItem("token");
+
 		const getTestResponse = await fetch(
 			`${host}:${port}/api/test-plugin/get-complete-test`,
 			{
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({ testDocId: selectedDocId }),
 			},
@@ -177,6 +185,8 @@ const DashboardPage: React.FC = () => {
 
 	// Funzione per gestire la ricerca dei test
 	const handleSearch = async () => {
+		const token = localStorage.getItem("token");
+
 		// Se il termine è vuoto allora recupero tutti i test
 		if (searchTerm === "") {
 			const fetchTest = async () => {
@@ -184,6 +194,7 @@ const DashboardPage: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				});
 
@@ -207,6 +218,9 @@ const DashboardPage: React.FC = () => {
 
 	// Funzione per gestire l'eliminazione di un test
 	const handleDelete = async (selectedDocId: string) => {
+
+		const token = localStorage.getItem("token");
+
 		const toDelete = await findSelectedTest(selectedDocId);
 
 		// Elimino il test
@@ -216,6 +230,7 @@ const DashboardPage: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({ quiz: toDelete }),
 			},
@@ -232,12 +247,16 @@ const DashboardPage: React.FC = () => {
 	};
 
 	const findSelectedExecutionTest = async (documentId: string) => {
+
+		const token = localStorage.getItem("token");
+
 		const getTestResponse = await fetch(
 			`${host}:${port}/api/test-plugin/get-test-execution`,
 			{
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({ execDocId: documentId }),
 			},

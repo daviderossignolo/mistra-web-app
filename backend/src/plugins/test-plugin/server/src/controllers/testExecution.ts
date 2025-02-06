@@ -131,6 +131,9 @@ export default {
 	async getRandomTest(ctx: Context) {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
+
+		const token = process.env.SERVICE_KEY;
+
 		// Recupera tutti i test
 		const testResponse = await fetch(
 			`http://${host}:${port}/api/tests?pLevel`,
@@ -138,6 +141,7 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -179,6 +183,7 @@ export default {
 
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -202,6 +207,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -223,6 +229,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -278,8 +285,9 @@ export default {
 	async insertTest(ctx: Context) {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
-		process.env.API_KEY;
 		const body = ctx.request.body;
+
+		const token = process.env.SERVICE_KEY;
 
 		// inserisco il test eseguito
 		const testExecutionResponse = await fetch(
@@ -288,6 +296,7 @@ export default {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({
 					data: {
@@ -321,6 +330,7 @@ export default {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 					body: JSON.stringify({
 						data: {
@@ -352,6 +362,8 @@ export default {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
 
+		const token = process.env.SERVICE_KEY;
+
 		// Recupero il body della richiesta
 		const body = ctx.request.body;
 		const documentId = body.execDocId;
@@ -382,6 +394,7 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -419,6 +432,7 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -443,6 +457,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -478,6 +493,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);

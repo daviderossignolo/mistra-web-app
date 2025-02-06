@@ -1,34 +1,34 @@
 export default [
 	{
 		method: "POST",
-		path: "/create-test", // Questa rotta genera un test casuale
-		handler: "tests.createTest", // Aggiungi il controller per ottenere il test
+		path: "/create-test", // Questa rotta permette di creare un test
+		handler: "tests.createTest", // Controller per creare un test
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{
 		method: "POST",
-		path: "/submit-modify-test",
-		handler: "tests.submitModifyTest",
+		path: "/submit-modify-test", // Questa rotta permette di visualizzare un test
+		handler: "tests.submitModifyTest", // Controller per visualizzare un test
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{
 		method: "POST",
-		path: "/delete-test",
-		handler: "tests.deleteTest",
+		path: "/delete-test", // Questa rotta permette di eliminare un test
+		handler: "tests.deleteTest", // Controller per eliminare un test
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{
 		method: "POST",
-		path: "/get-complete-test",
-		handler: "tests.getCompleteTest",
+		path: "/get-complete-test", // Questa rotta permette di ottenere un test completo
+		handler: "tests.getCompleteTest", // Controller per ottenere un test completo
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 ];
