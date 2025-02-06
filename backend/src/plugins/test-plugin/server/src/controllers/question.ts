@@ -25,7 +25,7 @@ export default {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": `Bearer ${token}`,
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -71,12 +71,15 @@ export default {
 				return ctx;
 			}
 
-			const response = await fetch(`http://localhost:1337/api/questions/${documentId}?populate=*`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`http://localhost:1337/api/questions/${documentId}?populate=*`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
@@ -146,13 +149,16 @@ export default {
 				},
 			};
 
-			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`http://localhost:1337/api/questions/${documentId}`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(payload),
 				},
-				body: JSON.stringify(payload),
-			});
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
@@ -169,20 +175,51 @@ export default {
 		}
 	},
 
-	/**
-	 * Endpoint per l'eliminazione di una domanda.
-	 * @param ctx
-	 * @returns
-	 */
 	async deleteQuestion(ctx: Context) {
-		try {
-			const { documentId } = ctx.query;
+		const body = ctx.request.body;
+		const documentId = body.documentId;
 
-			const response = await fetch(`http://localhost:1337/api/questions/${documentId}`, {
+		const host = process.env.HOST;
+		const port = process.env.PORT;
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Non autorizzato" };
+			return ctx;
+		}
+
+		// Devo recupera il document id della riga di question in test, se faccio la delete specificando solo il documentId della relazione question
+		// viene eliminata solo la relazione e non tutta la riga
+		const testResponse = await fetch(
+			`http://${host}:${port}/api/question-in-tests?filters[question_id][documentId][$eq]=${documentId}&pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!testResponse.ok) {
+			ctx.status = testResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const testResponseData = (await testResponse.json()) as any;
+		console.log(testResponseData);
+		const questionIntest = testResponseData.data[0].documentId;
+
+		// Elimino la domanda
+		const response = await fetch(
+			`http://localhost:1337/api/questions/${documentId}`,
+			{
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -222,12 +259,15 @@ export default {
 	 */
 	async getQuestions(ctx) {
 		try {
-			const response = await fetch("http://localhost:1337/api/questions?populate=*", {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				"http://localhost:1337/api/questions?populate=*",
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				ctx.status = response.status;
