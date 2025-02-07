@@ -401,7 +401,6 @@ export default {
 				},
 			},
 		);
-		console.log(testExecutionResponse);
 
 		if (!testExecutionResponse.ok) {
 			ctx.status = testExecutionResponse.status;
@@ -414,6 +413,7 @@ export default {
 
 		// Setto le informazioni riguardo al test eseguito
 		toReturn.test_info.documentId = testExecutionData.data[0].documentId;
+		console.log(testExecutionData.data[0].documentId);
 		toReturn.test_info.execution_time =
 			testExecutionData.data[0].execution_time;
 		toReturn.test_info.note = testExecutionData.data[0].note;
@@ -515,10 +515,17 @@ export default {
 
 			// Itero sulle risposte date per settare il campo user_selected
 			for (const givenAnswer of givenAnswers) {
-				// se la risposta è legata alla domanda corrente
+				if (givenAnswer.id_answer === null) {
+					continue;
+				}
+				if (givenAnswer.id_answer.question_id === null) {
+					continue;
+				}
+
 				if (
 					givenAnswer.id_answer.question_id.documentId === question.documentId
 				) {
+					// se la risposta è legata alla domanda corrente
 					// cerco la risposta data dall'utente
 					const answerIndex = answersList.findIndex(
 						(answer) => answer.documentId === givenAnswer.id_answer.documentId,
