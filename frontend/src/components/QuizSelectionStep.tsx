@@ -118,7 +118,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
+							"Authorization": `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},
@@ -160,7 +160,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
+							"Authorization": `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},
