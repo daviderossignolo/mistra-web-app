@@ -139,7 +139,7 @@ const DashboardPage: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Api key ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
@@ -221,7 +221,6 @@ const DashboardPage: React.FC = () => {
 	};
 
 	const handleSearchExecutions = async () => {
-
 		const token = localStorage.getItem("token");
 
 		// Se il termine è vuoto allora recupero tutti i test
@@ -233,7 +232,7 @@ const DashboardPage: React.FC = () => {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
+							Authorization: `Bearer ${token}`,
 						},
 					},
 				);
@@ -291,6 +290,7 @@ const DashboardPage: React.FC = () => {
 
 	const findSelectedExecutionTest = async (documentId: string) => {
 		const token = process.env.SERVICE_KEY;
+		console.log(documentId);
 
 		const getTestResponse = await fetch(
 			`${host}:${port}/api/test-plugin/get-test-execution`,
@@ -326,9 +326,9 @@ const DashboardPage: React.FC = () => {
 			`${host}:${port}/api/test-executions/${documentId}`,
 			{
 				method: "PUT",
-				headers: { 
-					"Content-Type": "application/json", 
-					"Authorization": `Bearer ${token}`,
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({
 					data: {

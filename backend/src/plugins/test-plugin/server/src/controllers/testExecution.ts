@@ -141,7 +141,7 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			},
 		);
@@ -183,7 +183,7 @@ export default {
 
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			},
 		);
@@ -207,7 +207,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
@@ -229,7 +229,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
@@ -288,7 +288,7 @@ export default {
 		const body = ctx.request.body;
 
 		console.log(body);
-		console.log(body.id_test)
+		console.log(body.id_test);
 
 		const token = process.env.SERVICE_KEY;
 
@@ -299,7 +299,7 @@ export default {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({
 					data: {
@@ -333,7 +333,7 @@ export default {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 					body: JSON.stringify({
 						data: {
@@ -397,10 +397,11 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			},
 		);
+		console.log(testExecutionResponse);
 
 		if (!testExecutionResponse.ok) {
 			ctx.status = testExecutionResponse.status;
@@ -435,10 +436,11 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			},
 		);
+		console.log(questionsInTestResponse);
 
 		if (!questionsInTestResponse.ok) {
 			ctx.status = questionsInTestResponse.status;
@@ -460,7 +462,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
@@ -496,7 +498,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
