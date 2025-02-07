@@ -124,12 +124,17 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 			prevAnswers.filter((answer) => answer.id !== id),
 		);
 
+		const token = localStorage.getItem("token");
+
 		if (edit) {
 			const answerResponse = await fetch(
 				`${host}:${port}/api/answers/${documentId}`,
 				{
 					method: "DELETE",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
 				},
 			);
 

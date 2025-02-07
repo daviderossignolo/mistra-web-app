@@ -25,7 +25,7 @@ export default {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
+				"Authorization": `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -77,6 +77,7 @@ export default {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -155,6 +156,7 @@ export default {
 					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 					body: JSON.stringify(payload),
 				},
@@ -181,6 +183,7 @@ export default {
 
 		const host = process.env.HOST;
 		const port = process.env.PORT;
+
 		const token = process.env.SERVICE_KEY;
 
 		if (!token) {
@@ -197,7 +200,7 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -220,6 +223,7 @@ export default {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -237,6 +241,7 @@ export default {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`,
 				},
 			},
 		);
@@ -259,12 +264,15 @@ export default {
 	 */
 	async getQuestions(ctx) {
 		try {
+
+			const token = process.env.SERVICE_KEY;
 			const response = await fetch(
 				"http://localhost:1337/api/questions?populate=*",
 				{
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);

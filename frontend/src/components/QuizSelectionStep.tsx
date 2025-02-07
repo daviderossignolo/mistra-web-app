@@ -52,6 +52,8 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	const host = process.env.REACT_APP_BACKEND_HOST;
 	const port = process.env.REACT_APP_BACKEND_PORT;
 
+	const token = localStorage.getItem("token");
+
 	// Elimina la domanda dalla lista
 	const handleDeleteQuestion = async (id: string) => {
 		setQuestions((prev: Question[]) =>
@@ -66,6 +68,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
 					},
 					body: JSON.stringify({
 						documentId: id,
