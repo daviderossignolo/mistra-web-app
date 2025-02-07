@@ -82,7 +82,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
+							"Authorization": `Bearer ${token}`,
 						},
 					},
 				);

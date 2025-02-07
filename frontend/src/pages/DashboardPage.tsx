@@ -119,7 +119,7 @@ const DashboardPage: React.FC = () => {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+					"Authorization": `Bearer ${token}`,
 				},
 			});
 
@@ -139,7 +139,7 @@ const DashboardPage: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Api key ${token}`,
+						"Authorization": `Bearer ${token}`,
 					},
 				},
 			);
@@ -171,7 +171,7 @@ const DashboardPage: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({ testDocId: selectedDocId }),
 			},
@@ -198,7 +198,7 @@ const DashboardPage: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
+						"Authorization": `Bearer ${token}`,
 					},
 				});
 
@@ -273,7 +273,7 @@ const DashboardPage: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({ quiz: toDelete }),
 			},
@@ -290,7 +290,10 @@ const DashboardPage: React.FC = () => {
 	};
 
 	const findSelectedExecutionTest = async (documentId: string) => {
-		const token = process.env.SERVICE_KEY;
+		
+		const token = localStorage.getItem("token");
+
+		console.log(JSON.stringify({ execDocId: documentId }));
 
 		const getTestResponse = await fetch(
 			`${host}:${port}/api/test-plugin/get-test-execution`,
@@ -298,7 +301,7 @@ const DashboardPage: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Api key ${token}`,
+					"Authorization": `Bearer ${token}`,
 				},
 				body: JSON.stringify({ execDocId: documentId }),
 			},
