@@ -55,7 +55,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	// Elimina la domanda dalla lista
 	const handleDeleteQuestion = async (id: string) => {
 		setQuestions((prev: Question[]) =>
-			prev.filter((question) => question.id !== id),
+			prev.filter((question) => question.documentId !== id),
 		);
 
 		if (edit) {
@@ -107,7 +107,6 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 			// chiamata API per salvare il quiz
 			try {
-
 				const token = localStorage.getItem("token");
 
 				const response = await fetch(
@@ -116,7 +115,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
+							Authorization: `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},
@@ -150,7 +149,6 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 			// chiamata API per salvare il quiz
 			try {
-
 				const token = localStorage.getItem("token");
 
 				const response = await fetch(
@@ -159,7 +157,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
+							Authorization: `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},

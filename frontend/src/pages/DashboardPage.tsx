@@ -108,10 +108,10 @@ const DashboardPage: React.FC = () => {
 		useState<ExecutedTestFull | null>(null);
 
 	const [notes, setNotes] = useState("");
+	const service_key = process.env.SERVICE_KEY;
 
 	// Effettua il fetch dei test
 	useEffect(() => {
-
 		const token = localStorage.getItem("token");
 
 		const fetchTest = async () => {
@@ -119,7 +119,7 @@ const DashboardPage: React.FC = () => {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			});
 
@@ -139,10 +139,12 @@ const DashboardPage: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Api key ${token}`,
 					},
 				},
 			);
+
+			console.log(response);
 
 			if (!response.ok) {
 				alert(
@@ -169,7 +171,7 @@ const DashboardPage: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({ testDocId: selectedDocId }),
 			},
@@ -196,7 +198,7 @@ const DashboardPage: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				});
 
@@ -256,7 +258,6 @@ const DashboardPage: React.FC = () => {
 
 	// Funzione per gestire l'eliminazione di un test
 	const handleDelete = async (selectedDocId: string) => {
-
 		const token = localStorage.getItem("token");
 
 		const toDelete = await findSelectedTest(selectedDocId);
@@ -268,7 +269,7 @@ const DashboardPage: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({ quiz: toDelete }),
 			},
@@ -285,8 +286,7 @@ const DashboardPage: React.FC = () => {
 	};
 
 	const findSelectedExecutionTest = async (documentId: string) => {
-
-		const token = localStorage.getItem("token");
+		const token = process.env.SERVICE_KEY;
 
 		const getTestResponse = await fetch(
 			`${host}:${port}/api/test-plugin/get-test-execution`,
@@ -294,7 +294,7 @@ const DashboardPage: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Api key ${token}`,
 				},
 				body: JSON.stringify({ execDocId: documentId }),
 			},
@@ -306,6 +306,8 @@ const DashboardPage: React.FC = () => {
 		}
 
 		const data = await getTestResponse.json();
+		console.log(data);
+		setNotes(data.test_info.note);
 
 		return data;
 	};
@@ -327,8 +329,6 @@ const DashboardPage: React.FC = () => {
 				}),
 			},
 		);
-
-		console.log(revisionResponse);
 
 		if (!revisionResponse.ok) {
 			alert("Non è stato possibile inserire le note");
