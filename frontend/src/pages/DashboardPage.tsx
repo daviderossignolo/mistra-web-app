@@ -414,7 +414,7 @@ const DashboardPage: React.FC = () => {
 										<td className="py-2 text-center">{test.score}</td>
 										<td className="py-2 text-center">{test.id_sex.name}</td>
 										<td className="py-2 text-center">
-											{test.id_test.name_test}
+											{test.id_test?.name_test}
 										</td>
 										<td className="py-2 text-center">
 											<input

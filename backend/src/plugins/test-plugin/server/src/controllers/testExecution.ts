@@ -410,6 +410,14 @@ export default {
 
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const testExecutionData = (await testExecutionResponse.json()) as any;
+		console.log(testExecutionData);
+		// TODO: capire cosa fare in questo caso
+		// se il modello del test è stato eliminato ritorno un errore
+		if (testExecutionData.data[0].id_test === null) {
+			ctx.status = 404;
+			ctx.body = "Il test è stato eliminato";
+			return ctx;
+		}
 
 		// Setto le informazioni riguardo al test eseguito
 		toReturn.test_info.documentId = testExecutionData.data[0].documentId;
@@ -419,6 +427,7 @@ export default {
 		toReturn.test_info.note = testExecutionData.data[0].note;
 		toReturn.test_info.revision_date = testExecutionData.data[0].revision_date;
 		toReturn.test_info.score = testExecutionData.data[0].score;
+
 		toReturn.test_info.test_name = testExecutionData.data[0].id_test.name_test;
 		toReturn.test_info.test_description =
 			testExecutionData.data[0].id_test.description_test;
