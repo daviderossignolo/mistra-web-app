@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import QuestionSelectionStep, {
 	type QuizData,
@@ -27,10 +27,14 @@ type ExecutedTest = {
 	note: string;
 	test_execution_id: string;
 	ip: string;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	id_sex: any;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	id_test: any;
+	id_sex: {
+		id: number;
+		name: string;
+	};
+	id_test: {
+		id: number;
+		name_test: string;
+	};
 };
 
 type ExecutedTestFull = {
@@ -61,27 +65,45 @@ type ExecutedTestFull = {
 	}[];
 };
 
+// Definisco un tipo per le voci del menu della sidebar
+type SidebarItemProps = {
+	id: string;
+	label: string;
+	onClick: () => void;
+};
+
+// Componente per le voci del menu della sidebar
+const SidebarItem: React.FC<SidebarItemProps> = ({ id, label, onClick }) => {
+	return (
+		<li className="cursor-pointer p-2 hover:bg-gray-200 rounded">
+			<button
+				id={id}
+				className="w-full text-left"
+				onClick={onClick}
+			>
+				{label}
+			</button>
+		</li>
+	);
+};
+
 const Sidebar = ({ onSelect }: { onSelect: (section: string) => void }) => {
 	return (
-		<div className="w-64 bg-white p-6 shadow-md rounded">
+		<nav className="w-64 bg-white p-6 shadow-md rounded" aria-label="Menu principale">
 			<h2 className="text-xl font-semibold mb-4">Menu</h2>
-			<ul>
-				<li
-					className="cursor-pointer p-2 hover:bg-gray-200 rounded"
+			<ul className="list-none pl-0">
+				<SidebarItem
+					id="executedTestsButton"
+					label="Test Eseguiti"
 					onClick={() => onSelect("executedTests")}
-					onKeyUp={(e) => e.key === "Enter" && onSelect("executedTests")}
-				>
-					Test Eseguiti
-				</li>
-				<li
-					className="cursor-pointer p-2 hover:bg-gray-200 rounded"
+				/>
+				<SidebarItem
+					id="testTemplatesButton"
+					label="Gestione Modelli di Test"
 					onClick={() => onSelect("testTemplates")}
-					onKeyUp={(e) => e.key === "Enter" && onSelect("testTemplates")}
-				>
-					Gestione Modelli di Test
-				</li>
+				/>
 			</ul>
-		</div>
+		</nav>
 	);
 };
 
@@ -365,30 +387,35 @@ const DashboardPage: React.FC = () => {
 
 			{/* Sezione "Test Eseguiti" */}
 			{selectedSection === "executedTests" && (
-				<div className="flex-1 bg-white p-6 shadow-md rounded">
+				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="executedTestsHeading">
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+						<h2 id="executedTestsHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
 							Test Eseguiti
 						</h2>
 					</div>
-					<div className="flex-1 flex items-center border rounded mt-3">
+					<form className="flex-1 flex items-center border rounded mt-3" onSubmit={(e) => {
+						e.preventDefault();
+						handleSearchExecutions();
+					}}>
+						<label htmlFor="searchExecutedTests" className="sr-only">Cerca test eseguiti</label>
 						<input
 							type="text"
+							id="searchExecutedTests"
 							placeholder="Cerca test..."
 							className="flex-1 px-4 py-2 border-none rounded-l"
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
 						/>
 						<button
-							type="button"
+							type="submit"
 							className="bg-navbar text-white px-4 py-2 rounded-r"
-							onClick={() => handleSearchExecutions()}
 						>
 							Cerca
 						</button>
-					</div>
+					</form>
+					{/* Modifica 3: Tabella accessibile */}
 					<div className="overflow-x-auto">
-						<table className="min-w-full bg-white border text-sm mt-4">
+						<table className="min-w-full bg-white border text-sm mt-4" aria-label="Tabella dei test eseguiti">
 							<thead>
 								<tr>
 									{[
@@ -399,7 +426,7 @@ const DashboardPage: React.FC = () => {
 										"Revisionato",
 										"Azioni",
 									].map((header) => (
-										<th key={header} className="py-2 border w-1/10 text-center">
+										<th key={header} className="py-2 border w-1/10 text-center" scope="col">
 											{header}
 										</th>
 									))}
@@ -408,18 +435,15 @@ const DashboardPage: React.FC = () => {
 							<tbody>
 								{executedTests.map((test) => (
 									<tr key={test.id} className="hover:bg-gray-200">
-										<td className="py-2 text-center">
-											{test.test_execution_id}
-										</td>
+										<td className="py-2 text-center">{test.test_execution_id}</td>
 										<td className="py-2 text-center">{test.score}</td>
 										<td className="py-2 text-center">{test.id_sex.name}</td>
-										<td className="py-2 text-center">
-											{test.id_test?.name_test}
-										</td>
+										<td className="py-2 text-center">{test.id_test?.name_test}</td>
 										<td className="py-2 text-center">
 											<input
 												type="checkbox"
 												checked={test.revision_date !== null}
+												disabled // Impedisci la modifica diretta
 											/>
 										</td>
 										<td className="py-2 text-center">
@@ -443,6 +467,7 @@ const DashboardPage: React.FC = () => {
 														fill="currentColor"
 														className="bi bi-eye"
 														viewBox="0 0 16 16"
+														aria-hidden="true" // Nascondi l'icona agli screen reader
 													>
 														<title>Visualizza</title>
 														<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zm-8 4a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
@@ -456,34 +481,38 @@ const DashboardPage: React.FC = () => {
 							</tbody>
 						</table>
 					</div>
-				</div>
+				</section>
 			)}
 
 			{/* Sezione "Gestione Modelli di Test" */}
 			{selectedSection === "testTemplates" && (
-				<div className="flex-1 bg-white p-6 shadow-md rounded">
+				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="manageTestsHeading">
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						<h2 id="manageTestsHeading" className="text-white font-bold font-poppins m-0 text-left text-[42px]">
 							Gestione test
 						</h2>
 					</div>
 					<div className="flex gap-2 mb-4 mt-4">
-						<div className="flex-1 flex items-center border rounded">
+						<form className="flex-1 flex items-center border rounded" onSubmit={(e) => {
+							e.preventDefault();
+							handleSearch();
+						}}>
+							<label htmlFor="searchTests" className="sr-only">Cerca test</label>
 							<input
 								type="text"
+								id="searchTests"
 								placeholder="Cerca test..."
 								className="flex-1 px-4 py-2 border-none rounded-l"
 								value={searchTerm}
 								onChange={(e) => setSearchTerm(e.target.value)}
 							/>
 							<button
-								type="button"
+								type="submit"
 								className="bg-navbar text-white px-4 py-2 rounded-r"
-								onClick={() => handleSearch()}
 							>
 								Cerca
 							</button>
-						</div>
+						</form>
 						<button
 							type="button"
 							className="bg-navbar text-white px-4 py-2 rounded"
@@ -493,11 +522,11 @@ const DashboardPage: React.FC = () => {
 						</button>
 					</div>
 					<div className="container py-8">
-						<h2 className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
+						<h3 className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
 							Informazioni sul test
-						</h2>
+						</h3>
 						<hr className="mb-4" />
-						<ul>
+						<ul className="list-none pl-0">
 							{tests.map((test) => (
 								<li
 									key={test.id}
@@ -513,13 +542,6 @@ const DashboardPage: React.FC = () => {
 												setSelectedTest(data);
 												setSelectedSection("editTest");
 											}}
-											onKeyDown={async (e) => {
-												if (e.key === "Enter") {
-													const data = await findSelectedTest(test.documentId);
-													setSelectedTest(data);
-													setSelectedSection("editTest");
-												}
-											}}
 										>
 											<div className="flex items-center space-x-1">
 												<span>Modifica</span>
@@ -530,7 +552,9 @@ const DashboardPage: React.FC = () => {
 													fill="currentColor"
 													className="bi bi-pencil-square"
 													viewBox="0 0 16 16"
+													aria-hidden="true" // Nascondi l'icona agli screen reader
 												>
+													<title>Modifica</title>
 													<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
 													<path
 														fill-rule="evenodd"
@@ -546,11 +570,6 @@ const DashboardPage: React.FC = () => {
 											onClick={async () => {
 												handleDelete(test.documentId);
 											}}
-											onKeyDown={async (e) => {
-												if (e.key === "Enter") {
-													handleDelete(test.documentId);
-												}
-											}}
 										>
 											<div className="flex items-center space-x-1">
 												<span>Elimina</span>
@@ -561,6 +580,7 @@ const DashboardPage: React.FC = () => {
 													fill="currentColor"
 													className="bi bi-trash-fill"
 													viewBox="0 0 16 16"
+													aria-hidden="true" // Nascondi l'icona agli screen reader
 												>
 													<title>Elimina</title>
 													<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
@@ -572,26 +592,26 @@ const DashboardPage: React.FC = () => {
 							))}
 						</ul>
 					</div>
-				</div>
+				</section>
 			)}
 
 			{/* Sezione per la creazione o modifica del test */}
 			{selectedSection === "createTest" && (
-				<div className="flex-1 bg-white p-6 shadow-md rounded">
+				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="createQuizHeading">
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						<h2 id="createQuizHeading" className="text-white font-bold font-poppins m-0 text-left text-[42px]">
 							CREAZIONE QUIZ
 						</h2>
 					</div>
 					<QuestionSelectionStep quizData={newTemplate} edit={false} />
-				</div>
+				</section>
 			)}
 
-			{/* Sezione per la creazione o modifica del test */}
+			{/* Sezione per la modifica del test */}
 			{selectedSection === "editTest" && (
-				<div className="flex-1 bg-white p-6 shadow-md rounded">
+				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="editQuizHeading">
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						<h2 id="editQuizHeading" className="text-white font-bold font-poppins m-0 text-left text-[42px]">
 							MODIFICA QUIZ
 						</h2>
 					</div>
@@ -599,55 +619,55 @@ const DashboardPage: React.FC = () => {
 						quizData={selectedTest ?? newTemplate}
 						edit={true}
 					/>
-				</div>
+				</section>
 			)}
 
 			{/* Sezione per la visualizzazione del test */}
 			{selectedSection === "viewTest" && (
-				<div className="flex-1 font-poppins text-navbar-hover">
+				<section className="flex-1 font-poppins text-navbar-hover" aria-labelledby="testResultsHeading">
 					<div className="flex flex-col w-full bg-white p-6 shadow-md rounded">
 						{/* Informazioni sul test da eseguire */}
 						{selectedExecution && (
 							<>
 								<div className="w-full bg-navbar-hover px-4 py-4">
-									<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+									<h2 id="testResultsHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
 										Risultati del Test
 									</h2>
 								</div>
 								{/* Sezione informazioni */}
 								<div className="mt-2 py-4 mb-6 p-4">
-									<h2 className="text-2xl font-bold mb-2 text-navbar-hover">
+									<h3 className="text-2xl font-bold mb-2 text-navbar-hover">
 										Informazioni sul test
-									</h2>
+									</h3>
 									<hr className="mb-4" />
 									<div className="mb-4">
-										{/* Nome del test e data di esecuaione */}
+										{/* Nome del test e data di esecuzione */}
 										<div className="flex items-center mb-2 justify-between">
 											<div className="flex items-center mb-2">
-												<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+												<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 													Nome del Test:
-												</h3>
-												<h3 className="text-lg text-navbar-hover">
+												</h4>
+												<p className="text-lg text-navbar-hover">
 													{selectedExecution.test_info.test_name}
-												</h3>
+												</p>
 											</div>
 											<div className="flex items-center mb-2">
-												<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+												<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 													Eseguito il:
-												</h3>
-												<h3 className="text-lg text-navbar-hover">
+												</h4>
+												<p className="text-lg text-navbar-hover">
 													{formatTime(
 														selectedExecution.test_info.execution_time,
 													)}
-												</h3>
+												</p>
 											</div>
 										</div>
 
 										{/* Descrizione del test */}
 										<div className="flex flex-col items-left mb-2">
-											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+											<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 												Descrizione:
-											</h3>
+											</h4>
 											<textarea
 												className="w-full p-2 border rounded-lg"
 												value={selectedExecution.test_info.test_description}
@@ -657,17 +677,18 @@ const DashboardPage: React.FC = () => {
 
 										{/* Note e data visualizzazione */}
 										<div className="flex flex-col mb-4">
-											<h3 className="text-lg font-semibold text-navbar-hover mb-2">
+											<label htmlFor="notes" className="text-lg font-semibold text-navbar-hover mb-2">
 												Note:
-											</h3>
+											</label>
 											<textarea
+												id="notes"
 												className="w-full p-2 border rounded-lg mb-4"
 												value={notes}
 												onChange={(e) => setNotes(e.target.value)}
 											/>
-											<h3 className="text-lg font-semibold text-navbar-hover mb-2">
+											<h4 className="text-lg font-semibold text-navbar-hover mb-2">
 												Visionato il:
-											</h3>
+											</h4>
 											<p className="text-lg text-navbar-hover">
 												{formatTime(selectedExecution.test_info.revision_date)}
 											</p>
@@ -681,6 +702,7 @@ const DashboardPage: React.FC = () => {
 														selectedExecution.test_info.documentId,
 													)
 												}
+												aria-label="Inserisci nota"
 											>
 												Inserisci nota
 											</button>
@@ -688,42 +710,42 @@ const DashboardPage: React.FC = () => {
 
 										{/* Punteggio del test */}
 										<div className="flex justify-end mb-2">
-											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+											<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 												Punteggio:
-											</h3>
-											<h3 className="text-lg text-navbar-hover">
+											</h4>
+											<p className="text-lg text-navbar-hover">
 												{selectedExecution.test_info.score}
-											</h3>
+											</p>
 										</div>
 									</div>
-									<h2 className="text-2xl font-bold mb-2 text-navbar-hover">
+									<h3 className="text-2xl font-bold mb-2 text-navbar-hover">
 										Informazioni sull'utente
-									</h2>
+									</h3>
 									<hr className="mb-4" />
 									<div className="mb-4">
 										<div className="flex items-center mb-2">
-											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+											<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 												Età:
-											</h3>
-											<h3 className="text-lg text-navbar-hover">
+											</h4>
+											<p className="text-lg text-navbar-hover">
 												{selectedExecution.test_info.user_info.age}
-											</h3>
+											</p>
 										</div>
 										<div className="flex items-center mb-2">
-											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+											<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 												Sesso:
-											</h3>
-											<h3 className="text-lg text-navbar-hover">
+											</h4>
+											<p className="text-lg text-navbar-hover">
 												{selectedExecution.test_info.user_info.sex}
-											</h3>
+											</p>
 										</div>
 										<div className="flex items-center mb-2">
-											<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+											<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 												IP:
-											</h3>
-											<h3 className="text-lg text-navbar-hover">
+											</h4>
+											<p className="text-lg text-navbar-hover">
 												{selectedExecution.test_info.user_info.ip}
-											</h3>
+											</p>
 										</div>
 									</div>
 								</div>
@@ -737,18 +759,18 @@ const DashboardPage: React.FC = () => {
 									key={question.question_name}
 									className="py-4 p-4 shadow-sm"
 								>
-									<h2 className="text-2xl font-bold mb-2 text-navbar-hover">
+									<h3 className="text-2xl font-bold mb-2 text-navbar-hover">
 										Domande
-									</h2>
+									</h3>
 									<hr className="mb-4" />
 									<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-poppins">
 										<p className="text-sm text-gray-600 mb-2">
 											Categoria: {question.category_name}
 										</p>
-										<h2 className="text-lg font-medium mb-2">
+										<h4 className="text-lg font-medium mb-2">
 											{index + 1}. {question.question_name}:{" "}
 											{question.question_text}
-										</h2>
+										</h4>
 										<div className="flex flex-col space-y-2">
 											{question.answers.map((answer) => (
 												<label
@@ -774,7 +796,7 @@ const DashboardPage: React.FC = () => {
 							);
 						})}
 					</div>
-				</div>
+				</section>
 			)}
 		</div>
 	);

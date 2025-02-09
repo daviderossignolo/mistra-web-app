@@ -113,9 +113,9 @@ const ContactPage: React.FC = () => {
 						{title}
 					</h1>
 				</div>
-				<div className="w-full bg-contact-bg py-5">
+				<div className="w-full bg-contact-bg py-5" aria-labelledby="introductionTitle">
 					<div className="container mx-auto max-w-5xl px-4">
-						<h2 className="text-center text-red-500 font-bold font-poppins text-[56px]">
+						<h2 className="text-center text-red-700 font-bold font-poppins text-[56px]">
 							{introduction.title}
 						</h2>
 						<div className="text-left font-poppins font-extralight text-navbar-hover text-[20px]">
@@ -123,7 +123,7 @@ const ContactPage: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="container mx-auto max-w-6xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+				<div className="container mx-auto max-w-6xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-center" aria-labelledby="mapSectionTitle">
 					<div className="flex flex-col gap-4">
 						<h2 className="font-poppins font-bold text-navbar-hover text-[35px]">
 							{map.title}
@@ -133,12 +133,12 @@ const ContactPage: React.FC = () => {
 						</div>
 					</div>
 					<div>
-						<div>
+						<div aria-label="Map">
 							<MapBlock latitude={map.latitude} longitude={map.longitude} />
 						</div>
 					</div>
 				</div>
-				<div className="w-full bg-contact-bg py-8">
+				<div className="w-full bg-contact-bg py-8" aria-labelledby="openingHoursTitle">
 					<div className="container mx-auto max-w-5xl px-4">
 						<h2 className="text-center text-[35px] font-poppins mb-4 text-navbar-hover">
 							{openingHours.title}
@@ -148,12 +148,12 @@ const ContactPage: React.FC = () => {
 							{openingHours.description}
 						</p>
 						<div className="overflow-x-auto">
-							<table className="w-full text-center">
+							<table className="w-full text-center"  summary="Orari di apertura">
 								<thead>
 									<tr>
-										<th className="py-2 px-2">Giorno</th>
-										<th className="py-2 px-2">Mattino</th>
-										<th className="py-2 px-2">Pomeriggio</th>
+										<th className="py-2 px-2" scope="col">Giorno</th>
+										<th className="py-2 px-2" scope="col">Mattino</th>
+										<th className="py-2 px-2" scope="col">Pomeriggio</th>
 										{/*<th className="py-2 px-4">Note</th>*/}
 									</tr>
 								</thead>
@@ -177,7 +177,7 @@ const ContactPage: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="container mx-auto max-w-5xl px-4">
+				<div className="container mx-auto max-w-5xl px-4" aria-labelledby="infoSectionTitle">
 					<h2 className="text-left text-[35px] font-poppins mb-4 text-navbar-hover">
 						{info.title}
 					</h2>
@@ -185,7 +185,7 @@ const ContactPage: React.FC = () => {
 						<TextBlock content={info.content} />
 					</div>
 				</div>
-				<div className="w-full">
+				<div className="w-full" aria-labelledby="actionSectionTitle">
 					<div className="container mx-auto max-w-4xl px-4 text-center text-navbar-hover">
 						<h2 className="text-2xl md:text-3xl lg:text-4xl font-bold">
 							{action.title}
@@ -196,6 +196,7 @@ const ContactPage: React.FC = () => {
 						<a
 							href={"mailto:centro.mistra@aovr.veneto.it"}
 							className="inline-block mt-6 bg-navbar text-white font-bold px-6 py-3 rounded-md"
+							aria-label="Invia Email a centro.mistra@aovr.veneto.it"
 						>
 							Invia Email
 						</a>
@@ -207,11 +208,26 @@ const ContactPage: React.FC = () => {
 
 	if (loading) return <p className="text-center p-4">Loading...</p>;
 	if (error)
-		return <p className="text-center p-4 text-red-500">Error: {error}</p>;
+		return <p className="text-center p-4 text-red-700">Error: {error}</p>;
 	if (!pageData) return <p className="text-center p-4">No page data found</p>;
 
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-start p-4 md:p-8">
+			<div aria-live="polite" className="sr-only">
+				{loading && "Caricamento..."}
+				{error && `Errore: ${error}`}
+				{!pageData && !loading && !error && "Nessun dato trovato"}
+			</div>
+
+			{loading && <p className="text-center p-4">Caricamento...</p>}
+			{error && (
+				<p className="text-center p-4 text-red-700" role="alert">
+					Errore: {error}
+				</p>
+			)}
+			{!pageData && !loading && !error && (
+				<p className="text-center p-4">Nessun dato trovato</p>
+			)}
 			{renderBlocks}
 		</div>
 	);

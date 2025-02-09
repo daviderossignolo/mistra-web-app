@@ -48,6 +48,7 @@ const Homepage: React.FC = () => {
 		return (
 			<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
 				<div className="w-full bg-navbar-hover px-4 py-4">
+					{/* Modifica 1: Utilizzo di <h1> per il titolo principale */}
 					<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
 						{title}
 					</h2>
@@ -59,15 +60,26 @@ const Homepage: React.FC = () => {
 		);
 	}, [pageData]);
 
-	if (loading) return <p className="text-center p-4">Loading...</p>;
-	if (error)
-		return <p className="text-center p-4 text-red-500">Error: {error}</p>;
-	if (!pageData) return <p className="text-center p-4">No page data found</p>;
-
 	return (
-		<div className="min-h-screen flex items-center justify-center p-8">
+		<main className="min-h-screen flex items-center justify-center p-8">
+			<div aria-live="polite" className="sr-only">
+				{loading && "Loading..."}
+				{error && `Error: ${error}`}
+				{!pageData && !loading && !error && "No page data found"}
+			</div>
+
 			{renderBlocks}
-		</div>
+
+			{loading && <p className="text-center p-4">Loading...</p>}
+			{error && (
+				<p className="text-center p-4 text-red-700" role="alert">
+					Error: {error}
+				</p>
+			)}
+			{!pageData && !loading && !error && (
+				<p className="text-center p-4">No page data found</p>
+			)}
+		</main>
 	);
 };
 

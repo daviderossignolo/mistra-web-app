@@ -55,44 +55,60 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 	};
 
 	return (
-		<div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-poppins text-navbar-hover">
-			<div className="bg-white w-11/12 max-w-md p-4 rounded shadow-lg">
+		<div
+			className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-poppins text-navbar-hover"
+			aria-modal="true"
+			role="dialog"
+			aria-labelledby="categoryModalHeading"
+		>
+			<div
+				className="bg-white w-11/12 max-w-md p-4 rounded shadow-lg"
+				aria-labelledby="categoryModalHeading"
+			>
 				<div className="w-full bg-navbar-hover px-4 py-4 mb-4">
-					<h3 className="font-bold text-center text-white">Nuova Categoria</h3>
+					<h3
+						id="categoryModalHeading"
+						className="font-bold text-center text-white"
+					>
+						Nuova Categoria
+					</h3>
 				</div>
 
-				{/* Label e campo input per il nome della categoria */}
-				<label
-					htmlFor="categoryName"
-					className="block mb-2 font-bold font-poppins"
-				>
-					Nome della Categoria
-				</label>
-				<input
-					id="categoryName"
-					value={categoryName}
-					onChange={(e) => setCategoryName(e.target.value)}
-					placeholder="Inserisci il nome della categoria"
-					className="w-full border rounded p-2 mb-4"
-				/>
+				<form aria-label="Form creazione categoria">
+					<div className="mb-4">
+						<label
+							htmlFor="categoryName"
+							className="block mb-2 font-bold font-poppins"
+						>
+							Nome della Categoria
+						</label>
+						<input
+							type="text"
+							id="categoryName"
+							value={categoryName}
+							onChange={(e) => setCategoryName(e.target.value)}
+							placeholder="Inserisci il nome della categoria"
+							className="w-full border rounded p-2 mb-4"
+						/>
+					</div>
 
-				{/* Div per i bottoni allineati a destra */}
-				<div className="flex justify-end">
-					<button
-						type="button"
-						onClick={onClose}
-						className="bg-red-600 text-white px-4 py-2 rounded mr-2"
-					>
-						Annulla
-					</button>
-					<button
-						type="button"
-						onClick={handleSave}
-						className="bg-navbar-hover text-white px-4 py-2 rounded"
-					>
-						Salva
-					</button>
-				</div>
+					<div className="flex justify-end">
+						<button
+							type="button"
+							onClick={onClose}
+							className="bg-red-600 text-white px-4 py-2 rounded mr-2"
+						>
+							Annulla
+						</button>
+						<button
+							type="button"
+							onClick={handleSave}
+							className="bg-navbar-hover text-white px-4 py-2 rounded"
+						>
+							Salva
+						</button>
+					</div>
+				</form>
 			</div>
 		</div>
 	);

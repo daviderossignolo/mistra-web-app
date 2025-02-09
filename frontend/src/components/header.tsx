@@ -79,7 +79,7 @@ const Header: React.FC = () => {
 		: "";
 
 	if (loading) return <div className="p-4 text-center">Caricamento...</div>;
-	if (error) return <div className="p-4 text-red-500">Errore: {error}</div>;
+	if (error) return <div className="p-4 text-red-700">Errore: {error}</div>;
 
 	return (
 		<header className="w-full bg-navbar shadow-md">

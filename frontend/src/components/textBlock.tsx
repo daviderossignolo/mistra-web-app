@@ -21,7 +21,7 @@ const TextBlock = ({
 						<span style={{ textDecoration: "underline" }}>{children}</span>
 					),
 					h5: ({ node, children }) => (
-						<h5 style={{ fontSize: "20px" }}>{children}</h5>
+						<p className="text-xl font-bold" style={{ fontSize: "20px" }}>{children}</p>
 					),
 				}}
 			>

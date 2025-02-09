@@ -45,15 +45,23 @@ const MapBlock: React.FC<MapBlockProps> = ({ latitude, longitude }) => {
 		<div className="flex items-start gap-5 m-5 p-5 rounded-lg">
 			<div className="flex-3 flex flex-col items-center w-full">
 				<div className="bg-navbar-hover text-white text-center p-2 rounded-t-lg w-full">
-					Il Centro MISTRA si trova qui
+					<h3 className="m-0 font-bold" id="mapTitle">
+						Il Centro MISTRA si trova qui
+					</h3>
 				</div>
 				<LoadScript googleMapsApiKey={apiKey}>
 					<GoogleMap
 						mapContainerStyle={containerStyle}
 						center={center}
 						zoom={15}
+						aria-describedby="mapTitle"
+						aria-label="Mappa interattiva del Centro MISTRA"
 					>
-						<Marker position={center} onClick={handleMarkerClick} />
+						<Marker
+							position={center}
+							onClick={handleMarkerClick}
+							aria-label="Posizione del Centro MISTRA"
+						/>
 
 						{selectedMarker && (
 							<InfoWindow
@@ -67,6 +75,7 @@ const MapBlock: React.FC<MapBlockProps> = ({ latitude, longitude }) => {
 										target="_blank"
 										rel="noopener noreferrer"
 										style={{ color: "blue", textDecoration: "underline" }}
+										aria-label={`Indicazioni stradali per AOUI Verona da ${selectedMarker.lat}, ${selectedMarker.lng} (si apre in una nuova scheda)`}
 									>
 										Come arrivare
 									</a>

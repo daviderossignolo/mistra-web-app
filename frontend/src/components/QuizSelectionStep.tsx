@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import type { Question } from "./QuestionModal";
 import QuestionModal from "./QuestionModal";
@@ -186,108 +187,115 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 	return (
 		<div className="flex">
-			<div className="flex-grow p-6">
-				<h2 className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
+			<section className="flex-grow p-6" aria-labelledby="quizInfoHeading">
+				<h2 id="quizInfoHeading" className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
 					Informazioni sul test
 				</h2>
 				<hr className="mb-4" />
-				<div className="mb-4">
-					<label
-						htmlFor="quizName"
-						className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
-					>
-						Nome del Quiz
-					</label>
-					<input
-						id="quizName"
-						type="text"
-						placeholder="Inserisci il nome del quiz..."
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
-					/>
-				</div>
-				<div className="mb-4">
-					<label
-						htmlFor="quizDescription"
-						className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
-					>
-						Descrizione del Quiz
-					</label>
-					<textarea
-						id="quizDescription"
-						value={description}
-						placeholder="Inserisci una descrizione del quiz..."
-						onChange={(e) => setDescription(e.target.value)}
-						className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
-					/>
-				</div>
-				<div className="mb-6">
-					<h2 className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
-						Domande
-					</h2>
-					<hr className="mb-4" />
-					{questions.map((question, index) => (
-						<div
-							key={question.id}
-							className="p-4 mb-4 border rounded shadow-sm flex justify-between items-center"
+				<form aria-label="Form informazioni quiz">
+					<div className="mb-4">
+						<label
+							htmlFor="quizName"
+							className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
 						>
-							<div>
-								<p className="text-sm text-gray-500">
-									{question.category.name}
-								</p>
-								<p className="font-semibold">
-									{index + 1}. {question.text}
-								</p>
-							</div>
-							<div className="flex space-x-2">
-								<button
-									type="button"
-									className="bg-navbar-hover text-white py-1 px-2 rounded"
-									onClick={() => handleEditQuestion(question)}
-								>
-									<div className="flex items-center space-x-1">
-										<span>Modifica</span>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="16"
-											height="16"
-											fill="currentColor"
-											className="bi bi-pencil-square"
-											viewBox="0 0 16 16"
-										>
-											<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-											<path
-												fill-rule="evenodd"
-												d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-											/>
-											<title>Modifica</title>
-										</svg>
-									</div>
-								</button>
-								<button
-									type="button"
-									className="text-white bg-red-600 py-1 px-2 rounded"
-									onClick={() => handleDeleteQuestion(question.documentId)}
-								>
-									<div className="flex items-center space-x-1">
-										<span>Elimina</span>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="16"
-											height="16"
-											fill="currentColor"
-											className="bi bi-trash-fill"
-											viewBox="0 0 16 16"
-										>
-											<title>Elimina</title>
-											<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
-										</svg>
-									</div>
-								</button>
-							</div>
-						</div>
-					))}
+							Nome del Quiz
+						</label>
+						<input
+							type="text"
+							id="quizName"
+							placeholder="Inserisci il nome del quiz..."
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
+						/>
+					</div>
+					<div className="mb-4">
+						<label
+							htmlFor="quizDescription"
+							className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
+						>
+							Descrizione del Quiz
+						</label>
+						<textarea
+							id="quizDescription"
+							value={description}
+							placeholder="Inserisci una descrizione del quiz..."
+							onChange={(e) => setDescription(e.target.value)}
+							className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
+						/>
+					</div>
+				</form>
+				<div className="mb-6">
+					<h3 className="font-bold font-poppins text-2xl text-navbar-hover mb-4" id="questionListHeading">
+						Domande
+					</h3>
+					<hr className="mb-4" />
+					<ul aria-labelledby="questionListHeading" className="list-none pl-0">
+						{questions.map((question, index) => (
+							<li
+								key={question.id}
+								className="p-4 mb-4 border rounded shadow-sm flex justify-between items-center"
+							>
+								<div>
+									<p className="text-sm text-gray-500">
+										{question.category.name}
+									</p>
+									<p className="font-semibold">
+										{index + 1}. {question.text}
+									</p>
+								</div>
+								<div className="flex space-x-2">
+									<button
+										type="button"
+										className="bg-navbar-hover text-white py-1 px-2 rounded"
+										onClick={() => handleEditQuestion(question)}
+										aria-label={`Modifica domanda ${question.name}`}
+									>
+										<div className="flex items-center space-x-1">
+											<span>Modifica</span>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="16"
+												height="16"
+												fill="currentColor"
+												className="bi bi-pencil-square"
+												viewBox="0 0 16 16"
+												aria-hidden="true"
+											>
+												<title>Modifica</title>
+												<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+												<path
+													fill-rule="evenodd"
+													d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+												/>
+											</svg>
+										</div>
+									</button>
+									<button
+										type="button"
+										className="text-white bg-red-600 py-1 px-2 rounded"
+										onClick={() => handleDeleteQuestion(question.documentId)}
+										aria-label={`Elimina domanda ${question.name}`}
+									>
+										<div className="flex items-center space-x-1">
+											<span>Elimina</span>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="16"
+												height="16"
+												fill="currentColor"
+												className="bi bi-trash-fill"
+												viewBox="0 0 16 16"
+											>
+												<title>Elimina</title>
+												<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
+											</svg>
+										</div>
+									</button>
+								</div>
+							</li>
+						))}
+					</ul>
 				</div>
 				<div className="mb-6">
 					<button
@@ -307,7 +315,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						Salva Quiz
 					</button>
 				</div>
-			</div>
+			</section>
 
 			{/* Question Modal */}
 			{isModalOpen && (

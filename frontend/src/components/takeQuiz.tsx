@@ -1,6 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import type { Category } from "./QuestionModal";
+import { useNavigate } from "react-router-dom";
+import { Category } from "./QuestionModal";
 
 // Definizione dei tipi per i dati che arrivano dal backend
 type Sex = {
@@ -26,7 +27,7 @@ type Question = {
 	documentId: string;
 	name: string;
 	text: string;
-	category: Category;
+	category: Category,
 	answers: Answer[];
 };
 
@@ -83,7 +84,6 @@ const TakeQuiz: React.FC = () => {
 		// Funzione per recuperare un test casuale dal database
 		const fetchRandomTest = async () => {
 			try {
-
 				const token = localStorage.getItem("token");
 
 				const randomTestResponse = await fetch(
@@ -92,7 +92,7 @@ const TakeQuiz: React.FC = () => {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
+							Authorization: `Bearer ${token}`,
 						},
 					},
 				);
@@ -112,7 +112,6 @@ const TakeQuiz: React.FC = () => {
 		// Funzione per recuperare i dati sul sesso
 		const fetchSexData = async () => {
 			try {
-
 				const response = await fetch(`${host}:${port}/api/sexes`, {
 					method: "GET",
 					headers: {
@@ -127,7 +126,7 @@ const TakeQuiz: React.FC = () => {
 				const data = await response.json();
 				console.log(data);
 				setSexData(data.data);
-			} catch (error) {}
+			} catch (error) { }
 		};
 
 		fetchSexData();
@@ -231,7 +230,10 @@ const TakeQuiz: React.FC = () => {
 							Inserisci i tuoi dati
 						</h2>
 					</div>
-					<div className="w-full max-w-md">
+					<form className="w-full max-w-md" onSubmit={e => {
+						e.preventDefault();
+						handleUserDataSubmit();
+					}} aria-label="Inserimento dati personali">
 						<div className="mb-8 mt-8">
 							<label htmlFor="sex" className="block text-sm font-bold mb-2">
 								Sesso
@@ -243,12 +245,16 @@ const TakeQuiz: React.FC = () => {
 									setUserData({ ...userData, sex: e.target.value })
 								}
 								className="border rounded w-full py-2 px-3"
+								aria-required="true" // Indica che il campo è obbligatorio
+								tabIndex={0}
 							>
-								<option value="" disabled>
+								<option value="" disabled tabIndex={0}>
 									Seleziona...
 								</option>
 								{sexData?.map((sex: Sex) => (
-									<option key={sex.name} value={sex.name}>
+									<option key={sex.id} value={sex.name}
+										tabIndex={0}
+									>
 										{sex.name}
 									</option>
 								))}
@@ -259,24 +265,24 @@ const TakeQuiz: React.FC = () => {
 								Età
 							</label>
 							<input
-								id="age"
 								type="number"
+								id="age"
 								value={userData.age}
 								onChange={(e) =>
 									setUserData({ ...userData, age: e.target.value })
 								}
 								className="border rounded w-full py-2 px-3"
 								placeholder="Inserisci la tua età..."
+								aria-required="true" // Indica che il campo è obbligatorio
 							/>
 						</div>
 						<button
-							type="button"
-							onClick={handleUserDataSubmit}
+							type="submit"
 							className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
 						>
 							Procedi con il test
 						</button>
-					</div>
+					</form>
 				</div>
 			</div>
 		);
@@ -286,17 +292,15 @@ const TakeQuiz: React.FC = () => {
 		// Quiz Step
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
-				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5">
-					{/* Informazioni sul test da eseguire */}
+				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5" aria-labelledby="quizHeading">
 					{quizData && (
 						<>
 							<div className="w-full bg-navbar-hover px-4 py-4">
-								<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+								<h1 id="quizHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
 									Rispondi alle domande
-								</h2>
+								</h1>
 							</div>
-							{/* Banner per salvataggio codice test */}
-							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50">
+							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50" role="alert" aria-live="assertive">
 								<h3 className="text-xl font-bold text-red-600 mb-2">
 									IMPORTANTE!
 								</h3>
@@ -317,14 +321,14 @@ const TakeQuiz: React.FC = () => {
 								</h3>
 								<hr className="mb-4" />
 								<div className="flex items-center mb-2">
-									<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+									<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 										Nome del Test:
-									</h3>
-									<h3 className="text-lg text-navbar-hover">{quizData.name}</h3>
+									</h4>
+									<p className="text-lg text-navbar-hover">{quizData.name}</p>
 								</div>
-								<h3 className="text-lg font-semibold mb-2 text-navbar-hover">
+								<h4 className="text-lg font-semibold mb-2 text-navbar-hover">
 									Descrizione:
-								</h3>
+								</h4>
 								<p className="text-navbar-hover text-left">
 									{quizData.description}
 								</p>
@@ -334,11 +338,12 @@ const TakeQuiz: React.FC = () => {
 
 					{/* Sezione domande del test */}
 					{quizData?.questions.map((question, index) => (
-						<div
+						<section
 							key={question.id}
+							aria-labelledby={`questionHeading-${question.id}`}
 							className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm"
 						>
-							<h3 className="text-xl font-bold mb-2 text-navbar-hover">
+							<h3 id={`questionHeading-${question.id}`} className="text-xl font-bold mb-2 text-navbar-hover">
 								Domande
 							</h3>
 							<hr className="mb-4" />
@@ -346,9 +351,9 @@ const TakeQuiz: React.FC = () => {
 								<p className="text-sm text-gray-600 mb-2">
 									Categoria: {question.category.name}
 								</p>
-								<h2 className="text-lg font-medium mb-2">
+								<h4 className="text-lg font-medium mb-2">
 									{index + 1}. {question.name}: {question.text}
-								</h2>
+								</h4>
 								<div className="flex flex-col space-y-2">
 									{question.answers.map((answer) => (
 										<label
@@ -357,6 +362,7 @@ const TakeQuiz: React.FC = () => {
 										>
 											<input
 												type="radio"
+												id={`answer-${answer.documentId}`}
 												name={`question-${question.documentId}`}
 												value={answer.id}
 												checked={
@@ -370,16 +376,16 @@ const TakeQuiz: React.FC = () => {
 													)
 												}
 												className="form-radio text-navbar"
+												aria-label={answer.text} // Descrive l'opzione per gli screen reader
 											/>
 											<span className="text-navbar-hover">{answer.text}</span>
 										</label>
 									))}
 								</div>
 							</div>
-						</div>
+						</section>
 					))}
 
-					{/* Bottone per il submit */}
 					<div className="mt-6 flex justify-end">
 						<button
 							type="button"
@@ -398,18 +404,16 @@ const TakeQuiz: React.FC = () => {
 		// Result Step
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
-				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5">
-					{/* Informazioni sul test da eseguire */}
+				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5" aria-labelledby="resultsHeading">
 					{quizData && (
 						<>
 							<div className="w-full bg-navbar-hover px-4 py-4">
-								<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+								<h1 id="resultsHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
 									Risultati del Test
-								</h2>
+								</h1>
 							</div>
 
-							{/* Banner per salvataggio codice test */}
-							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50">
+							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50" role="alert" aria-live="assertive">
 								<h3 className="text-xl font-bold text-red-600 mb-2">
 									IMPORTANTE!
 								</h3>
@@ -430,14 +434,14 @@ const TakeQuiz: React.FC = () => {
 								</h3>
 								<hr className="mb-4" />
 								<div className="flex items-center mb-2">
-									<h3 className="text-lg font-semibold mr-2 text-navbar-hover">
+									<h4 className="text-lg font-semibold mr-2 text-navbar-hover">
 										Nome del Test:
-									</h3>
-									<h3 className="text-lg text-navbar-hover">{quizData.name}</h3>
+									</h4>
+									<p className="text-lg text-navbar-hover">{quizData.name}</p>
 								</div>
-								<h3 className="text-lg font-semibold mb-2 text-navbar-hover">
+								<h4 className="text-lg font-semibold mb-2 text-navbar-hover">
 									Descrizione:
-								</h3>
+								</h4>
 								<p className="text-navbar-hover text-left">
 									{quizData.description}
 								</p>
@@ -454,11 +458,12 @@ const TakeQuiz: React.FC = () => {
 						const isCorrect = selectedAnswer?.score === 1;
 
 						return (
-							<div
+							<section
 								key={question.id}
+								aria-labelledby={`questionResultHeading-${question.id}`}
 								className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm"
 							>
-								<h3 className="text-xl font-bold mb-2 text-navbar-hover">
+								<h3 id={`questionResultHeading-${question.id}`} className="text-xl font-bold mb-2 text-navbar-hover">
 									Domande
 								</h3>
 								<hr className="mb-4" />
@@ -466,9 +471,9 @@ const TakeQuiz: React.FC = () => {
 									<p className="text-sm text-gray-600 mb-2">
 										Categoria: {question.category.name}
 									</p>
-									<h2 className="text-lg font-medium mb-2">
+									<h4 className="text-lg font-medium mb-2">
 										{index + 1}. {question.name}: {question.text}
-									</h2>
+									</h4>
 									<div className="flex flex-col space-y-2">
 										{question.answers.map((answer) => (
 											<label
@@ -477,6 +482,7 @@ const TakeQuiz: React.FC = () => {
 											>
 												<input
 													type="radio"
+													id={`answer-${answer.documentId}`}
 													name={`question-${question.documentId}`}
 													value={answer.documentId}
 													checked={
@@ -485,22 +491,22 @@ const TakeQuiz: React.FC = () => {
 													}
 													disabled
 													className="form-radio text-navbar"
+													aria-label={answer.text}
 												/>
 												<span className="text-navbar-hover">{answer.text}</span>
 											</label>
 										))}
 									</div>
 									{!isCorrect && selectedAnswer && (
-										<p className="text-red-700 mt-2">
+										<p className="text-red-700 mt-2" role="alert">
 											Correzione: {selectedAnswer.correction}
 										</p>
 									)}
 								</div>
-							</div>
+							</section>
 						);
 					})}
 
-					{/* Sezione punteggio e download PDF */}
 					<div className="mt-6 flex justify-end items-center space-x-4">
 						<div className="text-lg font-bold">
 							Punteggio: {score}/{quizData?.questions.length}
@@ -509,6 +515,7 @@ const TakeQuiz: React.FC = () => {
 							type="button"
 							onClick={window.print}
 							className="bg-navbar-hover text-white font-bold py-2 px-4 rounded"
+							aria-label="Stampa i risultati del test"
 						>
 							Scarica PDF
 						</button>

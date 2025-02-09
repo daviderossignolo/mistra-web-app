@@ -8,8 +8,9 @@ type ServicePageData = {
 	createdAt: string;
 	publishedAt: string;
 	updatedAt: string;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	main_image: any;
+	main_image: {
+		url: string;
+	};
 	slug: string;
 	title: string;
 	moving_banner: string;
@@ -38,8 +39,7 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 
 				const data = await response.json();
 				console.log(data);
-				setPageData(data.data[0]);
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				setPageData(data.data[0] as ServicePageData);
 			} catch (err: any) {
 				setError(err.message);
 			} finally {
@@ -59,14 +59,21 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 		const banner = pageData.moving_banner;
 
 		return (
-			<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
-				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h2 className="text-white font-bold font-poppins m-0 text-center text-[42px]">
-						Servizi Offerti
+			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
+				<div className="w-full bg-navbar-hover px-4 py-4" aria-labelledby="pageTitle">
+					<h2
+						id="pageTitle"
+						className="m-0 text-center text-[42px] font-bold font-poppins text-white"
+					>
+						{title}
 					</h2>
 				</div>
+
 				{banner && (
-					<div className="w-full bg-yellow-300 px-4 py-2 overflow-hidden">
+					<div
+						className="w-full bg-yellow-300 px-4 py-2 overflow-hidden"
+						aria-label={`Banner scorrevole: ${banner}`}
+					>
 						<div className="animate-scroll whitespace-nowrap">
 							<p className="text-red-600 font-bold inline-block">
 								{`${banner} ${banner} ${banner}`}
@@ -74,13 +81,15 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 						</div>
 					</div>
 				)}
+
 				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
 					<div className="flex gap-4">
 						<div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 flex items-start pt-1">
 							<img
 								src={`http://localhost:1337${mainImage.url}`}
-								alt={`${mainImage.alternativeText}`}
+								alt={"Immagine del servizio " + title}
 								className="w-24 h-24 md:w-32 md:h-32 object-contain"
+								aria-hidden={true} //Nascondo l'immagine in quanto puramente decorativa
 							/>
 						</div>
 
@@ -93,29 +102,35 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 		);
 	}, [pageData]);
 
-	if (loading)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-gray-600">Loading...</p>
-			</div>
-		);
-
-	if (error)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-red-500">Error: {error}</p>
-			</div>
-		);
-
-	if (!pageData)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-gray-600">No page data found</p>
-			</div>
-		);
-
 	return (
-		<div className="min-h-screen bg-gray-50 py-8 md:py-12">{renderBlocks}</div>
+		<div className="min-h-screen bg-gray-50 py-8 md:py-12">
+			{/* Area live per i messaggi di caricamento/errore */}
+			<div aria-live="polite" className="sr-only">
+				{loading && "Caricamento..."}
+				{error && `Errore: ${error}`}
+				{!pageData && !loading && !error && "Nessun dato trovato"}
+			</div>
+
+			{loading && (
+				<div className="min-h-screen flex items-center justify-center">
+					<p className="text-lg text-gray-600">Caricamento...</p>
+				</div>
+			)}
+			{error && (
+				<div className="min-h-screen flex items-center justify-center">
+					<p className="text-lg text-red-700" role="alert">
+						Errore: {error}
+					</p>
+				</div>
+			)}
+			{!pageData && !loading && !error && (
+				<div className="min-h-screen flex items-center justify-center">
+					<p className="text-lg text-gray-600">Nessun dato trovato</p>
+				</div>
+			)}
+
+			{renderBlocks}
+		</div>
 	);
 };
 
