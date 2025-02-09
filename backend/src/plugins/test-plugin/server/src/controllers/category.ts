@@ -54,7 +54,7 @@ export default {
 	 * @param ctx
 	 * @returns filtredData
 	 */
-	async modifyCategory(ctx: Context) {
+	/* async modifyCategory(ctx: Context) {
 		try {
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query
 
@@ -101,14 +101,14 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
 	/**
 	 * Endpoint to submit the modified category.
 	 * @param ctx
 	 * @returns
 	 */
-	async submitModifyCategory(ctx: Context) {
+	/* async submitModifyCategory(ctx: Context) {
 		try {
 
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query
@@ -150,14 +150,14 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
 	/**
 	 * Endpoint to delete a category.
 	 * @param ctx
 	 * @returns
 	 */
-	async deleteCategory(ctx: Context) {
+	/* async deleteCategory(ctx: Context) {
 		try {
 			const { documentId } = ctx.query; // Ottieni il documentId dalla query
 
@@ -190,7 +190,7 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
 	/**
 	 * Function that calls strapi API to get all categories.

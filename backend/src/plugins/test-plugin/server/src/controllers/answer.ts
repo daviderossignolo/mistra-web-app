@@ -84,7 +84,7 @@ export default {
 	 * @param ctx
 	 * @returns filtredData
 	 */
-	async modifyAnswer(ctx: Context) {
+	/*async modifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 
@@ -145,14 +145,15 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
+	
 	/**
 	 * Endpoin per la modifica di una risposta.
 	 * @param ctx
 	 * @returns
 	 */
-	async submitModifyAnswer(ctx: Context) {
+	/*async submitModifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 			const { text, score, correction } = ctx.request.body;
@@ -197,14 +198,15 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
+
 
 	/**
 	 * Endpoin per la cancellazione di una risposta.
 	 * @param ctx
 	 * @returns
 	 */
-	async deleteAnswer(ctx: Context) {
+	/*async deleteAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 
@@ -239,14 +241,14 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	},*/
 
 	/**
 	 * Endpoin per la visualizzazione di tutte le risposte.
 	 * @param ctx
 	 * @returns filteredAnswers
 	 */
-	async getAnswers(ctx: Context) {
+	/*async getAnswers(ctx: Context) {
 		try {
 
 			const token = process.env.SERVICE_KEY;
@@ -297,9 +299,9 @@ export default {
 		} catch (error) {
 			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
 		}
-	},
+	}, */
 
-	async getFreeAnswers(ctx: Context) {
+	/*async getFreeAnswers(ctx: Context) {
 		try {
 
 			const token = process.env.SERVICE_KEY;
@@ -357,5 +359,5 @@ export default {
 			console.error(`Errore nel caricamento delle answers: ${error.message}`);
 			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
 		}
-	},
+	}, */
 };

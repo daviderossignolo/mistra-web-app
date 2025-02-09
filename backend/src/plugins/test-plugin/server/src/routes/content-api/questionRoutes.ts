@@ -7,7 +7,7 @@ export default [
       		auth: { required: true },
       	},
     },
-	{
+	/*{
 		method: 'GET',
 		path: '/modify-question', // Questa rotta permette visualizzare una domanda
 		handler: 'question.modifyQuestion', // Controller per visualizzare una domanda
@@ -22,7 +22,7 @@ export default [
 		config: {
 			  auth: { required: true },
 		},
-  	},
+  	},*/
   	{
 		method: 'POST',
 		path: '/delete-question', // Questa rotta permette eliminare una domanda
@@ -31,12 +31,12 @@ export default [
 			  auth: { required: true },
 		},
   	},
-	  {
+	/*  {
         method: 'GET',
         path: '/get-questions', // Questa rotta permette ottenere tutte le domande
         handler: 'question.getQuestions', // Controller per ottenere tutte le domande
         config: {
         	auth: { required: true },
         },
-    },
+    },*/
 ]

@@ -7,7 +7,7 @@ export default [
       	  	auth: { required: true },
       	},
     },
-    {
+    /*{
       	method: 'GET',
       	path: '/modify-category', // Questa rotta permette di visualizzare una categoria
       	handler: 'category.modifyCategory', // Controller per visualizzare una categoria
@@ -22,7 +22,7 @@ export default [
       	config: {
       	  	auth: { required: true },
       	},
-    },
+    }, 
     {
       	method: 'GET',
       	path: '/delete-category', // Questa rotta permette di eliminare una categoria
@@ -30,7 +30,7 @@ export default [
       	config: {
       	  	auth: { required: true },
       	},
-    },
+    }, */
 	{
         method: 'GET',
         path: '/get-categories', // Questa rotta permette di ottenere tutte le categorie

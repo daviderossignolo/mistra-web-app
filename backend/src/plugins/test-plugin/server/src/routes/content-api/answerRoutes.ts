@@ -7,7 +7,7 @@ export default [
       	  	auth: { required: true },
       	},
     },
-	{
+	/*{
 		method: 'GET',
 		path: '/modify-answer', // Questa rotta permette di visualizzare una risposta
 		handler: 'answer.modifyAnswer', // Controller per visualizzare una risposta
@@ -22,7 +22,7 @@ export default [
 		config: {
 			  auth: { required: true },
 		},
-  	},
+  	}, 
   	{
 		method: 'GET',
 		path: '/delete-answer', // Questa rotta permette di eliminare una risposta
@@ -30,7 +30,7 @@ export default [
 		config: {
 			  auth: { required: true},
 		},
-  	},
+  	}, 
 	{
         method: 'GET',
         path: '/get-answers', // Questa rotta permette di ottenere tutte le risposte
@@ -38,7 +38,7 @@ export default [
         config: {
         	auth: { required: true },
         },
-    },
+    }, 
 	{
         method: 'GET',
         path: '/get-free-answers', // Questa rotta permette di ottenere le risposte libere
@@ -46,7 +46,7 @@ export default [
         config: {
         	auth: { required: true },
         },
-    },
+    },*/
 	{
         method: "GET",
         path: "/",

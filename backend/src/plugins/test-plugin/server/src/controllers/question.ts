@@ -59,7 +59,7 @@ export default {
 	 * @param ctx
 	 * @returns filtredData
 	 */
-	async modifyQuestion(ctx: Context) {
+	/* async modifyQuestion(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 
@@ -119,14 +119,14 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
 	/**
 	 * Endpoint per la modifica di una domanda.
 	 * @param ctx
 	 * @returns
 	 */
-	async submitModifyQuestion(ctx: Context) {
+	/* async submitModifyQuestion(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 			const { name, text, category_id } = ctx.request.body;
@@ -175,7 +175,7 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
 	async deleteQuestion(ctx: Context) {
 		const body = ctx.request.body;
@@ -262,7 +262,7 @@ export default {
 	 * @param ctx
 	 * @returns
 	 */
-	async getQuestions(ctx) {
+	/* async getQuestions(ctx) {
 		try {
 
 			const token = process.env.SERVICE_KEY;
@@ -309,5 +309,5 @@ export default {
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 };
