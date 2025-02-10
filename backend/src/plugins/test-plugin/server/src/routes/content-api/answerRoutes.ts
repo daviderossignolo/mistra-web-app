@@ -1,12 +1,12 @@
 export default [
-    {
-      	method: 'POST',
-      	path: '/create-answer', // Questa rotta permette di creare una risposta
-      	handler: 'answer.createAnswer', // Controller per creare una risposta
-      	config: {
-      	  	auth: { required: true },
-      	},
-    },
+	{
+		method: "POST",
+		path: "/create-answer", // Questa rotta permette di creare una risposta
+		handler: "answer.createAnswer", // Controller per creare una risposta
+		config: {
+			auth: { required: true },
+		},
+	},
 	/*{
 		method: 'GET',
 		path: '/modify-answer', // Questa rotta permette di visualizzare una risposta
@@ -30,15 +30,7 @@ export default [
 		config: {
 			  auth: { required: true},
 		},
-  	}, 
-	{
-        method: 'GET',
-        path: '/get-answers', // Questa rotta permette di ottenere tutte le risposte
-        handler: 'answer.getAnswers', // Controller per ottenere tutte le risposte
-        config: {
-        	auth: { required: true },
-        },
-    }, 
+  	},  
 	{
         method: 'GET',
         path: '/get-free-answers', // Questa rotta permette di ottenere le risposte libere
@@ -48,11 +40,19 @@ export default [
         },
     },*/
 	{
-        method: "GET",
-        path: "/",
-        handler: "controller.index",
-        config: {
-        	policies: [],
-        },
-    },
-]
+		method: "GET",
+		path: "/get-question-answers", // Questa rotta permette di ottenere tutte le risposte
+		handler: "answer.getQuestionAnswers", // Controller per ottenere tutte le risposte
+		config: {
+			auth: { required: true },
+		},
+	},
+	{
+		method: "GET",
+		path: "/",
+		handler: "controller.index",
+		config: {
+			policies: [],
+		},
+	},
+];

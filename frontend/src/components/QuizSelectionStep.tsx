@@ -1,8 +1,9 @@
-import React from "react";
+import type React from "react";
 import { useState } from "react";
 import type { Question } from "./QuestionModal";
 import QuestionModal from "./QuestionModal";
 import { v4 as uuidv4 } from "uuid";
+import ExistingQuestionModal from "./ExistingQuestionModal";
 
 interface QuestionSelectionStepProps {
 	quizData: QuizData;
@@ -30,9 +31,11 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	const [questions, setQuestions] = useState(quizData.questions || []);
 	const [isModalOpen, setModalOpen] = useState(false);
 	const [selectedQuestion, setSelectedQuestion] = useState<Question>();
+	const [openQuestionModal, setOpenQuestionModal] = useState(false);
 
 	// Questa funzione viene chiamata quando l'utente aggiunge una nuova domanda
 	const handleAddQuestion = (newQuestion: Question) => {
+		console.log(newQuestion);
 		// Se la domanda è già presente nella lista, allora la sostituisco
 		const existingQuestion = questions.find(
 			(question) => question.id === newQuestion.id,
@@ -52,7 +55,6 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	// Variabili d'ambiente
 	const host = process.env.REACT_APP_BACKEND_HOST;
 	const port = process.env.REACT_APP_BACKEND_PORT;
-
 	const token = localStorage.getItem("token");
 
 	// Elimina la domanda dalla lista
@@ -69,7 +71,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 					body: JSON.stringify({
 						documentId: id,
@@ -89,6 +91,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 	// Funzione che viene chiamata quando l'utente clicca sul pulsante di modifica di una domanda
 	const handleEditQuestion = (question: Question) => {
+		console.log(question);
 		setSelectedQuestion(question);
 		setModalOpen(true);
 	};
@@ -119,7 +122,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
+							Authorization: `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},
@@ -161,7 +164,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
+							Authorization: `Bearer ${token}`,
 						},
 						body: JSON.stringify(quiz),
 					},
@@ -188,7 +191,10 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	return (
 		<div className="flex">
 			<section className="flex-grow p-6" aria-labelledby="quizInfoHeading">
-				<h2 id="quizInfoHeading" className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
+				<h2
+					id="quizInfoHeading"
+					className="font-bold font-poppins text-2xl text-navbar-hover mb-4"
+				>
 					Informazioni sul test
 				</h2>
 				<hr className="mb-4" />
@@ -226,7 +232,10 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 					</div>
 				</form>
 				<div className="mb-6">
-					<h3 className="font-bold font-poppins text-2xl text-navbar-hover mb-4" id="questionListHeading">
+					<h3
+						className="font-bold font-poppins text-2xl text-navbar-hover mb-4"
+						id="questionListHeading"
+					>
 						Domande
 					</h3>
 					<hr className="mb-4" />
@@ -298,13 +307,22 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 					</ul>
 				</div>
 				<div className="mb-6">
-					<button
-						type="button"
-						onClick={() => setModalOpen(true)}
-						className="bg-navbar-hover text-white py-2 px-6 rounded shadow-md hover:bg-navbar-hover-dark transition duration-300"
-					>
-						Aggiungi Nuova Domanda
-					</button>
+					<div className="flex">
+						<button
+							type="button"
+							onClick={() => setModalOpen(true)}
+							className="bg-navbar-hover text-white py-2 px-6 m-1 rounded shadow-md hover:bg-navbar-hover-dark transition duration-300"
+						>
+							Aggiungi Nuova Domanda
+						</button>
+						<button
+							type="button"
+							onClick={() => setOpenQuestionModal(true)}
+							className="bg-navbar-hover text-white py-2 px-6 m-1 rounded shadow-md hover:bg-navbar-hover-dark transition duration-300"
+						>
+							Aggiungi Domanda Esistente
+						</button>
+					</div>
 				</div>
 				<div className="flex justify-end mt-8">
 					<button
@@ -317,7 +335,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 				</div>
 			</section>
 
-			{/* Question Modal */}
+			{/* Modale per le nuove domande */}
 			{isModalOpen && (
 				<QuestionModal
 					question={selectedQuestion}
@@ -326,6 +344,14 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 						setModalOpen(false);
 						setSelectedQuestion(undefined);
 					}}
+					onSave={handleAddQuestion}
+				/>
+			)}
+
+			{/* Modale per le domande esistenti */}
+			{openQuestionModal && (
+				<ExistingQuestionModal
+					onClose={() => setOpenQuestionModal(false)}
 					onSave={handleAddQuestion}
 				/>
 			)}

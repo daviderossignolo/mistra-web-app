@@ -25,7 +25,7 @@ export default {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": `Bearer ${token}`,
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -200,7 +200,7 @@ export default {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			},
 		);
@@ -223,7 +223,7 @@ export default {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			},
 		);
@@ -241,7 +241,7 @@ export default {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
+					Authorization: `Bearer ${token}`,
 				},
 			},
 		);
@@ -262,17 +262,16 @@ export default {
 	 * @param ctx
 	 * @returns
 	 */
-	/* async getQuestions(ctx) {
+	async getQuestions(ctx) {
 		try {
-
 			const token = process.env.SERVICE_KEY;
 			const response = await fetch(
-				"http://localhost:1337/api/questions?populate=*",
+				"http://localhost:1337/api/questions?pLevel",
 				{
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
@@ -289,14 +288,12 @@ export default {
 			const data = responseData.data;
 
 			const filteredAnswers = responseData.data.map((data) => ({
-				id: data.id ?? null, // Usa ?? per maggiore sicurezza
+				id: data.id_question,
 				documentId: data.documentId,
-				id_question: data.id_question,
 				name: data.name,
 				text: data.text,
-				id_category: data.category_id
+				category: data.category_id
 					? {
-							id: data.category_id.id ?? null,
 							documentId: data.category_id.documentId,
 							id_category: data.category_id.id_category,
 							name: data.category_id.name,
@@ -304,10 +301,9 @@ export default {
 					: null,
 			}));
 
-			console.log(filteredAnswers);
 			return filteredAnswers;
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	}, */
+	},
 };

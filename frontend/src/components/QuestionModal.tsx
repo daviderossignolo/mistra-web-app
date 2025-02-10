@@ -69,7 +69,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
+							Authorization: `Bearer ${token}`,
 						},
 					},
 				);
@@ -120,7 +120,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 					method: "DELETE",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
@@ -183,19 +183,29 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 		<div
 			className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-poppins text-navbar-hover"
 			aria-modal="true"
+			// biome-ignore lint/a11y/useSemanticElements: <explanation>
 			role="dialog"
 			aria-labelledby="modal-heading"
 		>
-			<div className="bg-white w-11/12 max-w-2xl p-6 rounded shadow-lg" aria-labelledby="questionModalHeading">
+			<div
+				className="bg-white w-10/12 max-w-2xl p-6 rounded shadow-lg h-4/5 overflow-y-auto"
+				aria-labelledby="questionModalHeading"
+			>
 				<div className="w-full bg-navbar-hover px-4 py-4 mb-4">
-					<h3 id="questionModalHeading" className="font-bold text-white font-poppins text-center">
+					<h3
+						id="questionModalHeading"
+						className="font-bold text-white font-poppins text-center"
+					>
 						Nuova Domanda
 					</h3>
 				</div>
 
 				{/* Sezione della categoria */}
 				<div className="mb-4">
-					<label htmlFor="category" className="block mb-2 font-poppins font-bold">
+					<label
+						htmlFor="category"
+						className="block mb-2 font-poppins font-bold"
+					>
 						Categoria
 					</label>
 					<div className="flex gap-2">
@@ -232,7 +242,10 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 				</div>
 
 				<div className="mb-4">
-					<label htmlFor="questionName" className="block mb-2 font-poppins font-bold">
+					<label
+						htmlFor="questionName"
+						className="block mb-2 font-poppins font-bold"
+					>
 						Nome della Domanda
 					</label>
 					<input
@@ -246,7 +259,10 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 				</div>
 
 				<div className="mb-4">
-					<label htmlFor="questionText" className="block mb-2 font-poppins font-bold">
+					<label
+						htmlFor="questionText"
+						className="block mb-2 font-poppins font-bold"
+					>
 						Testo della Domanda
 					</label>
 					<input
@@ -290,7 +306,11 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 												<textarea
 													value={answer.correction}
 													onChange={(e) =>
-														updateAnswerField(answer.id, "correction", e.target.value)
+														updateAnswerField(
+															answer.id,
+															"correction",
+															e.target.value,
+														)
 													}
 													placeholder="Correzione della risposta"
 													className="flex-1 border rounded p-2"
@@ -317,7 +337,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 											<td>
 												<button
 													type="button"
-													onClick={() => removeAnswer(answer.id, answer.documentId)}
+													onClick={() =>
+														removeAnswer(answer.id, answer.documentId)
+													}
 													className="text-red-600"
 												>
 													<svg

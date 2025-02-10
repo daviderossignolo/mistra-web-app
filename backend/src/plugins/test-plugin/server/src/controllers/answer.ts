@@ -47,7 +47,7 @@ export default {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": `Bearer ${token}`,
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -67,7 +67,7 @@ export default {
 		}
 
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		const answerData : any = (await response.json()) as CategoryResp;
+		const answerData: any = (await response.json()) as CategoryResp;
 
 		console.log(answerData);
 
@@ -147,7 +147,6 @@ export default {
 		}
 	}, */
 
-	
 	/**
 	 * Endpoin per la modifica di una risposta.
 	 * @param ctx
@@ -200,7 +199,6 @@ export default {
 		}
 	}, */
 
-
 	/**
 	 * Endpoin per la cancellazione di una risposta.
 	 * @param ctx
@@ -242,16 +240,15 @@ export default {
 			ctx.body = { error: error.message };
 		}
 	},*/
-
 	/**
-	 * Endpoin per la visualizzazione di tutte le risposte.
+	 * Endpoint per ottenere le risposte legate ad una domanda.
 	 * @param ctx
 	 * @returns filteredAnswers
 	 */
-	/*async getAnswers(ctx: Context) {
+	async getQuestionAnswers(ctx: Context) {
 		try {
-
 			const token = process.env.SERVICE_KEY;
+			const documentId = ctx.query.documentId;
 
 			if (!token) {
 				ctx.status = 401;
@@ -260,12 +257,12 @@ export default {
 			}
 
 			const response = await fetch(
-				"http://localhost:1337/api/answers?populate=*",
+				`http://localhost:1337/api/answers?filters[question_id][documentId]=${documentId}&pLevel`,
 				{
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			);
@@ -274,21 +271,11 @@ export default {
 			const responseData: any = await response.json(); // Converte la risposta in JSON
 
 			const filteredAnswers = responseData.data.map((answer) => ({
-				id: answer.id ?? null,
+				id: answer.id_answer,
 				documentId: answer.documentId,
-				id_answer: answer.id_answer,
 				text: answer.text,
 				score: answer.score,
 				correction: answer.correction,
-				id_question: answer.question_id
-					? {
-							id: answer.question_id.id,
-							documentId: answer.question_id.documentId,
-							id_question: answer.question_id.id_question,
-							name: answer.question_id.name,
-							text: answer.question_id.text,
-						}
-					: null,
 			}));
 
 			ctx.status = 200;
@@ -299,7 +286,7 @@ export default {
 		} catch (error) {
 			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
 		}
-	}, */
+	},
 
 	/*async getFreeAnswers(ctx: Context) {
 		try {

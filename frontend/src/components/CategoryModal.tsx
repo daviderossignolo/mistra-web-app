@@ -32,7 +32,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						"Authorization": `Bearer ${token}`,
+						Authorization: `Bearer ${token}`,
 					},
 					body: JSON.stringify({ id_category: category_id, name: name }),
 				},
@@ -58,6 +58,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ onClose, onSave }) => {
 		<div
 			className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-poppins text-navbar-hover"
 			aria-modal="true"
+			// biome-ignore lint/a11y/useSemanticElements: <explanation>
 			role="dialog"
 			aria-labelledby="categoryModalHeading"
 		>
