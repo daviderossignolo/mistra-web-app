@@ -1,8 +1,6 @@
 import type React from "react";
-import Lottie from "react-lottie";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import * as animationData from "../lottie/loader.json";
 
 type MenuLink = {
 	id: number;
@@ -61,13 +59,11 @@ const MenuComponent: React.FC = () => {
 	const baseUrl = process.env.REACT_APP_BACKEND_HOST;
 	const port = process.env.REACT_APP_BACKEND_PORT;
 
-	// Serve per fare il focus sul primo elemento della modale quando si apre
-	const firstUpdate = useRef(true);
-
 	// Funzione che recupera i dati delle voci del menù dal backend strapi
 	useEffect(() => {
 		const fetchMenuData = async () => {
-			const url = `${baseUrl}:${port}/api/main-menu?populate%5B0%5D=MainMenuItems&populate%5B1%5D=MainMenuItems.sections&populate%5B2%5D=MainMenuItems.sections.links`;
+			// populate%5B0%5D=MainMenuItems&populate%5B1%5D=MainMenuItems.sections&populate%5B2%5D=MainMenuItems.sections.links
+			const url = `${baseUrl}:${port}/api/main-menu?pLevel`;
 			try {
 				const response = await fetch(url);
 
@@ -122,23 +118,9 @@ const MenuComponent: React.FC = () => {
 		navigate("/login");
 	};
 
-	// Configurazione di default per il componente Lottie
-	const defaultOptions = {
-		loop: true,
-		autoplay: true,
-		animationData: animationData,
-		rendererSettings: {
-			preserveAspectRatio: "xMidYMid slice",
-		},
-	};
-
 	// Loading spinner se i dati sono in caricamento
 	if (loading) {
-		return (
-			<div className="p-4 text-center">
-				<Lottie options={defaultOptions} height={150} width={150} />
-			</div>
-		);
+		return <div>Loading...</div>;
 	}
 
 	if (error) return <div className="p-4 text-red-700">Errore: {error}</div>;
@@ -146,8 +128,9 @@ const MenuComponent: React.FC = () => {
 	const renderMenu = (items: MainMenuItem[], isMobile = false) => {
 		return (
 			<ul
-				className={`${isMobile ? "flex flex-col space-y-2" : "flex items-center space-x-4"
-					}`}
+				className={`${
+					isMobile ? "flex flex-col space-y-2" : "flex items-center space-x-4"
+				}`}
 				role="menu"
 			>
 				{items.map((item) => {
@@ -170,7 +153,7 @@ const MenuComponent: React.FC = () => {
 										className="text-white px-4 hover_bg-navbar-hover rounded font-poppins text-sm"
 										role="menuitem"
 									>
-										{item.title} 
+										{item.title}
 									</span>
 								)}
 							</li>
@@ -180,13 +163,16 @@ const MenuComponent: React.FC = () => {
 						return (
 							<li key={item.id} className="relative group" role="none">
 								<button
-									className={`text-white px-4 py-2 font-poppins text-sm transition-colors duration-200 hover:bg-navbar-hover rounded ${isMobile
+									className={`text-white px-4 py-2 font-poppins text-sm transition-colors duration-200 hover:bg-navbar-hover rounded ${
+										isMobile
 											? "flex justify-between items-center cursor-pointer"
 											: ""
-										}`}
-									onClick={() => {toggleDropdown(item.id);
+									}`}
+									onClick={() => {
+										toggleDropdown(item.id);
 										window.location.href = item.url;
 									}}
+									type="button"
 									aria-expanded={activeDropdowns.has(item.id)}
 									aria-haspopup="true"
 									aria-label={`Apri il menu ${item.title}`}
@@ -197,10 +183,11 @@ const MenuComponent: React.FC = () => {
 										<span>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
-												className={`h-5 w-5 transition-transform ${activeDropdowns.has(item.id)
+												className={`h-5 w-5 transition-transform ${
+													activeDropdowns.has(item.id)
 														? "rotate-180"
 														: "rotate-0"
-													}`}
+												}`}
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
@@ -219,12 +206,13 @@ const MenuComponent: React.FC = () => {
 								</button>
 								{/* Dropdown Content */}
 								<div
-									className={`${isMobile
+									className={`${
+										isMobile
 											? activeDropdowns.has(item.id)
 												? "block"
 												: "hidden"
 											: "absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-navbar rounded-md shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible  group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
-										}`}
+									}`}
 									role="menu"
 									aria-label={item.title}
 								>
@@ -258,7 +246,8 @@ const MenuComponent: React.FC = () => {
 							type="button"
 							onClick={handleLogout}
 							className="text-white py-2 px-4 transition-colors font-poppins text-sm duration-200 hover:bg-navbar-hover rounded"
-							role="menuitem" 						>
+							role="menuitem"
+						>
 							Logout
 						</button>
 					) : (

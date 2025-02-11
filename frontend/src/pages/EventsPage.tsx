@@ -57,8 +57,8 @@ const EventsPage: React.FC = () => {
 
 				// setto i dati ottenuti dalla chiamata nella variabile pageData
 				const data = await response.json();
-				console.log(data);
 				setPageData(data.data as EventPageData);
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
 				// se c'è un errore, lo setto nella variabile error
 				setError(err.message);
@@ -73,9 +73,7 @@ const EventsPage: React.FC = () => {
 	// funzione utilizzata per renderizzare i blocchi ottenuti dalla chiamata a strapi, usa memo per evitare di ricalcolare il render ad ogni renderizzazione
 	const renderBlocks = useMemo(() => {
 		if (!pageData) return null;
-
 		const sections = pageData.sections;
-		console.log(sections);
 
 		return (
 			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
@@ -104,7 +102,10 @@ const EventsPage: React.FC = () => {
 					</div>
 				)}
 				{sections.map((section) => (
-					<section key={section.id} aria-labelledby={`sectionTitle-${section.id}`}>
+					<section
+						key={section.id}
+						aria-labelledby={`sectionTitle-${section.id}`}
+					>
 						<div className="w-full bg-navbar-hover px-4 py-4">
 							<h2
 								id={`sectionTitle-${section.id}`}
@@ -145,7 +146,7 @@ const EventsPage: React.FC = () => {
 				))}
 			</div>
 		);
-	}, [pageData]);
+	}, [pageData, error, loading]);
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-8">

@@ -26,9 +26,10 @@ const InfectionList: React.FC = () => {
 					throw new Error("Failed to fetch infections");
 				}
 				const data = await response.json();
-				console.log(data);
 				setPageData(data.data as Infection[]);
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 				setError((err as any).message);
 			} finally {
 				setLoading(false);
@@ -40,7 +41,6 @@ const InfectionList: React.FC = () => {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-
 			{/* Area live per i messaggi di caricamento/errore */}
 			<div aria-live="polite" className="sr-only">
 				{loading && "Caricamento..."}

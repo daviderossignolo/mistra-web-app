@@ -38,8 +38,8 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 				}
 
 				const data = await response.json();
-				console.log(data);
 				setPageData(data.data[0] as ServicePageData);
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
 				setError(err.message);
 			} finally {
@@ -60,7 +60,10 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 
 		return (
 			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
-				<div className="w-full bg-navbar-hover px-4 py-4" aria-labelledby="pageTitle">
+				<div
+					className="w-full bg-navbar-hover px-4 py-4"
+					aria-labelledby="pageTitle"
+				>
 					<h2
 						id="pageTitle"
 						className="m-0 text-center text-[42px] font-bold font-poppins text-white"
@@ -87,7 +90,7 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 						<div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 flex items-start pt-1">
 							<img
 								src={`http://localhost:1337${mainImage.url}`}
-								alt={"Immagine del servizio " + title}
+								alt={`Immagine del servizio ${title}`}
 								className="w-24 h-24 md:w-32 md:h-32 object-contain"
 								aria-hidden={true} //Nascondo l'immagine in quanto puramente decorativa
 							/>

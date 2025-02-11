@@ -545,40 +545,10 @@ export default {
 				return ctx;
 			}
 
-			// Inserisco la domanda corrente
-			const questionResponse = await fetch(
-				"http://localhost:1337/api/test-plugin/create-question",
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
-					},
-					body: JSON.stringify({
-						id_question: question.id,
-						name: question.name,
-						text: question.text,
-						category_id: categoryId,
-					}),
-				},
-			);
-
-			// Se la chiama API non è andata a buon fine, setto l'errore nella risposta
-			if (!questionResponse.ok) {
-				ctx.status = questionResponse.status;
-				ctx.body = { message: "Errore nella creazione delle domande" };
-				return ctx;
-			}
-
-			// La chiamata API ha avuto successo, estraggo l'id della domanda appena creata
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const questionData: any = await questionResponse.json();
-			const questionId = questionData.question_id;
-
-			// Processo le risposte collegate alla domanda corrente
-			for (const answer of question.answers) {
-				const answerResponse = await fetch(
-					"http://localhost:1337/api/test-plugin/create-answer",
+			if (question.documentId !== "") {
+				// Se la domanda ha un documentId la inserisco subito nella tabella question-in-tests
+				const questionInTestResponse = await fetch(
+					"http://localhost:1337/api/question-in-tests",
 					{
 						method: "POST",
 						headers: {
@@ -586,44 +556,104 @@ export default {
 							Authorization: `Bearer ${token}`,
 						},
 						body: JSON.stringify({
-							id_answer: answer.id,
-							text: answer.text,
-							correction: answer.correction,
-							score: answer.score,
-							question_id: questionId,
+							data: {
+								question_id: question.documentId,
+								test_id: testId,
+							},
 						}),
 					},
 				);
 
-				if (!answerResponse.ok) {
-					ctx.status = answerResponse.status;
-					ctx.body = { message: "Errore nella creazione delle risposte" };
+				if (!questionInTestResponse.ok) {
+					ctx.status = questionInTestResponse.status;
+					ctx.body = { message: "Errore nella creazione delle domande" };
 					return ctx;
 				}
-			}
-
-			// Collego le domande al test
-			const questionInTestResponse = await fetch(
-				"http://localhost:1337/api/question-in-tests",
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
-					},
-					body: JSON.stringify({
-						data: {
-							question_id: questionId,
-							test_id: testId,
+			} else {
+				// Inserisco la domanda corrente
+				const questionResponse = await fetch(
+					"http://localhost:1337/api/test-plugin/create-question",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
 						},
-					}),
-				},
-			);
+						body: JSON.stringify({
+							id_question: question.id,
+							name: question.name,
+							text: question.text,
+							category_id: categoryId,
+						}),
+					},
+				);
 
-			if (!questionInTestResponse.ok) {
-				ctx.status = questionInTestResponse.status;
-				ctx.body = { message: "Errore nella creazione delle domande" };
-				return ctx;
+				// Se la chiama API non è andata a buon fine, setto l'errore nella risposta
+				if (!questionResponse.ok) {
+					ctx.status = questionResponse.status;
+					ctx.body = { message: "Errore nella creazione delle domande" };
+					return ctx;
+				}
+
+				// La chiamata API ha avuto successo, estraggo l'id della domanda appena creata
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				const questionData: any = await questionResponse.json();
+				const questionId = questionData.question_id;
+
+				// Processo le risposte collegate alla domanda corrente
+				for (const answer of question.answers) {
+					// le risposte esistenti non vanno inserite
+					if (answer.documentId !== "") {
+						continue;
+					}
+					const answerResponse = await fetch(
+						"http://localhost:1337/api/test-plugin/create-answer",
+						{
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${token}`,
+							},
+							body: JSON.stringify({
+								id_answer: answer.id,
+								text: answer.text,
+								correction: answer.correction,
+								score: answer.score,
+								question_id: questionId,
+							}),
+						},
+					);
+
+					if (!answerResponse.ok) {
+						ctx.status = answerResponse.status;
+						ctx.body = { message: "Errore nella creazione delle risposte" };
+						return ctx;
+					}
+				}
+
+				// Collego le domande al test
+				const questionInTestResponse = await fetch(
+					"http://localhost:1337/api/question-in-tests",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({
+							data: {
+								question_id: questionId,
+								test_id: testId,
+							},
+						}),
+					},
+				);
+
+				if (!questionInTestResponse.ok) {
+					ctx.status = questionInTestResponse.status;
+					ctx.body = { message: "Errore nella creazione delle domande" };
+					return ctx;
+				}
 			}
 		}
 

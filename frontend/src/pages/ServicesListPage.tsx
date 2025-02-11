@@ -38,8 +38,8 @@ const ServicesListPage: React.FC = () => {
 				}
 
 				const data = await response.json();
-				console.log(data);
 				setPageData(data.data as ServicePageData[]);
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
 				setError(err.message);
 			} finally {
@@ -55,7 +55,6 @@ const ServicesListPage: React.FC = () => {
 
 		return (
 			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
-
 				<div className="w-full bg-navbar-hover px-4 py-4">
 					<h2 className="m-0 text-center text-[42px] font-bold font-poppins text-white">
 						Servizi Offerti
@@ -75,7 +74,6 @@ const ServicesListPage: React.FC = () => {
 								className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover"
 							>
 								<div className="flex gap-4">
-
 									<div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 flex items-start pt-1">
 										<img
 											src={`http://localhost:1337${image_url}`}
@@ -105,7 +103,6 @@ const ServicesListPage: React.FC = () => {
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-8 md:py-12">
-
 			{/* Area live per i messaggi di caricamento/errore */}
 			<div aria-live="polite" className="sr-only">
 				{loading && "Caricamento..."}

@@ -35,7 +35,6 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 	// Questa funzione viene chiamata quando l'utente aggiunge una nuova domanda
 	const handleAddQuestion = (newQuestion: Question) => {
-		console.log(newQuestion);
 		// Se la domanda è già presente nella lista, allora la sostituisco
 		const existingQuestion = questions.find(
 			(question) => question.id === newQuestion.id,
@@ -91,7 +90,6 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 
 	// Funzione che viene chiamata quando l'utente clicca sul pulsante di modifica di una domanda
 	const handleEditQuestion = (question: Question) => {
-		console.log(question);
 		setSelectedQuestion(question);
 		setModalOpen(true);
 	};

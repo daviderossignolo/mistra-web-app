@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Category } from "./QuestionModal";
+import type { Category } from "./QuestionModal";
 
 // Definizione dei tipi per i dati che arrivano dal backend
 type Sex = {
@@ -27,7 +27,7 @@ type Question = {
 	documentId: string;
 	name: string;
 	text: string;
-	category: Category,
+	category: Category;
 	answers: Answer[];
 };
 
@@ -124,9 +124,8 @@ const TakeQuiz: React.FC = () => {
 				}
 
 				const data = await response.json();
-				console.log(data);
 				setSexData(data.data);
-			} catch (error) { }
+			} catch (error) {}
 		};
 
 		fetchSexData();
@@ -194,11 +193,6 @@ const TakeQuiz: React.FC = () => {
 		};
 
 		// chiamata al backend per salvare il test
-
-		//const token = localStorage.getItem("token");
-
-		console.log("stampa", compiledQuiz);
-
 		const response = await fetch(
 			`${host}:${port}/api/test-plugin/insert-test-execution`,
 			{
@@ -230,10 +224,14 @@ const TakeQuiz: React.FC = () => {
 							Inserisci i tuoi dati
 						</h2>
 					</div>
-					<form className="w-full max-w-md" onSubmit={e => {
-						e.preventDefault();
-						handleUserDataSubmit();
-					}} aria-label="Inserimento dati personali">
+					<form
+						className="w-full max-w-md"
+						onSubmit={(e) => {
+							e.preventDefault();
+							handleUserDataSubmit();
+						}}
+						aria-label="Inserimento dati personali"
+					>
 						<div className="mb-8 mt-8">
 							<label htmlFor="sex" className="block text-sm font-bold mb-2">
 								Sesso
@@ -252,9 +250,7 @@ const TakeQuiz: React.FC = () => {
 									Seleziona...
 								</option>
 								{sexData?.map((sex: Sex) => (
-									<option key={sex.id} value={sex.name}
-										tabIndex={0}
-									>
+									<option key={sex.id} value={sex.name} tabIndex={0}>
 										{sex.name}
 									</option>
 								))}
@@ -292,15 +288,25 @@ const TakeQuiz: React.FC = () => {
 		// Quiz Step
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
-				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5" aria-labelledby="quizHeading">
+				<div
+					className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5"
+					aria-labelledby="quizHeading"
+				>
 					{quizData && (
 						<>
 							<div className="w-full bg-navbar-hover px-4 py-4">
-								<h1 id="quizHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+								<h1
+									id="quizHeading"
+									className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+								>
 									Rispondi alle domande
 								</h1>
 							</div>
-							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50" role="alert" aria-live="assertive">
+							<div
+								className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50"
+								role="alert"
+								aria-live="assertive"
+							>
 								<h3 className="text-xl font-bold text-red-600 mb-2">
 									IMPORTANTE!
 								</h3>
@@ -343,7 +349,10 @@ const TakeQuiz: React.FC = () => {
 							aria-labelledby={`questionHeading-${question.id}`}
 							className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm"
 						>
-							<h3 id={`questionHeading-${question.id}`} className="text-xl font-bold mb-2 text-navbar-hover">
+							<h3
+								id={`questionHeading-${question.id}`}
+								className="text-xl font-bold mb-2 text-navbar-hover"
+							>
 								Domande
 							</h3>
 							<hr className="mb-4" />
@@ -404,16 +413,26 @@ const TakeQuiz: React.FC = () => {
 		// Result Step
 		return (
 			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
-				<div className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5" aria-labelledby="resultsHeading">
+				<div
+					className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5"
+					aria-labelledby="resultsHeading"
+				>
 					{quizData && (
 						<>
 							<div className="w-full bg-navbar-hover px-4 py-4">
-								<h1 id="resultsHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+								<h1
+									id="resultsHeading"
+									className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+								>
 									Risultati del Test
 								</h1>
 							</div>
 
-							<div className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50" role="alert" aria-live="assertive">
+							<div
+								className="flex flex-col mt-4 mb-4 p-4 border-2 border-red-600 rounded-lg bg-red-50"
+								role="alert"
+								aria-live="assertive"
+							>
 								<h3 className="text-xl font-bold text-red-600 mb-2">
 									IMPORTANTE!
 								</h3>
@@ -463,7 +482,10 @@ const TakeQuiz: React.FC = () => {
 								aria-labelledby={`questionResultHeading-${question.id}`}
 								className="mt-2 py-4 rounded-lg mb-6 bg-gray-50 p-4 shadow-sm"
 							>
-								<h3 id={`questionResultHeading-${question.id}`} className="text-xl font-bold mb-2 text-navbar-hover">
+								<h3
+									id={`questionResultHeading-${question.id}`}
+									className="text-xl font-bold mb-2 text-navbar-hover"
+								>
 									Domande
 								</h3>
 								<hr className="mb-4" />

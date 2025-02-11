@@ -80,6 +80,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ id, label, onClick }) => {
 				id={id}
 				className="w-full text-left"
 				onClick={onClick}
+				type="button"
 			>
 				{label}
 			</button>
@@ -89,7 +90,10 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ id, label, onClick }) => {
 
 const Sidebar = ({ onSelect }: { onSelect: (section: string) => void }) => {
 	return (
-		<nav className="w-64 bg-white p-6 shadow-md rounded" aria-label="Menu principale">
+		<nav
+			className="w-64 bg-white p-6 shadow-md rounded"
+			aria-label="Menu principale"
+		>
 			<h2 className="text-xl font-semibold mb-4">Menu</h2>
 			<ul className="list-none pl-0">
 				<SidebarItem
@@ -165,8 +169,6 @@ const DashboardPage: React.FC = () => {
 					},
 				},
 			);
-
-			console.log(response);
 
 			if (!response.ok) {
 				alert(
@@ -312,9 +314,6 @@ const DashboardPage: React.FC = () => {
 
 	const findSelectedExecutionTest = async (documentId: string) => {
 		const token = localStorage.getItem("token");
-
-		console.log(JSON.stringify({ execDocId: documentId }));
-
 		const getTestResponse = await fetch(
 			`${host}:${port}/api/test-plugin/get-test-execution`,
 			{
@@ -333,18 +332,13 @@ const DashboardPage: React.FC = () => {
 		}
 
 		const data = await getTestResponse.json();
-		console.log(data);
 		setNotes(data.test_info.note);
 
 		return data;
 	};
 
 	const handleInsertNote = async (documentId: string) => {
-		console.log(documentId);
-		console.log(notes);
-
 		const token = localStorage.getItem("token");
-
 		const revisionResponse = await fetch(
 			`${host}:${port}/api/test-executions/${documentId}`,
 			{
@@ -387,17 +381,28 @@ const DashboardPage: React.FC = () => {
 
 			{/* Sezione "Test Eseguiti" */}
 			{selectedSection === "executedTests" && (
-				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="executedTestsHeading">
+				<section
+					className="flex-1 bg-white p-6 shadow-md rounded"
+					aria-labelledby="executedTestsHeading"
+				>
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 id="executedTestsHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+						<h2
+							id="executedTestsHeading"
+							className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+						>
 							Test Eseguiti
 						</h2>
 					</div>
-					<form className="flex-1 flex items-center border rounded mt-3" onSubmit={(e) => {
-						e.preventDefault();
-						handleSearchExecutions();
-					}}>
-						<label htmlFor="searchExecutedTests" className="sr-only">Cerca test eseguiti</label>
+					<form
+						className="flex-1 flex items-center border rounded mt-3"
+						onSubmit={(e) => {
+							e.preventDefault();
+							handleSearchExecutions();
+						}}
+					>
+						<label htmlFor="searchExecutedTests" className="sr-only">
+							Cerca test eseguiti
+						</label>
 						<input
 							type="text"
 							id="searchExecutedTests"
@@ -415,7 +420,10 @@ const DashboardPage: React.FC = () => {
 					</form>
 					{/* Modifica 3: Tabella accessibile */}
 					<div className="overflow-x-auto">
-						<table className="min-w-full bg-white border text-sm mt-4" aria-label="Tabella dei test eseguiti">
+						<table
+							className="min-w-full bg-white border text-sm mt-4"
+							aria-label="Tabella dei test eseguiti"
+						>
 							<thead>
 								<tr>
 									{[
@@ -426,7 +434,11 @@ const DashboardPage: React.FC = () => {
 										"Revisionato",
 										"Azioni",
 									].map((header) => (
-										<th key={header} className="py-2 border w-1/10 text-center" scope="col">
+										<th
+											key={header}
+											className="py-2 border w-1/10 text-center"
+											scope="col"
+										>
 											{header}
 										</th>
 									))}
@@ -435,10 +447,14 @@ const DashboardPage: React.FC = () => {
 							<tbody>
 								{executedTests.map((test) => (
 									<tr key={test.id} className="hover:bg-gray-200">
-										<td className="py-2 text-center">{test.test_execution_id}</td>
+										<td className="py-2 text-center">
+											{test.test_execution_id}
+										</td>
 										<td className="py-2 text-center">{test.score}</td>
 										<td className="py-2 text-center">{test.id_sex.name}</td>
-										<td className="py-2 text-center">{test.id_test?.name_test}</td>
+										<td className="py-2 text-center">
+											{test.id_test?.name_test}
+										</td>
 										<td className="py-2 text-center">
 											<input
 												type="checkbox"
@@ -486,18 +502,29 @@ const DashboardPage: React.FC = () => {
 
 			{/* Sezione "Gestione Modelli di Test" */}
 			{selectedSection === "testTemplates" && (
-				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="manageTestsHeading">
+				<section
+					className="flex-1 bg-white p-6 shadow-md rounded"
+					aria-labelledby="manageTestsHeading"
+				>
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 id="manageTestsHeading" className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						<h2
+							id="manageTestsHeading"
+							className="text-white font-bold font-poppins m-0 text-left text-[42px]"
+						>
 							Gestione test
 						</h2>
 					</div>
 					<div className="flex gap-2 mb-4 mt-4">
-						<form className="flex-1 flex items-center border rounded" onSubmit={(e) => {
-							e.preventDefault();
-							handleSearch();
-						}}>
-							<label htmlFor="searchTests" className="sr-only">Cerca test</label>
+						<form
+							className="flex-1 flex items-center border rounded"
+							onSubmit={(e) => {
+								e.preventDefault();
+								handleSearch();
+							}}
+						>
+							<label htmlFor="searchTests" className="sr-only">
+								Cerca test
+							</label>
 							<input
 								type="text"
 								id="searchTests"
@@ -597,9 +624,15 @@ const DashboardPage: React.FC = () => {
 
 			{/* Sezione per la creazione o modifica del test */}
 			{selectedSection === "createTest" && (
-				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="createQuizHeading">
+				<section
+					className="flex-1 bg-white p-6 shadow-md rounded"
+					aria-labelledby="createQuizHeading"
+				>
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 id="createQuizHeading" className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						<h2
+							id="createQuizHeading"
+							className="text-white font-bold font-poppins m-0 text-left text-[42px]"
+						>
 							CREAZIONE QUIZ
 						</h2>
 					</div>
@@ -609,9 +642,15 @@ const DashboardPage: React.FC = () => {
 
 			{/* Sezione per la modifica del test */}
 			{selectedSection === "editTest" && (
-				<section className="flex-1 bg-white p-6 shadow-md rounded" aria-labelledby="editQuizHeading">
+				<section
+					className="flex-1 bg-white p-6 shadow-md rounded"
+					aria-labelledby="editQuizHeading"
+				>
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 id="editQuizHeading" className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+						<h2
+							id="editQuizHeading"
+							className="text-white font-bold font-poppins m-0 text-left text-[42px]"
+						>
 							MODIFICA QUIZ
 						</h2>
 					</div>
@@ -624,13 +663,19 @@ const DashboardPage: React.FC = () => {
 
 			{/* Sezione per la visualizzazione del test */}
 			{selectedSection === "viewTest" && (
-				<section className="flex-1 font-poppins text-navbar-hover" aria-labelledby="testResultsHeading">
+				<section
+					className="flex-1 font-poppins text-navbar-hover"
+					aria-labelledby="testResultsHeading"
+				>
 					<div className="flex flex-col w-full bg-white p-6 shadow-md rounded">
 						{/* Informazioni sul test da eseguire */}
 						{selectedExecution && (
 							<>
 								<div className="w-full bg-navbar-hover px-4 py-4">
-									<h2 id="testResultsHeading" className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+									<h2
+										id="testResultsHeading"
+										className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+									>
 										Risultati del Test
 									</h2>
 								</div>
@@ -677,7 +722,10 @@ const DashboardPage: React.FC = () => {
 
 										{/* Note e data visualizzazione */}
 										<div className="flex flex-col mb-4">
-											<label htmlFor="notes" className="text-lg font-semibold text-navbar-hover mb-2">
+											<label
+												htmlFor="notes"
+												className="text-lg font-semibold text-navbar-hover mb-2"
+											>
 												Note:
 											</label>
 											<textarea

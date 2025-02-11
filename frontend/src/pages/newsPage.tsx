@@ -50,10 +50,9 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 				if (!response.ok) {
 					throw new Error("Errore durante il caricamento dei dati");
 				}
-
 				const data = await response.json();
-				console.log(data);
 				setPageData(data.data[0] as NewsPageData);
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
 				setError(err.message);
 			} finally {
@@ -110,7 +109,7 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 							<div className="flex-shrink-0 w-20 h-20 md:w-28 md:h-28 flex items-start pt-1 pb-1">
 								<img
 									src={`http://localhost:1337${mainImage.url}`}
-									alt={"Immagine principale della news " + title}
+									alt={`Immagine principale della news ${title}`}
 									className="w-24 h-24 md:w-32 md:h-32 object-contain"
 								/>
 							</div>
@@ -135,7 +134,11 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 								{section.qrcode && (
 									<img
 										src={`http://localhost:1337${section.qrcode.url}`}
-										alt={section.qrcode.alternativeText ? section.qrcode.alternativeText : "QR code della sezione"}
+										alt={
+											section.qrcode.alternativeText
+												? section.qrcode.alternativeText
+												: "QR code della sezione"
+										}
 										className="w-24 h-24 md:w-32 md:h-32 object-contain"
 									/>
 								)}
@@ -145,7 +148,7 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 				</div>
 			</div>
 		);
-	}, [pageData]);
+	}, [pageData, error, loading]);
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-8 md:py-12">{renderBlocks}</div>

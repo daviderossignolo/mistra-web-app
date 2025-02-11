@@ -56,7 +56,6 @@ const About: React.FC = () => {
 
 				// setto i dati ottenuti dalla chiamata nella variabile pageData
 				const data = await response.json();
-				console.log(data);
 				setPageData(data.data as AboutPageData); // Type assertion here
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
@@ -91,10 +90,7 @@ const About: React.FC = () => {
 					className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover"
 					aria-labelledby="introductionTitle"
 				>
-					<h2
-						id="introductionTitle"
-						className="sr-only" 
-					>
+					<h2 id="introductionTitle" className="sr-only">
 						Introduzione
 					</h2>
 					<TextBlock content={introduction} />
@@ -168,15 +164,15 @@ const TeamMemberCard = ({
 	<div className="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4">
 		<img
 			src={`http://localhost:1337${member.image?.url}`}
-			alt={
-			`Foto di ${member.name}`
-			}
+			alt={`Foto di ${member.name}`}
 			className="w-24 h-24 rounded-full object-cover mb-4"
 		/>
 		<h4 className="font-bold text-lg text-navbar-hover font-poppins">
 			{member.name}
 		</h4>
-		<p className="text-sm text-navbar-hover font-poppins">{member.profession}</p>
+		<p className="text-sm text-navbar-hover font-poppins">
+			{member.profession}
+		</p>
 	</div>
 );
 
