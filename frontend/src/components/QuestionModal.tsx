@@ -162,12 +162,17 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	// Gestisci il salvataggio della domanda
 	const handleSave = async () => {
 		const token = localStorage.getItem("token");
-		if (!text.trim() || !category.name.trim()) {
+		if ((!text.trim() || !category.name.trim()) && !view) {
 			alert("Completa tutti i campi obbligatori.");
 			return;
 		}
 
 		console.log(answers);
+
+		if (view) {
+			onClose();
+			return;
+		}
 
 		if (edit && question) {
 			const response = await fetch(
@@ -464,22 +469,35 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 					)}
 				</div>
 
-				<div className="flex justify-end">
-					<button
-						type="button"
-						onClick={onClose}
-						className="bg-red-600 px-4 py-2 rounded mr-2 text-white"
-					>
-						Annulla
-					</button>
-					<button
-						type="button"
-						onClick={handleSave}
-						className="bg-navbar-hover text-white px-4 py-2 rounded"
-					>
-						Salva
-					</button>
-				</div>
+				{!view && (
+					<div className="flex justify-end">
+						<button
+							type="button"
+							onClick={onClose}
+							className="bg-red-600 px-4 py-2 rounded mr-2 text-white"
+						>
+							Annulla
+						</button>
+						<button
+							type="button"
+							onClick={handleSave}
+							className="bg-navbar-hover text-white px-4 py-2 rounded"
+						>
+							Salva
+						</button>
+					</div>
+				)}
+				{view && (
+					<div className="flex justify-end">
+						<button
+							type="button"
+							onClick={handleSave}
+							className="bg-navbar-hover text-white px-4 py-2 rounded"
+						>
+							Chiudi
+						</button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

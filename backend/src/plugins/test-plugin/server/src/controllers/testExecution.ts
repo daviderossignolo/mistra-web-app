@@ -349,18 +349,16 @@ export default {
 
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const testExecutionData = (await testExecutionResponse.json()) as any;
-		console.log(testExecutionData);
-		// TODO: capire cosa fare in questo caso
+
 		// se il modello del test è stato eliminato ritorno un errore
 		if (testExecutionData.data[0].id_test === null) {
 			ctx.status = 404;
-			ctx.body = "Il test è stato eliminato";
+			ctx.body = "Il modello del test è stato eliminato";
 			return ctx;
 		}
 
 		// Setto le informazioni riguardo al test eseguito
 		toReturn.test_info.documentId = testExecutionData.data[0].documentId;
-		console.log(testExecutionData.data[0].documentId);
 		toReturn.test_info.execution_time =
 			testExecutionData.data[0].execution_time;
 		toReturn.test_info.note = testExecutionData.data[0].note;
@@ -398,9 +396,12 @@ export default {
 
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const questionsInTestData = (await questionsInTestResponse.json()) as any;
-		console.log(questionsInTestData.data[0].question_id);
 
 		for (const row of questionsInTestData.data) {
+			if (row.question_id === null) {
+				continue;
+			}
+
 			const question = row.question_id;
 
 			// Recupero le risposte dalla domanda
@@ -484,7 +485,8 @@ export default {
 
 			// Inserisco i dati sulla domanda
 			toReturn.questions.push({
-				category_name: question.category_id.name,
+				category_name:
+					question.category_id === null ? "" : question.category_id.name,
 				question_name: question.name,
 				question_text: question.text,
 				answers: answersList,

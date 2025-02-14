@@ -40,7 +40,7 @@ export default [
         },
     },*/
 	{
-		method: "GET",
+		method: "POST",
 		path: "/get-question-answers", // Questa rotta permette di ottenere tutte le risposte
 		handler: "answer.getQuestionAnswers", // Controller per ottenere tutte le risposte
 		config: {

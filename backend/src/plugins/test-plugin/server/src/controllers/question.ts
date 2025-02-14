@@ -290,7 +290,11 @@ export default {
 							id_category: data.category_id.id_category,
 							name: data.category_id.name,
 						}
-					: null,
+					: {
+							documentId: "",
+							id_category: "",
+							name: "",
+						},
 			}));
 
 			return filteredAnswers;
@@ -458,9 +462,9 @@ export default {
 		toReturn.name = question.name;
 		toReturn.text = question.text;
 		toReturn.category = {
-			documentId: question.category_id.documentId,
-			id_category: question.category_id.id_category,
-			name: question.category_id.name,
+			documentId: question.category_id ? question.category_id.documentId : "",
+			id_category: question.category_id ? question.category_id.id_category : "",
+			name: question.category_id ? question.category_id.name : "",
 		};
 
 		ctx.status = 200;

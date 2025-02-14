@@ -167,7 +167,18 @@ const DashboardPage: React.FC = () => {
 		| "viewTest"
 		| "manageQuestion"
 		| "manageCategories"
-	>("testTemplates");
+	>(() => {
+		const storedSection = localStorage.getItem("selectedSection") as
+			| "executedTests"
+			| "createTest"
+			| "editTest"
+			| "testTemplates"
+			| "viewTest"
+			| "manageQuestion"
+			| "manageCategories"
+			| null;
+		return storedSection ?? "testTemplates";
+	});
 	const [newTemplate, setNewTemplate] = useState<QuizData>({
 		id: uuidv4(),
 		documentId: "",
@@ -258,6 +269,13 @@ const DashboardPage: React.FC = () => {
 			}
 
 			const data = await response.json();
+
+			// TODO
+			// filtro via i test eseguiti a cui non è associato un test perchè è stato eliminato
+			data.data = data.data.filter(
+				(test: { id_test: null }) => test.id_test !== null,
+			);
+
 			setExecutedTests(data.data);
 		};
 
@@ -433,6 +451,7 @@ const DashboardPage: React.FC = () => {
 			return;
 		}
 		setSelectedTest(null);
+		localStorage.setItem("selectedSection", "testTemplates");
 		window.location.reload();
 	};
 
@@ -456,6 +475,7 @@ const DashboardPage: React.FC = () => {
 		}
 
 		const data = await getTestResponse.json();
+
 		setNotes(data.test_info.note);
 
 		return data;
@@ -463,6 +483,8 @@ const DashboardPage: React.FC = () => {
 
 	const handleInsertNote = async (documentId: string) => {
 		const token = localStorage.getItem("token");
+		const revisionDate = new Date();
+		revisionDate.setHours(revisionDate.getHours() + 1);
 		const revisionResponse = await fetch(
 			`${host}:${port}/api/test-executions/${documentId}`,
 			{
@@ -474,7 +496,7 @@ const DashboardPage: React.FC = () => {
 				body: JSON.stringify({
 					data: {
 						note: notes,
-						revision_date: new Date().toISOString().split("T")[0],
+						revision_date: revisionDate.toISOString().split("T")[0],
 					},
 				}),
 			},
@@ -486,6 +508,8 @@ const DashboardPage: React.FC = () => {
 
 		if (revisionResponse.ok) {
 			alert("Note inserite correttamente");
+			localStorage.setItem("selectedSection", "executedTests");
+			window.location.reload();
 		}
 	};
 
@@ -592,7 +616,7 @@ const DashboardPage: React.FC = () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ category_id: documentId }),
+				body: JSON.stringify({ documentId: documentId }),
 			},
 		);
 
@@ -1166,8 +1190,8 @@ const DashboardPage: React.FC = () => {
 												<td className="py-2 text-center border">
 													{question.name}
 												</td>
-												<td className="py-2 text-center border">
-													{question.name}
+												<td className="py-2 text-left border px-2">
+													{question.text}
 												</td>
 												<td className="py-2 text-center border">
 													<div className="flex justify-center space-x-2">
@@ -1365,6 +1389,8 @@ const DashboardPage: React.FC = () => {
 					onClose={() => {
 						setIsNew(false);
 						setIsCategoryModalOpen(false);
+						localStorage.setItem("selectedSection", "manageCategories");
+						window.location.reload();
 					}}
 					onSave={() => setIsCategoryModalOpen(false)}
 				/>
@@ -1377,6 +1403,8 @@ const DashboardPage: React.FC = () => {
 					edit={true}
 					onClose={() => {
 						setIsCategoryModalOpen(false);
+						localStorage.setItem("selectedSection", "manageCategories");
+						window.location.reload();
 					}}
 					onSave={() => setIsCategoryModalOpen(false)}
 				/>

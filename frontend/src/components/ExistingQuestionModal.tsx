@@ -72,6 +72,7 @@ const ExistingQuestionModal: React.FC<ExistingQuestionModal> = ({
 			}
 
 			const data = await response.json();
+
 			setQuestions(data);
 		};
 

@@ -439,9 +439,13 @@ export default {
 				name: question.name,
 				text: question.text,
 				category: {
-					id_category: question.category_id.id_category,
-					documentId: question.category_id.documentId,
-					name: question.category_id.name,
+					id_category: question.category_id
+						? question.category_id.id_category
+						: "",
+					documentId: question.category_id
+						? question.category_id.documentId
+						: "",
+					name: question.category_id ? question.category_id.name : "",
 				},
 				answers: answers,
 			});
