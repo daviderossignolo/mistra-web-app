@@ -132,11 +132,10 @@ const UsefulLinksPage: React.FC = () => {
 													{/* Description */}
 													<p
 														className={`text-lg font-accesible-font text-navbar-hover mb-2 ${
-															link.description ? "text-left" : "sr-only"
-														}`} // sr-only per nascondere se non c'è descrizione
+															link.description ? "text-left" : "invisible"
+														}`}
 													>
-														{link.description || "Placeholder"}{" "}
-														{/* For alignment */}
+														{link.description || "Placeholder"}
 													</p>
 
 													<iframe
