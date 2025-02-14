@@ -15,7 +15,7 @@ import ServicesListPage from "./pages/ServicesListPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
 import ContactPage from "./pages/ContactPage";
 import DashboardPage from "./pages/DashboardPage";
-import PrivateRoute from "./components/privateRoute";
+import PrivateRoute from "./components/PrivateRoute";
 import TakeQuizPage from "./pages/TakeQuizPage";
 
 function App() {

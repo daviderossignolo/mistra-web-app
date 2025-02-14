@@ -33,7 +33,7 @@ const ExistingQuestionModal: React.FC<ExistingQuestionModal> = ({
 		const response = await fetch(
 			`${host}:${port}/api/test-plugin/get-question-answers?documentId=${selectedQuestion.documentId}`,
 			{
-				method: "GET",
+				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
