@@ -109,26 +109,32 @@ const ContactPage: React.FC = () => {
 		return (
 			<div className="flex flex-col gap-12">
 				<div className="w-full bg-navbar-hover px-4 py-6">
-					<h1 className="text-white font-bold font-poppins m-0 text-left text-3xl md:text-4xl lg:text-5xl container mx-auto">
+					<h1 className="text-white font-bold font-accesible-font m-0 text-left text-3xl md:text-4xl lg:text-5xl container mx-auto">
 						{title}
 					</h1>
 				</div>
-				<div className="w-full bg-contact-bg py-5" aria-labelledby="introductionTitle">
+				<div
+					className="w-full bg-contact-bg py-5"
+					aria-labelledby="introductionTitle"
+				>
 					<div className="container mx-auto max-w-5xl px-4">
-						<h2 className="text-center text-red-700 font-bold font-poppins text-[56px]">
+						<h2 className="text-center text-red-700 font-bold font-accesible-font text-[56px]">
 							{introduction.title}
 						</h2>
-						<div className="text-left font-poppins font-extralight text-navbar-hover text-[20px]">
+						<div className="text-left font-accesible-font font-extralight text-navbar-hover text-[20px]">
 							<TextBlock content={introduction.content} />
 						</div>
 					</div>
 				</div>
-				<div className="container mx-auto max-w-6xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-center" aria-labelledby="mapSectionTitle">
+				<div
+					className="container mx-auto max-w-6xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+					aria-labelledby="mapSectionTitle"
+				>
 					<div className="flex flex-col gap-4">
-						<h2 className="font-poppins font-bold text-navbar-hover text-[35px]">
+						<h2 className="font-accesible-font font-bold text-navbar-hover text-[35px]">
 							{map.title}
 						</h2>
-						<div className="font-poppins text-navbar-hover">
+						<div className="font-accesible-font text-navbar-hover">
 							<TextBlock content={map.content} />
 						</div>
 					</div>
@@ -138,22 +144,31 @@ const ContactPage: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="w-full bg-contact-bg py-8" aria-labelledby="openingHoursTitle">
+				<div
+					className="w-full bg-contact-bg py-8"
+					aria-labelledby="openingHoursTitle"
+				>
 					<div className="container mx-auto max-w-5xl px-4">
-						<h2 className="text-center text-[35px] font-poppins mb-4 text-navbar-hover">
+						<h2 className="text-center text-[35px] font-accesible-font mb-4 text-navbar-hover">
 							{openingHours.title}
 						</h2>
 						<hr className="border-2 border-navbar-hover mx-auto mb-4" />
-						<p className="text-base text-[20px] font-poppins font-extralight text-navbar-hover py-1 mb-4">
+						<p className="text-base text-[20px] font-accesible-font font-extralight text-navbar-hover py-1 mb-4">
 							{openingHours.description}
 						</p>
 						<div className="overflow-x-auto">
-							<table className="w-full text-center"  summary="Orari di apertura">
+							<table className="w-full text-center" summary="Orari di apertura">
 								<thead>
 									<tr>
-										<th className="py-2 px-2" scope="col">Giorno</th>
-										<th className="py-2 px-2" scope="col">Mattino</th>
-										<th className="py-2 px-2" scope="col">Pomeriggio</th>
+										<th className="py-2 px-2" scope="col">
+											Giorno
+										</th>
+										<th className="py-2 px-2" scope="col">
+											Mattino
+										</th>
+										<th className="py-2 px-2" scope="col">
+											Pomeriggio
+										</th>
 										{/*<th className="py-2 px-4">Note</th>*/}
 									</tr>
 								</thead>
@@ -177,11 +192,14 @@ const ContactPage: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="container mx-auto max-w-5xl px-4" aria-labelledby="infoSectionTitle">
-					<h2 className="text-left text-[35px] font-poppins mb-4 text-navbar-hover">
+				<div
+					className="container mx-auto max-w-5xl px-4"
+					aria-labelledby="infoSectionTitle"
+				>
+					<h2 className="text-left text-[35px] font-accesible-font mb-4 text-navbar-hover">
 						{info.title}
 					</h2>
-					<div className="font-poppins font-extralight text-[20px] text-navbar-hover">
+					<div className="font-accesible-font font-extralight text-[20px] text-navbar-hover">
 						<TextBlock content={info.content} />
 					</div>
 				</div>

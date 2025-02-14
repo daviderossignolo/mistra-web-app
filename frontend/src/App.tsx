@@ -14,9 +14,9 @@ import ServicePage from "./pages/ServicePage";
 import ServicesListPage from "./pages/ServicesListPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
 import ContactPage from "./pages/ContactPage";
-import TakeQuiz from "./components/takeQuiz";
 import DashboardPage from "./pages/DashboardPage";
 import PrivateRoute from "./components/privateRoute";
+import TakeQuizPage from "./pages/TakeQuizPage";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -76,7 +76,7 @@ function App() {
 				<MenuComponent />
 				<Routes>
 					<Route path="/login" element={<Login />} />{" "}
-					<Route path="/taketest" element={<TakeQuiz />} />
+					<Route path="/taketest" element={<TakeQuizPage />} />
 					<Route path="/contatti" element={<ContactPage />} />
 					<Route path="/" element={<Homepage />} />
 					<Route path="/home" element={<Homepage />} />

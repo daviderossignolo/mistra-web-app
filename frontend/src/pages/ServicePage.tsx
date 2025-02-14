@@ -66,7 +66,7 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 				>
 					<h2
 						id="pageTitle"
-						className="m-0 text-center text-[42px] font-bold font-poppins text-white"
+						className="m-0 text-center text-[42px] font-bold font-accesible-font text-white"
 					>
 						{title}
 					</h2>
@@ -85,7 +85,7 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 					</div>
 				)}
 
-				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
+				<div className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover">
 					<div className="flex gap-4">
 						<div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 flex items-start pt-1">
 							<img
@@ -96,7 +96,7 @@ const ServicePage: React.FC<{ slug: string }> = ({ slug }) => {
 							/>
 						</div>
 
-						<div className="flex-grow prose max-w-none text-navbar-hover font-poppins text-[17px]">
+						<div className="flex-grow prose max-w-none text-navbar-hover font-accesible-font text-[17px]">
 							<TextBlock content={content} />
 						</div>
 					</div>

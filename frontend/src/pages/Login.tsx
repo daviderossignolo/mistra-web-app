@@ -36,18 +36,22 @@ const Login: React.FC = () => {
 	};
 
 	return (
-		<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
+		<div className="flex justify-center items-center bg-gray-100 py-8 font-accesible-font text-navbar-hover">
 			<div className="w-full max-w-md flex flex-col items-center bg-white shadow-md rounded-lg p-4">
 				<div className="w-full bg-navbar-hover px-2 py-2">
-					<h2 className="m-0 text-center text-[42px] font-bold font-poppins text-white">
+					<h2 className="m-0 text-center text-[42px] font-bold font-accesible-font text-white">
 						Login
 					</h2>
 				</div>
-				<form onSubmit={handleLogin} className="space-y-6 mt-3" aria-label="Form di login">
+				<form
+					onSubmit={handleLogin}
+					className="space-y-6 mt-3"
+					aria-label="Form di login"
+				>
 					<div>
 						<label
 							htmlFor="email"
-							className="block text-sm font-bold font-poppins text-navbar-hover"
+							className="block text-sm font-bold font-accesible-font text-navbar-hover"
 						>
 							Email:
 						</label>
@@ -64,7 +68,7 @@ const Login: React.FC = () => {
 					<div>
 						<label
 							htmlFor="password"
-							className="block text-sm font-bold font-poppins text-navbar-hover"
+							className="block text-sm font-bold font-accesible-font text-navbar-hover"
 						>
 							Password:
 						</label>
@@ -79,11 +83,7 @@ const Login: React.FC = () => {
 						/>
 					</div>
 					{error && (
-						<p
-							id="email-error"
-							className="text-sm text-red-600"
-							role="alert"
-						>
+						<p id="email-error" className="text-sm text-red-600" role="alert">
 							{error}
 						</p>
 					)}

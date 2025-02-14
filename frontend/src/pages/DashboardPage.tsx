@@ -5,6 +5,9 @@ import QuestionSelectionStep, {
 	type QuizData,
 } from "../components/QuizSelectionStep";
 import { formatTime } from "../utils";
+import type { Category } from "../components/QuestionModal";
+import QuestionModal from "../components/QuestionModal";
+import CategoryModal from "../components/CategoryModal";
 
 type Test = {
 	id: number;
@@ -65,6 +68,29 @@ type ExecutedTestFull = {
 	}[];
 };
 
+type Question = {
+	category: Category;
+	documentId: string;
+	id: string;
+	name: string;
+	text: string;
+};
+
+type FullQuestion = {
+	id: string;
+	documentId: string;
+	name: string;
+	text: string;
+	category: Category;
+	answers: {
+		id: string;
+		documentId: string;
+		text: string;
+		score: number;
+		correction: string;
+	}[];
+};
+
 // Definisco un tipo per le voci del menu della sidebar
 type SidebarItemProps = {
 	id: string;
@@ -106,12 +132,26 @@ const Sidebar = ({ onSelect }: { onSelect: (section: string) => void }) => {
 					label="Gestione Modelli di Test"
 					onClick={() => onSelect("testTemplates")}
 				/>
+				<SidebarItem
+					id="manageQuestionButton"
+					label="Gestione Delle Domande"
+					onClick={() => onSelect("manageQuestion")}
+				/>
+				<SidebarItem
+					id="manageCategoriesButton"
+					label="Gestione Delle Categorie"
+					onClick={() => onSelect("manageCategories")}
+				/>
 			</ul>
 		</nav>
 	);
 };
 
 const DashboardPage: React.FC = () => {
+	const findSelectedCategory = async (documentId: string) => {
+		// Replace this with your actual logic to fetch or filter the category using documentId
+		return categories.find((category) => category.documentId === documentId);
+	};
 	// Variabili d'ambiente
 	const host = process.env.REACT_APP_BACKEND_HOST;
 	const port = process.env.REACT_APP_BACKEND_PORT;
@@ -120,7 +160,13 @@ const DashboardPage: React.FC = () => {
 	const [tests, setTests] = useState<Test[]>([]);
 	const [selectedTest, setSelectedTest] = useState<QuizData | null>(null);
 	const [selectedSection, setSelectedSection] = useState<
-		"executedTests" | "createTest" | "editTest" | "testTemplates" | "viewTest"
+		| "executedTests"
+		| "createTest"
+		| "editTest"
+		| "testTemplates"
+		| "viewTest"
+		| "manageQuestion"
+		| "manageCategories"
 	>("testTemplates");
 	const [newTemplate, setNewTemplate] = useState<QuizData>({
 		id: uuidv4(),
@@ -132,9 +178,43 @@ const DashboardPage: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedExecution, setSelectedExecution] =
 		useState<ExecutedTestFull | null>(null);
-
+	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 	const [notes, setNotes] = useState("");
-	const service_key = process.env.SERVICE_KEY;
+	const [categories, setCategories] = useState<Category[]>([]);
+	const [selectedCategory, setSelectedCategory] = useState<
+		Category | undefined
+	>(undefined);
+	const [questions, setQuestions] = useState<Question[]>([]);
+	const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
+	const [selectedQuestion, setSelectedQuestion] = useState<
+		FullQuestion | undefined
+	>(undefined);
+	const [newQuestion, setNewQuestion] = useState<FullQuestion>({
+		id: "",
+		documentId: "",
+		name: "",
+		text: "",
+		category: {
+			id_category: "",
+			name: "",
+			documentId: "",
+		},
+		answers: [
+			{
+				id: "",
+				documentId: "",
+				text: "",
+				score: 0,
+				correction: "",
+			},
+		],
+	});
+	const [isNew, setIsNew] = useState(false);
+	const [newCategory, setNewCategory] = useState<Category>({
+		id_category: "",
+		name: "",
+		documentId: "",
+	});
 
 	// Effettua il fetch dei test
 	useEffect(() => {
@@ -181,7 +261,51 @@ const DashboardPage: React.FC = () => {
 			setExecutedTests(data.data);
 		};
 
+		const fetchCategories = async () => {
+			const response = await fetch(`${host}:${port}/api/categories?pLevel`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			});
+
+			if (!response.ok) {
+				alert(
+					`Errore nel recupero delle categorie - status: ${response.status}`,
+				);
+				return;
+			}
+
+			const data = await response.json();
+			setCategories(data.data);
+		};
+
+		const fetchQuestions = async () => {
+			const response = await fetch(
+				`${host}:${port}/api/test-plugin/get-questions`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			);
+
+			if (!response.ok) {
+				alert(`Errore nel recupero delle domande - status: ${response.status}`);
+				return;
+			}
+
+			const data = await response.json();
+			console.log(data);
+			setQuestions(data);
+		};
+
 		fetchTest();
+		fetchQuestions();
+		fetchCategories();
 		fetchExecutedTests();
 	}, [host, port]);
 
@@ -365,16 +489,129 @@ const DashboardPage: React.FC = () => {
 		}
 	};
 
+	const deleteQuestionModel = async (documentId: string) => {
+		const token = localStorage.getItem("token");
+		const response = await fetch(
+			`${host}:${port}/api/test-plugin/delete-question-model`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({ question_id: documentId }),
+			},
+		);
+
+		if (!response.ok) {
+			alert("Errore durante l'eliminazione della domanda");
+			return;
+		}
+
+		setQuestions(
+			questions.filter((question) => question.documentId !== documentId),
+		);
+	};
+
+	// Funzione per gestire la ricerca dei test
+	const handleQuestionSearch = async () => {
+		const token = localStorage.getItem("token");
+
+		// Se il termine è vuoto allora recupero tutti i test
+		if (searchTerm === "") {
+			const fetchQuestion = async () => {
+				const response = await fetch(
+					`${host}:${port}/api/test-plugin/get-questions`,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+					},
+				);
+
+				if (!response.ok) {
+					alert(
+						`Errore nel recupero delle domande - status: ${response.status}`,
+					);
+					return;
+				}
+
+				const data = await response.json();
+				setQuestions(data);
+			};
+
+			fetchQuestion();
+			return;
+		}
+
+		// Altrimenti filtro i test in base al termine di ricerca
+		setQuestions(
+			questions.filter((question) => question.name.includes(searchTerm)),
+		);
+		setSearchTerm("");
+	};
+
+	const findSelectedQuestion = async (selectedDocId: string) => {
+		const token = localStorage.getItem("token");
+
+		const getQuestionResponse = await fetch(
+			`${host}:${port}/api/test-plugin/get-complete-question`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({ question_id: selectedDocId }),
+			},
+		);
+
+		if (!getQuestionResponse.ok) {
+			alert(
+				`Errore nel recupero della domanda - status: ${getQuestionResponse.status}`,
+			);
+			return;
+		}
+
+		const data = await getQuestionResponse.json();
+		console.log(data);
+		console.log(data.answers);
+
+		return data;
+	};
+
+	const handleDeleteCategory = async (documentId: string) => {
+		const token = localStorage.getItem("token");
+		const response = await fetch(
+			`${host}:${port}/api/test-plugin/delete-category`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({ category_id: documentId }),
+			},
+		);
+
+		if (!response.ok) {
+			alert("Errore durante l'eliminazione della categoria");
+			return;
+		}
+
+		setCategories(
+			categories.filter((category) => category.documentId !== documentId),
+		);
+	};
+
 	return (
 		<div className="flex flex-col lg:flex-row gap-6 p-6 bg-gray-100 min-h-75">
 			<Sidebar
 				onSelect={(section) =>
 					setSelectedSection(
-						section as
-							| "executedTests"
-							| "createTest"
-							| "editTest"
-							| "testTemplates",
+						section as "executedTests" | "testTemplates" | "manageQuestion",
 					)
 				}
 			/>
@@ -388,7 +625,7 @@ const DashboardPage: React.FC = () => {
 					<div className="w-full bg-navbar-hover px-4 py-4">
 						<h2
 							id="executedTestsHeading"
-							className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+							className="text-white font-bold font-accesible-font m-0 text-left text-[2.625rem]"
 						>
 							Test Eseguiti
 						</h2>
@@ -459,7 +696,7 @@ const DashboardPage: React.FC = () => {
 											<input
 												type="checkbox"
 												checked={test.revision_date !== null}
-												disabled // Impedisci la modifica diretta
+												readOnly
 											/>
 										</td>
 										<td className="py-2 text-center">
@@ -509,7 +746,7 @@ const DashboardPage: React.FC = () => {
 					<div className="w-full bg-navbar-hover px-4 py-4">
 						<h2
 							id="manageTestsHeading"
-							className="text-white font-bold font-poppins m-0 text-left text-[42px]"
+							className="text-white font-bold font-accesible-font m-0 text-left text-[42px]"
 						>
 							Gestione test
 						</h2>
@@ -549,7 +786,7 @@ const DashboardPage: React.FC = () => {
 						</button>
 					</div>
 					<div className="container py-8">
-						<h3 className="font-bold font-poppins text-2xl text-navbar-hover mb-4">
+						<h3 className="font-bold font-accesible-font text-2xl text-navbar-hover mb-4">
 							Informazioni sul test
 						</h3>
 						<hr className="mb-4" />
@@ -631,12 +868,16 @@ const DashboardPage: React.FC = () => {
 					<div className="w-full bg-navbar-hover px-4 py-4">
 						<h2
 							id="createQuizHeading"
-							className="text-white font-bold font-poppins m-0 text-left text-[42px]"
+							className="text-white font-bold font-accesible-font m-0 text-left text-[42px]"
 						>
 							CREAZIONE QUIZ
 						</h2>
 					</div>
-					<QuestionSelectionStep quizData={newTemplate} edit={false} />
+					<QuestionSelectionStep
+						quizData={newTemplate}
+						edit={false}
+						readOnly={false}
+					/>
 				</section>
 			)}
 
@@ -649,7 +890,7 @@ const DashboardPage: React.FC = () => {
 					<div className="w-full bg-navbar-hover px-4 py-4">
 						<h2
 							id="editQuizHeading"
-							className="text-white font-bold font-poppins m-0 text-left text-[42px]"
+							className="text-white font-bold font-accesible-font m-0 text-left text-[42px]"
 						>
 							MODIFICA QUIZ
 						</h2>
@@ -657,6 +898,7 @@ const DashboardPage: React.FC = () => {
 					<QuestionSelectionStep
 						quizData={selectedTest ?? newTemplate}
 						edit={true}
+						readOnly={true}
 					/>
 				</section>
 			)}
@@ -664,7 +906,7 @@ const DashboardPage: React.FC = () => {
 			{/* Sezione per la visualizzazione del test */}
 			{selectedSection === "viewTest" && (
 				<section
-					className="flex-1 font-poppins text-navbar-hover"
+					className="flex-1 font-accesible-font text-navbar-hover"
 					aria-labelledby="testResultsHeading"
 				>
 					<div className="flex flex-col w-full bg-white p-6 shadow-md rounded">
@@ -674,7 +916,7 @@ const DashboardPage: React.FC = () => {
 								<div className="w-full bg-navbar-hover px-4 py-4">
 									<h2
 										id="testResultsHeading"
-										className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+										className="text-white font-bold font-accesible-font m-0 text-left text-[2.625rem]"
 									>
 										Risultati del Test
 									</h2>
@@ -811,7 +1053,7 @@ const DashboardPage: React.FC = () => {
 										Domande
 									</h3>
 									<hr className="mb-4" />
-									<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-poppins">
+									<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-accesible-font">
 										<p className="text-sm text-gray-600 mb-2">
 											Categoria: {question.category_name}
 										</p>
@@ -846,6 +1088,301 @@ const DashboardPage: React.FC = () => {
 					</div>
 				</section>
 			)}
+
+			{/* Sezione per la gestione delle domande */}
+			{selectedSection === "manageQuestion" && (
+				<section
+					className="flex-1 bg-white p-6 shadow-md rounded"
+					aria-labelledby="manageTestsHeading"
+				>
+					<div className="w-full bg-navbar-hover px-4 py-4">
+						<h2
+							id="manageTestsHeading"
+							className="text-white font-bold font-accesible-font m-0 text-left text-[42px]"
+						>
+							Gestione delle Domande
+						</h2>
+					</div>
+					<div className="flex gap-2 mb-4 mt-4">
+						<form
+							className="flex-1 flex items-center border rounded"
+							onSubmit={(e) => {
+								e.preventDefault();
+								handleQuestionSearch();
+							}}
+						>
+							<label htmlFor="searchQuestion" className="sr-only">
+								Cerca Domanda
+							</label>
+							<input
+								type="text"
+								id="searchQuestion"
+								placeholder="Cerca domanda..."
+								className="flex-1 px-4 py-2 border-none rounded-l"
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+							<button
+								type="submit"
+								className="bg-navbar text-white px-4 py-2 rounded-r"
+							>
+								Cerca
+							</button>
+						</form>
+						<button
+							type="button"
+							className="bg-navbar text-white px-4 py-2 rounded"
+							onClick={() => {
+								setIsNew(true);
+								setIsQuestionModalOpen(true);
+							}}
+						>
+							Crea Nuova Domanda
+						</button>
+					</div>
+					<div className="container py-8">
+						<h3 className="font-bold font-accesible-font text-2xl text-navbar-hover mb-4">
+							Informazioni sulle domande
+						</h3>
+						<hr className="mb-4" />
+						<ul className="list-none pl-0">
+							<div className="overflow-auto">
+								<table className="min-w-full bg-white border text-sm mt-4">
+									<thead>
+										<tr>
+											<th className="py-2 border text-center">Categoria</th>
+											<th className="py-2 border text-center">Nome</th>
+											<th className="py-2 border text-center">Testo</th>
+											<th className="py-2 border text-center">Modifica</th>
+											<th className="py-2 border text-center">Elimina</th>
+										</tr>
+									</thead>
+									<tbody>
+										{questions.map((question) => (
+											<tr key={question.id} className="hover:bg-gray-200">
+												<td className="py-2 text-center border">
+													{question.category.name}
+												</td>
+												<td className="py-2 text-center border">
+													{question.name}
+												</td>
+												<td className="py-2 text-center border">
+													{question.name}
+												</td>
+												<td className="py-2 text-center border">
+													<div className="flex justify-center space-x-2">
+														<button
+															type="button"
+															className="bg-navbar-hover text-white py-1 px-2 rounded"
+															onClick={async () => {
+																const data = await findSelectedQuestion(
+																	question.documentId,
+																);
+																setSelectedQuestion(data);
+																setIsQuestionModalOpen(true);
+															}}
+														>
+															<div className="flex items-center space-x-1">
+																<span>Modifica</span>
+																<svg
+																	xmlns="http://www.w3.org/2000/svg"
+																	width="16"
+																	height="16"
+																	fill="currentColor"
+																	className="bi bi-pencil-square"
+																	viewBox="0 0 16 16"
+																	aria-hidden="true"
+																>
+																	<title>Modifica</title>
+																	<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+																	<path
+																		fillRule="evenodd"
+																		d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+																	/>
+																</svg>
+															</div>
+														</button>
+													</div>
+												</td>
+												<td className="py-2 text-center border">
+													<div className="flex justify-center space-x-2">
+														<button
+															type="button"
+															className="text-white bg-red-600 py-1 px-2 rounded"
+															onClick={async () => {
+																deleteQuestionModel(question.documentId);
+															}}
+														>
+															<div className="flex items-center space-x-1">
+																<span>Elimina</span>
+																<svg
+																	xmlns="http://www.w3.org/2000/svg"
+																	width="16"
+																	height="16"
+																	fill="currentColor"
+																	className="bi bi-trash-fill"
+																	viewBox="0 0 16 16"
+																	aria-hidden="true"
+																>
+																	<title>Elimina</title>
+																	<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
+																</svg>
+															</div>
+														</button>
+													</div>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						</ul>
+					</div>
+				</section>
+			)}
+
+			{/* Sezione per la modifica delle categorie*/}
+			{selectedSection === "manageCategories" && (
+				<section
+					className="flex-1 bg-white p-6 shadow-md rounded"
+					aria-labelledby="manageCategoriesHeading"
+				>
+					<div className="w-full bg-navbar-hover px-4 py-4">
+						<h2
+							id="manageCategoriesHeading"
+							className="text-white font-bold font-accesible-font m-0 text-left text-[42px]"
+						>
+							Gestione delle Categorie
+						</h2>
+					</div>
+					<div className="container py-8">
+						<h3 className="font-bold font-accesible-font text-2xl text-navbar-hover mb-4">
+							Lista Categorie
+						</h3>
+						<hr className="mb-4" />
+						<ul className="list-none pl-0">
+							{categories.map((category) => (
+								<li
+									key={category.id_category}
+									className="flex justify-between items-center p-2 rounded cursor-pointer"
+								>
+									<span>{category.name}</span>
+									<div className="flex space-x-2">
+										<button
+											type="button"
+											className="bg-navbar-hover text-white py-1 px-2 rounded"
+											onClick={async () => {
+												const data = await findSelectedCategory(
+													category.documentId,
+												);
+												setSelectedCategory(data);
+												setIsCategoryModalOpen(true);
+											}}
+										>
+											<div className="flex items-center space-x-1">
+												<span>Modifica</span>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													fill="currentColor"
+													className="bi bi-pencil-square"
+													viewBox="0 0 16 16"
+													aria-hidden="true" // Nascondi l'icona agli screen reader
+												>
+													<title>Modifica</title>
+													<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+													<path
+														fill-rule="evenodd"
+														d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+													/>
+													<title>Modifica</title>
+												</svg>
+											</div>
+										</button>
+										<button
+											type="button"
+											className="text-white bg-red-600 py-1 px-2 rounded"
+											onClick={async () => {
+												handleDeleteCategory(category.documentId);
+											}}
+										>
+											<div className="flex items-center space-x-1">
+												<span>Elimina</span>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													fill="currentColor"
+													className="bi bi-trash-fill"
+													viewBox="0 0 16 16"
+													aria-hidden="true" // Nascondi l'icona agli screen reader
+												>
+													<title>Elimina</title>
+													<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
+												</svg>
+											</div>
+										</button>
+									</div>
+								</li>
+							))}
+						</ul>
+					</div>
+				</section>
+			)}
+
+			{/* Modale per la visualizzazione della domanda */}
+			{isQuestionModalOpen && (
+				<QuestionModal
+					question={selectedQuestion ?? newQuestion}
+					edit={true}
+					onClose={() => setIsQuestionModalOpen(false)}
+					onSave={() => setIsQuestionModalOpen(false)}
+				/>
+			)}
+
+			{/* Modale per la visualizzazione della domanda */}
+			{isQuestionModalOpen && isNew && (
+				<QuestionModal
+					question={newQuestion}
+					onClose={() => {
+						setIsNew(false);
+						setIsQuestionModalOpen(false);
+						setSelectedSection("manageQuestion");
+					}}
+					onSave={() => {
+						setIsNew(false);
+						setIsQuestionModalOpen(false);
+						setSelectedSection("manageQuestion");
+					}}
+				/>
+			)}
+
+			{/* Modale per la visualizzazione della categoria */}
+			{isCategoryModalOpen && isNew && (
+				<CategoryModal
+					category={newCategory}
+					onClose={() => {
+						setIsNew(false);
+						setIsCategoryModalOpen(false);
+					}}
+					onSave={() => setIsCategoryModalOpen(false)}
+				/>
+			)}
+
+			{/* Modale per la visualizzazione della categoria */}
+			{isCategoryModalOpen && !isNew && (
+				<CategoryModal
+					category={selectedCategory ?? newCategory}
+					edit={true}
+					onClose={() => {
+						setIsCategoryModalOpen(false);
+					}}
+					onSave={() => setIsCategoryModalOpen(false)}
+				/>
+			)}
+
+			{/* Modale per la visualizzazione della categoria */}
 		</div>
 	);
 };

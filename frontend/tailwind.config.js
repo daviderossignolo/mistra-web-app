@@ -11,7 +11,8 @@ module.exports = {
         "contact-bg": '#E0E6E8',
       },
       fontFamily: {
-        'poppins': ['Poppins-ExtraLight', 'Poppins', 'sans-serif'],
+        'accessible-font': ['Tahoma', 'Calibri', 'Helvetica', 'Arial', 'Verdana', 'Times New Roman', 'sans-serif'],
+        'sans': ['Tahoma', 'Calibri', 'Helvetica', 'Arial', 'Verdana', 'Times New Roman', 'sans-serif'], 
       },
       keyframes: {
         scroll: {
@@ -26,4 +27,3 @@ module.exports = {
   },
   plugins: [],
 }
-

@@ -56,7 +56,7 @@ const ServicesListPage: React.FC = () => {
 		return (
 			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
 				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h2 className="m-0 text-center text-[42px] font-bold font-poppins text-white">
+					<h2 className="m-0 text-center text-[42px] font-bold font-accesible-font text-white">
 						Servizi Offerti
 					</h2>
 				</div>
@@ -71,7 +71,7 @@ const ServicesListPage: React.FC = () => {
 						return (
 							<li
 								key={page.id}
-								className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover"
+								className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover"
 							>
 								<div className="flex gap-4">
 									<div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 flex items-start pt-1">
@@ -83,7 +83,7 @@ const ServicesListPage: React.FC = () => {
 										/>
 									</div>
 
-									<div className="flex-grow prose max-w-none text-white font-poppins text-[24px] bg-navbar-hover flex items-center justify-center">
+									<div className="flex-grow prose max-w-none text-white font-accesible-font text-[24px] bg-navbar-hover flex items-center justify-center">
 										<a
 											href={`/${page.slug}`}
 											className="text-white no-underline hover:text-services-hover"

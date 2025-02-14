@@ -1,7 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import type { Category } from "./QuestionModal";
+import type { Category } from "../components/QuestionModal";
 
 // Definizione dei tipi per i dati che arrivano dal backend
 type Sex = {
@@ -39,7 +38,7 @@ type QuizData = {
 	questions: Question[];
 };
 
-const TakeQuiz: React.FC = () => {
+const TakeQuizPage: React.FC = () => {
 	// Variabile di stato usata per gestire gli step del quiz
 	const [step, setStep] = useState(0);
 
@@ -217,10 +216,10 @@ const TakeQuiz: React.FC = () => {
 	// Primo step: inserimento dei dati su sesso ed età da parte dell'utente
 	if (step === 0) {
 		return (
-			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
+			<div className="flex justify-center items-center bg-gray-100 py-8 font-accesible-font text-navbar-hover">
 				<div className="flex flex-col items-center bg-white shadow-md rounded-lg p-4 w-4/5">
 					<div className="w-full bg-navbar-hover px-4 py-4">
-						<h2 className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]">
+						<h2 className="text-white font-bold font-accesible-font m-0 text-left text-[2.625rem]">
 							Inserisci i tuoi dati
 						</h2>
 					</div>
@@ -287,7 +286,7 @@ const TakeQuiz: React.FC = () => {
 	if (step === 1) {
 		// Quiz Step
 		return (
-			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
+			<div className="flex justify-center items-center bg-gray-100 py-8 font-accesible-font text-navbar-hover">
 				<div
 					className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5"
 					aria-labelledby="quizHeading"
@@ -297,7 +296,7 @@ const TakeQuiz: React.FC = () => {
 							<div className="w-full bg-navbar-hover px-4 py-4">
 								<h1
 									id="quizHeading"
-									className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+									className="text-white font-bold font-accesible-font m-0 text-left text-[2.625rem]"
 								>
 									Rispondi alle domande
 								</h1>
@@ -356,7 +355,7 @@ const TakeQuiz: React.FC = () => {
 								Domande
 							</h3>
 							<hr className="mb-4" />
-							<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-poppins">
+							<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-accesible-font">
 								<p className="text-sm text-gray-600 mb-2">
 									Categoria: {question.category.name}
 								</p>
@@ -412,7 +411,7 @@ const TakeQuiz: React.FC = () => {
 	if (step === 2) {
 		// Result Step
 		return (
-			<div className="flex justify-center items-center bg-gray-100 py-8 font-poppins text-navbar-hover">
+			<div className="flex justify-center items-center bg-gray-100 py-8 font-accesible-font text-navbar-hover">
 				<div
 					className="flex flex-col bg-white shadow-md rounded-lg p-4 w-4/5"
 					aria-labelledby="resultsHeading"
@@ -422,7 +421,7 @@ const TakeQuiz: React.FC = () => {
 							<div className="w-full bg-navbar-hover px-4 py-4">
 								<h1
 									id="resultsHeading"
-									className="text-white font-bold font-poppins m-0 text-left text-[2.625rem]"
+									className="text-white font-bold font-accesible-font m-0 text-left text-[2.625rem]"
 								>
 									Risultati del Test
 								</h1>
@@ -489,7 +488,7 @@ const TakeQuiz: React.FC = () => {
 									Domande
 								</h3>
 								<hr className="mb-4" />
-								<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-poppins">
+								<div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50 font-accesible-font">
 									<p className="text-sm text-gray-600 mb-2">
 										Categoria: {question.category.name}
 									</p>
@@ -550,4 +549,4 @@ const TakeQuiz: React.FC = () => {
 	return null;
 };
 
-export default TakeQuiz;
+export default TakeQuizPage;

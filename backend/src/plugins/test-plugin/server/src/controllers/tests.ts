@@ -262,66 +262,11 @@ export default {
 			return ctx;
 		}
 
-		// Elimino il test dalla tabella tests
-		const testResponse = await fetch(
-			`http://localhost:1337/api/tests/${quiz.documentId}`,
-			{
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-			},
-		);
-
-		if (!testResponse.ok) {
-			ctx.status = testResponse.status;
-			ctx.body = { message: "Non sono riuscito ad eliminare il test." };
-			return ctx;
-		}
-
 		// Elimino le domande collegate al test
 		for (const question of body.quiz.questions) {
-			const questionResponse = await fetch(
-				`http://localhost:1337/api/questions/${question.documentId}`,
-				{
-					method: "DELETE",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
-					},
-				},
-			);
-
-			if (!questionResponse.ok) {
-				ctx.status = questionResponse.status;
-				ctx.body = { message: "Non sono riuscito ad eliminare la domanda." };
-				return ctx;
-			}
-
-			// Elimino le risposte collegate alla domanda
-			for (const answer of question.answers) {
-				const answerResponse = await fetch(
-					`http://localhost:1337/api/answers/${answer.documentId}`,
-					{
-						method: "DELETE",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
-						},
-					},
-				);
-
-				if (!answerResponse.ok) {
-					ctx.status = answerResponse.status;
-					ctx.body = { message: "Non sono riuscito ad eliminare la risposta." };
-					return ctx;
-				}
-			}
-
 			// Elimino le righe in question-in-tests
 			const questionInTestResponse = await fetch(
-				`http://localhost:1337/api/question-in-tests?filters[question_id][$eq]=${question.id}`,
+				`http://localhost:1337/api/question-in-tests?filters[$and][0][question_id][documentId][$eq]=${question.documentId}&filters[$and][1][test_id][documentId][$eq]=${quiz.documentId}`,
 				{
 					method: "GET",
 					headers: {
@@ -357,6 +302,24 @@ export default {
 					return ctx;
 				}
 			}
+		}
+
+		// Elimino il test dalla tabella tests
+		const testResponse = await fetch(
+			`http://localhost:1337/api/tests/${quiz.documentId}`,
+			{
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!testResponse.ok) {
+			ctx.status = testResponse.status;
+			ctx.body = { message: "Non sono riuscito ad eliminare il test." };
+			return ctx;
 		}
 
 		ctx.status = 200;
@@ -496,7 +459,6 @@ export default {
 	 */
 	async createTest(ctx: Context) {
 		const quiz = ctx.request.body as Quiz;
-
 		const token = process.env.SERVICE_KEY;
 
 		if (!token) {
@@ -532,128 +494,31 @@ export default {
 		// che servirà per le relazioni
 		const testData = (await testResponse.json()) as TestResponse;
 		const testId = testData.data.documentId;
-		console.log("TEST ID: ", testId);
 
 		// Processo le domande del quiz
 		for (const question of quiz.questions) {
-			// recupero l'id della categoria creata
-			const categoryId = await getCategory(question.category.id_category);
+			// Se la domanda ha un documentId la inserisco subito nella tabella question-in-tests
+			const questionInTestResponse = await fetch(
+				"http://localhost:1337/api/question-in-tests",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						data: {
+							question_id: question.documentId,
+							test_id: testId,
+						},
+					}),
+				},
+			);
 
-			if (categoryId === undefined) {
-				ctx.status = 404;
-				ctx.body = { message: "Categoria non trovata" };
+			if (!questionInTestResponse.ok) {
+				ctx.status = questionInTestResponse.status;
+				ctx.body = { message: "Errore nella creazione delle domande" };
 				return ctx;
-			}
-
-			if (question.documentId !== "") {
-				// Se la domanda ha un documentId la inserisco subito nella tabella question-in-tests
-				const questionInTestResponse = await fetch(
-					"http://localhost:1337/api/question-in-tests",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
-						},
-						body: JSON.stringify({
-							data: {
-								question_id: question.documentId,
-								test_id: testId,
-							},
-						}),
-					},
-				);
-
-				if (!questionInTestResponse.ok) {
-					ctx.status = questionInTestResponse.status;
-					ctx.body = { message: "Errore nella creazione delle domande" };
-					return ctx;
-				}
-			} else {
-				// Inserisco la domanda corrente
-				const questionResponse = await fetch(
-					"http://localhost:1337/api/test-plugin/create-question",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
-						},
-						body: JSON.stringify({
-							id_question: question.id,
-							name: question.name,
-							text: question.text,
-							category_id: categoryId,
-						}),
-					},
-				);
-
-				// Se la chiama API non è andata a buon fine, setto l'errore nella risposta
-				if (!questionResponse.ok) {
-					ctx.status = questionResponse.status;
-					ctx.body = { message: "Errore nella creazione delle domande" };
-					return ctx;
-				}
-
-				// La chiamata API ha avuto successo, estraggo l'id della domanda appena creata
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-				const questionData: any = await questionResponse.json();
-				const questionId = questionData.question_id;
-
-				// Processo le risposte collegate alla domanda corrente
-				for (const answer of question.answers) {
-					// le risposte esistenti non vanno inserite
-					if (answer.documentId !== "") {
-						continue;
-					}
-					const answerResponse = await fetch(
-						"http://localhost:1337/api/test-plugin/create-answer",
-						{
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								Authorization: `Bearer ${token}`,
-							},
-							body: JSON.stringify({
-								id_answer: answer.id,
-								text: answer.text,
-								correction: answer.correction,
-								score: answer.score,
-								question_id: questionId,
-							}),
-						},
-					);
-
-					if (!answerResponse.ok) {
-						ctx.status = answerResponse.status;
-						ctx.body = { message: "Errore nella creazione delle risposte" };
-						return ctx;
-					}
-				}
-
-				// Collego le domande al test
-				const questionInTestResponse = await fetch(
-					"http://localhost:1337/api/question-in-tests",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
-						},
-						body: JSON.stringify({
-							data: {
-								question_id: questionId,
-								test_id: testId,
-							},
-						}),
-					},
-				);
-
-				if (!questionInTestResponse.ok) {
-					ctx.status = questionInTestResponse.status;
-					ctx.body = { message: "Errore nella creazione delle domande" };
-					return ctx;
-				}
 			}
 		}
 

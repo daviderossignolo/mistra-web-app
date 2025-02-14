@@ -49,11 +49,11 @@ const Homepage: React.FC = () => {
 			<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
 				<div className="w-full bg-navbar-hover px-4 py-4">
 					{/* Modifica 1: Utilizzo di <h1> per il titolo principale */}
-					<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+					<h2 className="text-white font-bold font-accesible-font m-0 text-left text-[42px]">
 						{title}
 					</h2>
 				</div>
-				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
+				<div className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover">
 					<TextBlock content={content} />
 				</div>
 			</div>

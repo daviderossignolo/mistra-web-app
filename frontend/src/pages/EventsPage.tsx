@@ -109,7 +109,7 @@ const EventsPage: React.FC = () => {
 						<div className="w-full bg-navbar-hover px-4 py-4">
 							<h2
 								id={`sectionTitle-${section.id}`}
-								className="m-0 text-left text-[42px] font-bold font-poppins text-white"
+								className="m-0 text-left text-[42px] font-bold font-accesible-font text-white"
 							>
 								{section.title}
 							</h2>
@@ -118,7 +118,7 @@ const EventsPage: React.FC = () => {
 						{section.section_block?.map((block) => (
 							<div
 								key={block.id}
-								className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover"
+								className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover"
 							>
 								{block.content !== null && (
 									<TextBlock content={block.content} />

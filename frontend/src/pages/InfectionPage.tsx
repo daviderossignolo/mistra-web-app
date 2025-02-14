@@ -64,18 +64,20 @@ const InfectionPage: React.FC<{ slug: string }> = ({ slug }) => {
 
 		return (
 			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
-
-				<div className="w-full bg-navbar-hover px-4 py-4" aria-labelledby="pageTitle">
+				<div
+					className="w-full bg-navbar-hover px-4 py-4"
+					aria-labelledby="pageTitle"
+				>
 					<h2
 						id="pageTitle"
-						className="m-0 text-center text-[42px] font-bold font-poppins text-white"
+						className="m-0 text-center text-[42px] font-bold font-accesible-font text-white"
 					>
 						{title}
 					</h2>
 				</div>
 
 				<div
-					className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover"
+					className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover"
 					role="group"
 					aria-labelledby="sectionsTitle"
 				>
@@ -83,19 +85,23 @@ const InfectionPage: React.FC<{ slug: string }> = ({ slug }) => {
 						Sezioni
 					</h3>
 					{pageData.sections.map((section) => (
-						<section key={section.id} className="w-full mb-4" aria-labelledby={`sectionTitle-${section.id}`}>
+						<section
+							key={section.id}
+							className="w-full mb-4"
+							aria-labelledby={`sectionTitle-${section.id}`}
+						>
 							<div className="flex gap-4">
 								{section.icon && (
 									<div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 flex items-start pt-1">
 										<img
 											src={`http://localhost:1337${section.icon.url}`}
-											alt={"Icona sezione: "+section.title}
+											alt={"Icona sezione: " + section.title}
 											className="w-8 h-8 md:w-10 md:h-10 object-contain"
 											aria-hidden={true} // L'icona è puramente decorativa
 										/>
 									</div>
 								)}
-								<div className="flex-grow prose max-w-none text-navbar-hover font-poppins text-[17px]">
+								<div className="flex-grow prose max-w-none text-navbar-hover font-accesible-font text-[17px]">
 									<h4
 										className="text-[24px] font-bold"
 										id={`sectionTitle-${section.id}`}

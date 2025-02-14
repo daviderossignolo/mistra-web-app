@@ -8,6 +8,7 @@ import ExistingQuestionModal from "./ExistingQuestionModal";
 interface QuestionSelectionStepProps {
 	quizData: QuizData;
 	edit: boolean;
+	readOnly: boolean;
 }
 
 export type QuizData = {
@@ -21,6 +22,7 @@ export type QuizData = {
 const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	quizData,
 	edit,
+	readOnly,
 }) => {
 	// Stati per il quiz
 	const [id, setId] = useState<string>(quizData.id || uuidv4());
@@ -56,6 +58,8 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 	const port = process.env.REACT_APP_BACKEND_PORT;
 	const token = localStorage.getItem("token");
 
+	const [isNew, setIsNew] = useState(false);
+
 	// Elimina la domanda dalla lista
 	const handleDeleteQuestion = async (id: string) => {
 		setQuestions((prev: Question[]) =>
@@ -65,7 +69,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 		if (edit) {
 			// Faccio la chiamata API per eliminare la domanda dal database
 			const deletedQuestions = await fetch(
-				`${host}:${port}/api/test-plugin/delete-question`,
+				`${host}:${port}/api/test-plugin/delete-question-in-test`,
 				{
 					method: "POST",
 					headers: {
@@ -142,7 +146,6 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 				alert(error);
 			}
 		} else {
-			// TODO: Implementare la logica per la modifica del quiz
 			// costruzione del quiz
 			const quiz = {
 				id: id,
@@ -191,7 +194,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 			<section className="flex-grow p-6" aria-labelledby="quizInfoHeading">
 				<h2
 					id="quizInfoHeading"
-					className="font-bold font-poppins text-2xl text-navbar-hover mb-4"
+					className="font-bold font-accesible-font text-2xl text-navbar-hover mb-4"
 				>
 					Informazioni sul test
 				</h2>
@@ -200,7 +203,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 					<div className="mb-4">
 						<label
 							htmlFor="quizName"
-							className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
+							className="block mb-2 font-accesible-font font-bold text-lg text-navbar-hover"
 						>
 							Nome del Quiz
 						</label>
@@ -210,13 +213,13 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 							placeholder="Inserisci il nome del quiz..."
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
+							className="w-full border rounded-lg p-3 mb-4 font-accesible-font shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
 						/>
 					</div>
 					<div className="mb-4">
 						<label
 							htmlFor="quizDescription"
-							className="block mb-2 font-poppins font-bold text-lg text-navbar-hover"
+							className="block mb-2 font-accesible-font font-bold text-lg text-navbar-hover"
 						>
 							Descrizione del Quiz
 						</label>
@@ -225,13 +228,13 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 							value={description}
 							placeholder="Inserisci una descrizione del quiz..."
 							onChange={(e) => setDescription(e.target.value)}
-							className="w-full border rounded-lg p-3 mb-4 font-poppins shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
+							className="w-full border rounded-lg p-3 mb-4 font-accesible-font shadow-sm focus:outline-none focus:ring-2 focus:ring-navbar-hover focus:border-transparent"
 						/>
 					</div>
 				</form>
 				<div className="mb-6">
 					<h3
-						className="font-bold font-poppins text-2xl text-navbar-hover mb-4"
+						className="font-bold font-accesible-font text-2xl text-navbar-hover mb-4"
 						id="questionListHeading"
 					>
 						Domande
@@ -256,28 +259,50 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 										type="button"
 										className="bg-navbar-hover text-white py-1 px-2 rounded"
 										onClick={() => handleEditQuestion(question)}
-										aria-label={`Modifica domanda ${question.name}`}
+										aria-label={
+											readOnly
+												? `Visualizza Domanda ${question.name}`
+												: `Modifica domanda ${question.name}`
+										}
 									>
 										<div className="flex items-center space-x-1">
-											<span>Modifica</span>
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												width="16"
-												height="16"
-												fill="currentColor"
-												className="bi bi-pencil-square"
-												viewBox="0 0 16 16"
-												aria-hidden="true"
-											>
-												<title>Modifica</title>
-												<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-												<path
-													fill-rule="evenodd"
-													d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-												/>
-											</svg>
+											<span>{readOnly ? "Visualizza" : "Modifica"}</span>
+											{readOnly && (
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													fill="currentColor"
+													className="bi bi-eye"
+													viewBox="0 0 16 16"
+													aria-hidden="true" // Nascondi l'icona agli screen reader
+												>
+													<title>Visualizza</title>
+													<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zm-8 4a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+													<path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+												</svg>
+											)}
+											{!readOnly && (
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													fill="currentColor"
+													className="bi bi-pencil-square"
+													viewBox="0 0 16 16"
+													aria-hidden="true"
+												>
+													<title>Modifica</title>
+													<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+													<path
+														fill-rule="evenodd"
+														d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+													/>
+												</svg>
+											)}
 										</div>
 									</button>
+
 									<button
 										type="button"
 										className="text-white bg-red-600 py-1 px-2 rounded"
@@ -308,14 +333,19 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 					<div className="flex">
 						<button
 							type="button"
-							onClick={() => setModalOpen(true)}
+							onClick={() => {
+								setIsNew(true);
+								setModalOpen(true);
+							}}
 							className="bg-navbar-hover text-white py-2 px-6 m-1 rounded shadow-md hover:bg-navbar-hover-dark transition duration-300"
 						>
 							Aggiungi Nuova Domanda
 						</button>
 						<button
 							type="button"
-							onClick={() => setOpenQuestionModal(true)}
+							onClick={() => {
+								setOpenQuestionModal(true);
+							}}
 							className="bg-navbar-hover text-white py-2 px-6 m-1 rounded shadow-md hover:bg-navbar-hover-dark transition duration-300"
 						>
 							Aggiungi Domanda Esistente
@@ -334,10 +364,23 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 			</section>
 
 			{/* Modale per le nuove domande */}
-			{isModalOpen && (
+			{isModalOpen && isNew && (
+				<QuestionModal
+					question={selectedQuestion}
+					onClose={() => {
+						setIsNew(false);
+						setModalOpen(false);
+						setSelectedQuestion(undefined);
+					}}
+					onSave={handleAddQuestion}
+				/>
+			)}
+
+			{isModalOpen && !isNew && (
 				<QuestionModal
 					question={selectedQuestion}
 					edit={edit}
+					view={readOnly}
 					onClose={() => {
 						setModalOpen(false);
 						setSelectedQuestion(undefined);

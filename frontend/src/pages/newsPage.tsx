@@ -97,12 +97,12 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 				)}
 				{/* Intestazione della pagina */}
 				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h1 className="m-0 text-center text-[42px] font-bold font-poppins text-white">
+					<h1 className="m-0 text-center text-[42px] font-bold font-accesible-font text-white">
 						{title}
 					</h1>
 				</div>
 				{/* Contenuto principale */}
-				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
+				<div className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover">
 					<div className="flex gap-4">
 						{/* Immagine principale */}
 						{mainImage && (
@@ -119,7 +119,7 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 							<section
 								key={section.id}
 								aria-labelledby={`sectionTitle-${section.id}`}
-								className="flex-grow prose max-w-none text-navbar-hover font-poppins text-[17px] mt-4"
+								className="flex-grow prose max-w-none text-navbar-hover font-accesible-font text-[17px] mt-4"
 							>
 								{/* Intestazione della sezione */}
 								<h2

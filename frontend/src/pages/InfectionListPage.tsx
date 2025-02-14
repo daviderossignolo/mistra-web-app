@@ -76,7 +76,7 @@ const InfectionList: React.FC = () => {
 							aria-label={`Vai alla pagina di ${infection.title}`}
 						>
 							<div className="p-6">
-								<h2 className="text-xl font-semibold font-poppins text-navbar-hover">
+								<h2 className="text-xl font-semibold font-accesible-font text-navbar-hover">
 									{infection.title}
 								</h2>
 							</div>

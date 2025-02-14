@@ -81,13 +81,13 @@ const About: React.FC = () => {
 		return (
 			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
 				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h2 className="m-0 text-left text-[42px] font-bold font-poppins text-white">
+					<h2 className="m-0 text-left text-[42px] font-bold font-accesible-font text-white">
 						{title}
 					</h2>
 				</div>
 
 				<div
-					className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover"
+					className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover"
 					aria-labelledby="introductionTitle"
 				>
 					<h2 id="introductionTitle" className="sr-only">
@@ -102,14 +102,14 @@ const About: React.FC = () => {
 				>
 					<h2
 						id="teamSectionTitle"
-						className="bg-navbar-hover px-4 py-4 m-0 text-left text-[42px] font-bold font-poppins text-white"
+						className="bg-navbar-hover px-4 py-4 m-0 text-left text-[42px] font-bold font-accesible-font text-white"
 					>
 						{teamSectionTitle}
 					</h2>
 					{department.map((dept: Department) => (
 						<div key={dept.id} className="mb-8">
 							<h3
-								className="mb-4 py-2 text-center text-[24px] font-semibold font-poppins text-navbar-hover"
+								className="mb-4 py-2 text-center text-[24px] font-semibold font-accesible-font text-navbar-hover"
 								id={`departmentTitle-${dept.id}`}
 							>
 								{dept.title}
@@ -167,10 +167,10 @@ const TeamMemberCard = ({
 			alt={`Foto di ${member.name}`}
 			className="w-24 h-24 rounded-full object-cover mb-4"
 		/>
-		<h4 className="font-bold text-lg text-navbar-hover font-poppins">
+		<h4 className="font-bold text-lg text-navbar-hover font-accesible-font">
 			{member.name}
 		</h4>
-		<p className="text-sm text-navbar-hover font-poppins">
+		<p className="text-sm text-navbar-hover font-accesible-font">
 			{member.profession}
 		</p>
 	</div>

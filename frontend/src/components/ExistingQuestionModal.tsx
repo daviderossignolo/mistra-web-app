@@ -80,7 +80,7 @@ const ExistingQuestionModal: React.FC<ExistingQuestionModal> = ({
 
 	return (
 		<div
-			className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-poppins text-navbar-hover"
+			className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-accesible-font text-navbar-hover"
 			aria-modal="true"
 			// biome-ignore lint/a11y/useSemanticElements: <explanation>
 			role="dialog"
@@ -104,7 +104,7 @@ const ExistingQuestionModal: React.FC<ExistingQuestionModal> = ({
 					<div className="mb-4">
 						<label
 							htmlFor="questionSelect"
-							className="block mb-2 font-bold font-poppins"
+							className="block mb-2 font-bold font-accesible-font"
 						>
 							Seleziona una domanda
 						</label>

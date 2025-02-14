@@ -106,12 +106,12 @@ const UsefulLinksPage: React.FC = () => {
 						<div className="w-full bg-navbar-hover px-4 py-4">
 							<h2
 								id={`sectionTitle-${section.id}`}
-								className="m-0 text-center text-[42px] font-bold font-poppins text-white"
+								className="m-0 text-center text-[42px] font-bold font-accesible-font text-white"
 							>
 								{section.title}
 							</h2>
 						</div>
-						<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
+						<div className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover">
 							{section.resource?.map((resource, index) => (
 								<div
 									key={resource.id}
@@ -128,13 +128,10 @@ const UsefulLinksPage: React.FC = () => {
 											}`}
 										>
 											{resource.links.map((link) => (
-												<div
-													key={link.id}
-													className="flex flex-col gap-2 pb-4"
-												>
+												<div key={link.id} className="flex flex-col gap-2 pb-4">
 													{/* Description */}
 													<p
-														className={`text-lg font-poppins text-navbar-hover mb-2 ${
+														className={`text-lg font-accesible-font text-navbar-hover mb-2 ${
 															link.description ? "text-left" : "sr-only"
 														}`} // sr-only per nascondere se non c'è descrizione
 													>
@@ -150,9 +147,7 @@ const UsefulLinksPage: React.FC = () => {
 																? link.url.replace("watch?v=", "embed/")
 																: link.url
 														} // Convert YouTube URL to an embed URL if necessary
-														title={
-															link.description || `Video da ${link.url}`
-														} // Titolo descrittivo per l'iframe
+														title={link.description || `Video da ${link.url}`} // Titolo descrittivo per l'iframe
 														allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 														allowFullScreen
 														className="w-full rounded-md shadow-md"
@@ -171,9 +166,7 @@ const UsefulLinksPage: React.FC = () => {
 	}, [pageData]);
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8 md:py-12">
-			{renderBlocks}
-		</div>
+		<div className="min-h-screen bg-gray-50 py-8 md:py-12">{renderBlocks}</div>
 	);
 };
 

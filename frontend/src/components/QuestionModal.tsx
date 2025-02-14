@@ -1,7 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import CategoryModal from "./CategoryModal";
 
 // Tipi TypeScript
 export type Answer = {
@@ -30,6 +29,7 @@ export type Category = {
 interface QuestionModalProps {
 	question?: Question;
 	edit?: boolean;
+	view?: boolean;
 	onClose: () => void;
 	onSave: (question: Question) => void;
 }
@@ -38,6 +38,7 @@ interface QuestionModalProps {
 const QuestionModal: React.FC<QuestionModalProps> = ({
 	question,
 	edit,
+	view,
 	onClose,
 	onSave,
 }) => {
@@ -52,7 +53,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 	const [answers, setAnswers] = useState<Answer[]>([
 		{ id: uuidv4(), documentId: "", text: "", score: 0, correction: "" },
 	]);
-	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+	const [componentLabel, setComponentLabel] = useState("Nuova Domanda");
 
 	const host = process.env.REACT_APP_BACKEND_HOST;
 	const port = process.env.REACT_APP_BACKEND_PORT;
@@ -84,15 +85,29 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 				console.error("Errore nel recupero delle categorie:", error);
 			}
 		};
+
+		if (view) {
+			setComponentLabel("Visualizza Domanda");
+		} else if (edit) {
+			setComponentLabel("Modifica Domanda");
+		} else {
+			setComponentLabel("Nuova Domanda");
+		}
+
 		fetchCategories();
-	}, []);
+	}, [edit, view]);
 
 	useEffect(() => {
 		if (question) {
 			setName(question.name);
 			setText(question.text);
 			setCategory(question.category);
-			setAnswers(question.answers);
+			setAnswers(
+				question.answers.map((answer) => ({
+					...answer,
+					id: answer.id || uuidv4(),
+				})),
+			);
 		}
 	}, [question]);
 
@@ -112,7 +127,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 
 		const token = localStorage.getItem("token");
 
-		if (edit) {
+		if (edit && documentId) {
 			const answerResponse = await fetch(
 				`${host}:${port}/api/answers/${documentId}`,
 				{
@@ -144,43 +159,113 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 		);
 	};
 
-	// Gestisce l'aggiunta di una nuova categoria
-	const handleAddCategory = (newCategory: Category) => {
-		setCategories((prevCategories) => [...prevCategories, newCategory]);
-
-		// imposto la nuova categoria come selezionata
-		setCategory(newCategory);
-	};
-
 	// Gestisci il salvataggio della domanda
-	const handleSave = () => {
+	const handleSave = async () => {
+		const token = localStorage.getItem("token");
 		if (!text.trim() || !category.name.trim()) {
 			alert("Completa tutti i campi obbligatori.");
 			return;
 		}
 
-		// L'id della domanda è quello della domanda da modificare o un nuovo ID.
-		const questionId = question ? question.id : uuidv4();
+		console.log(answers);
 
-		// Passo i dati alla funzione onSave
-		onSave({
-			id: questionId,
-			documentId: question ? question.documentId : "",
-			name,
-			text,
-			category: {
-				id_category: category.id_category,
-				name: category.name,
-				documentId: "",
-			},
-			answers,
-		});
-		onClose();
+		if (edit && question) {
+			const response = await fetch(
+				`${host}:${port}/api/test-plugin/modify-question`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						id: question.id,
+						documentId: question.documentId,
+						name: name,
+						text: text,
+						category_id: category.documentId,
+						answers: answers,
+					}),
+				},
+			);
+
+			if (!response.ok) {
+				alert("Errore durante la modifica della domanda");
+				return;
+			}
+
+			if (response.ok) {
+				alert("Domanda modificata con successo");
+			}
+
+			// Passo i dati alla funzione onSave
+			onSave({
+				id: question.id,
+				documentId: question.documentId,
+				name,
+				text,
+				category: {
+					id_category: category.id_category,
+					name: category.name,
+					documentId: category.documentId,
+				},
+				answers,
+			});
+			onClose();
+		}
+
+		if (!edit) {
+			const id = uuidv4();
+			const response = await fetch(
+				`${host}:${port}/api/test-plugin/create-question`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						id: id,
+						name: name,
+						text: text,
+						category_id: category.documentId,
+						answers: answers,
+					}),
+				},
+			);
+
+			if (!response.ok) {
+				alert("Errore durante la modifica della domanda");
+			}
+
+			if (response.ok) {
+				alert("Domanda creata con successo");
+			}
+			const data = await response.json();
+			const documentId = data.documentId;
+
+			// Passo i dati alla funzione onSave
+			onSave({
+				id: id,
+				documentId: documentId,
+				name,
+				text,
+				category: {
+					id_category: category.id_category,
+					name: category.name,
+					documentId: category.documentId,
+				},
+				answers,
+			});
+			onClose();
+		}
+
+		return;
 	};
 
 	return (
 		<div
-			className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-poppins text-navbar-hover"
+			className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center font-accesible-font text-navbar-hover"
 			aria-modal="true"
 			// biome-ignore lint/a11y/useSemanticElements: <explanation>
 			role="dialog"
@@ -193,9 +278,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 				<div className="w-full bg-navbar-hover px-4 py-4 mb-4">
 					<h3
 						id="questionModalHeading"
-						className="font-bold text-white font-poppins text-center"
+						className="font-bold text-white font-accesible-font text-center"
 					>
-						Nuova Domanda
+						{componentLabel}
 					</h3>
 				</div>
 
@@ -203,7 +288,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 				<div className="mb-4">
 					<label
 						htmlFor="category"
-						className="block mb-2 font-poppins font-bold"
+						className="block mb-2 font-accesible-font font-bold"
 					>
 						Categoria
 					</label>
@@ -220,6 +305,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 								}
 							}}
 							className="w-full border rounded p-2 mb-4"
+							disabled={view}
 						>
 							<option value="" disabled>
 								Seleziona la categoria...
@@ -230,20 +316,13 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 								</option>
 							))}
 						</select>
-						<button
-							type="button"
-							onClick={() => setIsCategoryModalOpen(true)}
-							className="bg-navbar-hover text-white px-4 py-2 rounded mb-4"
-						>
-							Nuova
-						</button>
 					</div>
 				</div>
 
 				<div className="mb-4">
 					<label
 						htmlFor="questionName"
-						className="block mb-2 font-poppins font-bold"
+						className="block mb-2 font-accesible-font font-bold"
 					>
 						Nome della Domanda
 					</label>
@@ -253,14 +332,15 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						placeholder="Inserisci il nome della domanda"
-						className="w-full border rounded p-2 mb-4 font-poppins"
+						className="w-full border rounded p-2 mb-4 font-accesible-font"
+						disabled={view}
 					/>
 				</div>
 
 				<div className="mb-4">
 					<label
 						htmlFor="questionText"
-						className="block mb-2 font-poppins font-bold"
+						className="block mb-2 font-accesible-font font-bold"
 					>
 						Testo della Domanda
 					</label>
@@ -270,22 +350,25 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 						value={text}
 						onChange={(e) => setText(e.target.value)}
 						placeholder="Inserisci il testo"
-						className="w-full border rounded p-2 mb-4 font-poppins"
+						className="w-full border rounded p-2 mb-4 font-accesible-font"
+						disabled={view}
 					/>
 				</div>
 
 				{/* Sezione: Risposte */}
 				<div className="mb-4">
-					<h4 className="font-bold text-lg font-poppins mb-2">Risposte</h4>
+					<h4 className="font-bold text-lg font-accesible-font mb-2">
+						Risposte
+					</h4>
 					<div className="max-h-96 overflow-y-auto border rounded p-2 mb-4">
 						{answers.length > 0 && (
-							<table>
+							<table className="items-center text-center w-full">
 								<thead>
 									<tr>
 										<th>Testo</th>
 										<th>Correzione</th>
 										<th>Punteggio</th>
-										<th>Azioni</th>
+										{!view && <th>Azioni</th>}
 									</tr>
 								</thead>
 								<tbody>
@@ -294,11 +377,16 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 											<td>
 												<textarea
 													value={answer.text}
-													onChange={(e) =>
-														updateAnswerField(answer.id, "text", e.target.value)
-													}
+													onChange={(e) => {
+														updateAnswerField(
+															answer.id,
+															"text",
+															e.target.value,
+														);
+													}}
 													placeholder="Testo della risposta"
 													className="flex-1 border rounded p-2"
+													disabled={view}
 												/>
 											</td>
 											<td>
@@ -313,6 +401,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 													}
 													placeholder="Correzione della risposta"
 													className="flex-1 border rounded p-2"
+													disabled={view}
 												/>
 											</td>
 											<td>
@@ -326,6 +415,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 														)
 													}
 													className="border rounded p-2"
+													disabled={view}
 												>
 													<option value={0}>0</option>
 													<option value={0.25}>0.25</option>
@@ -333,41 +423,45 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 													<option value={1}>1</option>
 												</select>
 											</td>
-											<td>
-												<button
-													type="button"
-													onClick={() =>
-														removeAnswer(answer.id, answer.documentId)
-													}
-													className="text-red-600"
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														width="16"
-														height="16"
-														fill="currentColor"
-														className="bi bi-trash-fill"
-														viewBox="0 0 16 16"
-														aria-hidden="true"
+											{!view && (
+												<td>
+													<button
+														type="button"
+														onClick={() =>
+															removeAnswer(answer.id, answer.documentId)
+														}
+														className="text-red-600"
 													>
-														<title>Icona rimuovi</title>
-														<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
-													</svg>
-												</button>
-											</td>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															width="16"
+															height="16"
+															fill="currentColor"
+															className="bi bi-trash-fill"
+															viewBox="0 0 16 16"
+															aria-hidden="true"
+														>
+															<title>Icona rimuovi</title>
+															<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
+														</svg>
+													</button>
+												</td>
+											)}
 										</tr>
 									))}
 								</tbody>
 							</table>
 						)}
 					</div>
-					<button
-						onClick={addAnswer}
-						type="button"
-						className="bg-navbar-hover text-white font-poppins py-2 px-4 rounded"
-					>
-						Aggiungi Risposta
-					</button>
+					{!view && (
+						<button
+							onClick={addAnswer}
+							type="button"
+							className="bg-navbar-hover text-white font-accesible-font py-2 px-4 rounded"
+						>
+							Aggiungi Risposta
+						</button>
+					)}
 				</div>
 
 				<div className="flex justify-end">
@@ -387,14 +481,6 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
 					</button>
 				</div>
 			</div>
-
-			{/* Modale per la creazione di una nuova categoria */}
-			{isCategoryModalOpen && (
-				<CategoryModal
-					onClose={() => setIsCategoryModalOpen(false)}
-					onSave={handleAddCategory}
-				/>
-			)}
 		</div>
 	);
 };
