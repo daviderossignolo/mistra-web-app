@@ -15,8 +15,8 @@ import ServicesListPage from "./pages/ServicesListPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
 import ContactPage from "./pages/ContactPage";
 import DashboardPage from "./pages/DashboardPage";
-import PrivateRoute from "./components/PrivateRoute";
 import TakeQuizPage from "./pages/TakeQuizPage";
+import PrivateRoute from "./components/privateRoute";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);

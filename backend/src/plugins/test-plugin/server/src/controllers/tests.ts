@@ -399,6 +399,10 @@ export default {
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const questionInTestData = (await questionInTestResponse.json()) as any;
 		for (const questionInTest of questionInTestData.data) {
+			if (questionInTest.question_id === null) {
+				continue;
+			}
+
 			const question = questionInTest.question_id;
 			const questionId = question.id;
 
