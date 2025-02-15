@@ -1280,9 +1280,21 @@ const DashboardPage: React.FC = () => {
 						</h2>
 					</div>
 					<div className="container py-8">
-						<h3 className="font-bold font-accesible-font text-2xl text-navbar-hover mb-4">
-							Lista Categorie
-						</h3>
+						<div className="flex items-center justify-between mb-4">
+							<h3 className="font-bold font-accesible-font text-2xl text-navbar-hover">
+								Lista Categorie
+							</h3>
+							<button
+								type="button"
+								className="bg-navbar-hover text-white px-4 py-2 rounded"
+								onClick={() => {
+									setIsNew(true);
+									setIsCategoryModalOpen(true);
+								}}
+							>
+								Crea Nuova Categoria
+							</button>
+						</div>
 						<hr className="mb-4" />
 						<ul className="list-none pl-0">
 							{categories.map((category) => (
@@ -1360,8 +1372,14 @@ const DashboardPage: React.FC = () => {
 				<QuestionModal
 					question={selectedQuestion ?? newQuestion}
 					edit={true}
-					onClose={() => setIsQuestionModalOpen(false)}
-					onSave={() => setIsQuestionModalOpen(false)}
+					onClose={() => {
+						setIsQuestionModalOpen(false);
+					}}
+					onSave={() => {
+						setIsQuestionModalOpen(false);
+						localStorage.setItem("selectedSection", "manageQuestion");
+						window.location.reload();
+					}}
 				/>
 			)}
 
@@ -1372,12 +1390,12 @@ const DashboardPage: React.FC = () => {
 					onClose={() => {
 						setIsNew(false);
 						setIsQuestionModalOpen(false);
-						setSelectedSection("manageQuestion");
 					}}
 					onSave={() => {
 						setIsNew(false);
 						setIsQuestionModalOpen(false);
-						setSelectedSection("manageQuestion");
+						localStorage.setItem("selectedSection", "manageQuestion");
+						window.location.reload();
 					}}
 				/>
 			)}

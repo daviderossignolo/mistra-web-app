@@ -3,12 +3,14 @@ import { v4 as uuidv4 } from "uuid";
 import type { Question } from "./QuestionModal";
 
 interface ExistingQuestionModal {
+	questionsTest: Question[];
 	onClose: () => void;
 	onSave: (question: Question) => void;
 }
 
 // Componente per il modale di creazione categoria
 const ExistingQuestionModal: React.FC<ExistingQuestionModal> = ({
+	questionsTest,
 	onClose,
 	onSave,
 }) => {
@@ -73,11 +75,17 @@ const ExistingQuestionModal: React.FC<ExistingQuestionModal> = ({
 
 			const data = await response.json();
 
-			setQuestions(data);
+			// Rimuovo le domande già presenti nel test
+			const filteredData = data.filter(
+				(question: Question) =>
+					!questionsTest.find((q) => q.documentId === question.documentId),
+			);
+
+			setQuestions(filteredData);
 		};
 
 		fetchQuestion();
-	}, [host, port]);
+	}, [host, port, questionsTest]);
 
 	return (
 		<div

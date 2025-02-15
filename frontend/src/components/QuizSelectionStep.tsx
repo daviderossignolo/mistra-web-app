@@ -133,6 +133,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 				// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
 				if (response.status === 200) {
 					alert("Il test è stato salvato con successo.");
+					localStorage.setItem("selectedSection", "testTemplates");
 					window.location.reload();
 				}
 
@@ -174,6 +175,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 				// Se la risposta è ok, allora navigo alla pagina di visualizzazione del quiz
 				if (response.status === 200) {
 					alert("Il test è stato salvato con successo.");
+					localStorage.setItem("selectedSection", "testTemplates");
 					window.location.reload();
 				}
 
@@ -392,6 +394,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 			{/* Modale per le domande esistenti */}
 			{openQuestionModal && (
 				<ExistingQuestionModal
+					questionsTest={questions}
 					onClose={() => setOpenQuestionModal(false)}
 					onSave={handleAddQuestion}
 				/>

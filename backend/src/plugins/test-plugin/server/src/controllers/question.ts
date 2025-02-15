@@ -355,6 +355,28 @@ export default {
 			}
 		}
 
+		// Elimino le question in test dalla tabella
+
+		const reponse = await fetch(
+			"http://localhost:1337/api/test-plugin/delete-question-in-test",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					question_id: question_id,
+				}),
+			},
+		);
+
+		if (!reponse.ok) {
+			ctx.status = reponse.status;
+			ctx.body = { error: "Errore nella cancellazione delle domande in test" };
+			return ctx;
+		}
+
 		// Elimino la domanda
 		const deleteQuestionResponse = await fetch(
 			`http://localhost:1337/api/questions/${question_id}`,
