@@ -250,6 +250,79 @@ export default {
 	},
 
 	/**
+	 * Permette di eliminare una domanda presente in un test.
+	 * (Non elimina la domanda dal database, ma solo la relazione con il test)
+	 * @param ctx
+	 * @returns
+	 */
+	async deleteAllQuestionInTest(ctx: Context) {
+		const body = ctx.request.body;
+		const documentId = body.documentId;
+
+		const host = process.env.HOST;
+		const port = process.env.PORT;
+
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Non autorizzato" };
+			return ctx;
+		}
+
+		// Devo recupera il document id della riga di question in test, se faccio la delete specificando solo il documentId della relazione question
+		// viene eliminata solo la relazione e non tutta la riga
+		const testResponse = await fetch(
+			`http://${host}:${port}/api/question-in-tests?filters[question_id][documentId][$eq]=${documentId}&pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!testResponse.ok) {
+			ctx.status = testResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const testResponseData = (await testResponse.json()) as any;
+		console.log(testResponseData);
+
+		for (const questionIntest of testResponseData.data) {
+			
+			const questionId = questionIntest.documentId;
+			console.log("QUESTION IN TEST ID: ", questionId);
+
+			// Elimino la riga da question-in-tests
+			const deleteResponse = await fetch(
+				`http://localhost:1337/api/question-in-tests/${questionId}`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			);
+
+			if (!deleteResponse.ok) {
+				ctx.status = deleteResponse.status;
+				ctx.body = { error: "Errore nell'eliminazione della domanda" };
+				return ctx;
+			}
+		}
+
+		ctx.status = 200;
+		ctx.body = { message: "Question deleted successfully" };
+		return ctx;
+	},
+
+	/**
 	 * Endpoint per ottenere le domande.
 	 * @param ctx
 	 * @returns
@@ -313,7 +386,7 @@ export default {
 		const question_id = body.question_id;
 		console.log("QUESTION ID: ", question_id);
 		const token = process.env.SERVICE_KEY;
-		const medicJWT = body.medicJWT;
+		//const medicJWT = body.medicJWT;
 
 		// Elimino prima tutte le risposte legate alla domanda
 		const response = await fetch(
@@ -358,12 +431,12 @@ export default {
 
 		// Elimino le question in test dalla tabella
 		const reponse = await fetch(
-			"http://localhost:1337/api/test-plugin/delete-question-in-test",
+			"http://localhost:1337/api/test-plugin/delete-all-question-in-test",
 			{
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${medicJWT}`,
+					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({
 					documentId: question_id,

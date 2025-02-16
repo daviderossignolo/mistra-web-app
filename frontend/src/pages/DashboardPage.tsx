@@ -528,7 +528,10 @@ const DashboardPage: React.FC = () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ question_id: documentId, medicJWT: token }),
+				body: JSON.stringify({ 
+					question_id: documentId, 
+					//medicJWT: token 
+				}),
 			},
 		);
 
@@ -1291,7 +1294,7 @@ const DashboardPage: React.FC = () => {
 							</h3>
 							<button
 								type="button"
-								className="bg-navbar-hover text-white px-4 py-2 rounded"
+								className="bg-navbar text-white px-4 py-2 rounded"
 								onClick={() => {
 									setIsNew(true);
 									setIsCategoryModalOpen(true);

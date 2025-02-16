@@ -24,6 +24,14 @@ export default [
 		},
 	},
 	{
+		method: "POST",
+		path: "/delete-all-question-in-test", // Questa rotta permette eliminare una domanda presente in un test
+		handler: "question.deleteAllQuestionInTest", // Controller per eliminare una domanda in un test
+		config: {
+			auth: { required: true },
+		},
+	},
+	{
 		method: "GET",
 		path: "/get-questions", // Questa rotta permette ottenere tutte le domande
 		handler: "question.getQuestions", // Controller per ottenere tutte le domande
