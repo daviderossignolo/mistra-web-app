@@ -9,7 +9,6 @@ export default {
 	async createQuestion(ctx: Context) {
 		const token = process.env.SERVICE_KEY;
 		const body = ctx.request.body;
-		console.log("BODY: ", body);
 
 		const id_question = body.id;
 		const name = body.name;

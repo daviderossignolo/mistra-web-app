@@ -48,8 +48,6 @@ export default {
 		const host = process.env.HOST;
 		const port = process.env.PORT;
 		const quiz = ctx.request.body as Quiz;
-		console.log(quiz);
-
 		const token = process.env.SERVICE_KEY;
 
 		if (!token) {
@@ -79,66 +77,12 @@ export default {
 		// Se la risposta non è ok, setto l'errore nella risposta
 		if (!testResponse.ok) {
 			ctx.status = testResponse.status;
-			ctx.body = { message: "Failed to create the test" };
+			ctx.body = { message: "Non sono riuscito a modificare il test." };
 			return ctx;
 		}
 
 		// Processo le domande del quiz
 		for (const question of quiz.questions) {
-			const idCategory = await getCategory(question.category.id_category);
-
-			// Se la domanda non ha un documentId, allora vuol dire che la devo inserire
-			// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
-			let questionResponse;
-			if (question.documentId === "") {
-				questionResponse = await fetch(`http://${host}:${port}/api/questions`, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
-					},
-					body: JSON.stringify({
-						data: {
-							id_question: question.id,
-							name: question.name,
-							text: question.text,
-							category_id: idCategory,
-						},
-					}),
-				});
-			} else {
-				questionResponse = await fetch(
-					`http://${host}:${port}/api/questions/${question.documentId}`,
-					{
-						method: "PUT",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
-						},
-						body: JSON.stringify({
-							data: {
-								name: question.name,
-								text: question.text,
-								category_id: idCategory,
-							},
-						}),
-					},
-				);
-			}
-
-			// Se la chiama API non è andata a buon fine, setto l'errore nella risposta
-			if (!questionResponse.ok) {
-				ctx.status = questionResponse.status;
-				ctx.body = { message: "Errore nella creazione delle domande" };
-				return ctx;
-			}
-
-			// La chiamata API ha avuto successo, estraggo l'id della domanda appena creata
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			const questionData: any = await questionResponse.json();
-			const questionId = questionData.data.documentId;
-			console.log(questionData);
-
 			// controllo se è stata aggiunta una domanda esistente che va quindi aggiunta question in test
 			const exists = await fetch(
 				`http://${host}:${port}/api/question-in-tests?filters[$and][0][question_id][documentId][$eq]=${question.documentId}&filters[$and][1][test_id][documentId][$eq]=${quiz.documentId}`,
@@ -150,8 +94,6 @@ export default {
 					},
 				},
 			);
-
-			console.log("\n\n", exists);
 
 			if (exists.status === 200) {
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -168,7 +110,7 @@ export default {
 							},
 							body: JSON.stringify({
 								data: {
-									question_id: questionId,
+									question_id: question.documentId,
 									test_id: quiz.documentId,
 								},
 							}),
@@ -187,55 +129,6 @@ export default {
 				ctx.status = exists.status;
 				ctx.body = { message: "Errore nella creazione delle domande" };
 				return ctx;
-			}
-
-			// Processo le risposte collegate alla domanda corrente
-			for (const answer of question.answers) {
-				// Se la risposta non ha un documentId, allora vuol dire che la devo inserire
-				// biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
-				let answerResponse;
-				if (answer.documentId === "") {
-					answerResponse = await fetch(`http://${host}:${port}/api/answers`, {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
-						},
-						body: JSON.stringify({
-							data: {
-								id_answer: answer.id,
-								text: answer.text,
-								correction: answer.correction,
-								score: answer.score,
-								question_id: questionId,
-							},
-						}),
-					});
-				} else {
-					answerResponse = await fetch(
-						`http://${host}:${port}/api/answers/${answer.documentId}`,
-						{
-							method: "PUT",
-							headers: {
-								"Content-Type": "application/json",
-								Authorization: `Bearer ${token}`,
-							},
-							body: JSON.stringify({
-								data: {
-									text: answer.text,
-									correction: answer.correction,
-									score: answer.score,
-								},
-							}),
-						},
-					);
-				}
-
-				if (!answerResponse.ok) {
-					ctx.status = answerResponse.status;
-					ctx.body = { message: "Errore nella creazione delle risposte" };
-					return ctx;
-				}
 			}
 		}
 
