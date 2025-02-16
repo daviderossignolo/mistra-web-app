@@ -78,6 +78,7 @@ const QuestionSelectionStep: React.FC<QuestionSelectionStepProps> = ({
 					},
 					body: JSON.stringify({
 						documentId: id,
+						testId: quizData.documentId,
 					}),
 				},
 			);

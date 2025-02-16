@@ -142,8 +142,7 @@ const TakeQuizPage: React.FC = () => {
 	// Funzione di help che crea il codice del test
 	const createQuizId = () => {
 		const date = new Date();
-		date.setHours(date.getHours() + 1);
-		const isoDate = date.toISOString();
+		const isoDate = date.toISOString().split("T")[0];
 		const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		const randomLetters = Array.from(
 			{ length: 3 },

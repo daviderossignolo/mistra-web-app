@@ -528,9 +528,8 @@ const DashboardPage: React.FC = () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ 
-					question_id: documentId, 
-					//medicJWT: token 
+				body: JSON.stringify({
+					question_id: documentId,
 				}),
 			},
 		);
@@ -636,6 +635,9 @@ const DashboardPage: React.FC = () => {
 		setCategories(
 			categories.filter((category) => category.documentId !== documentId),
 		);
+
+		localStorage.setItem("selectedSection", "manageCategories");
+		window.location.reload();
 	};
 
 	return (

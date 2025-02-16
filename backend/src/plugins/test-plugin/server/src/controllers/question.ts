@@ -60,6 +60,7 @@ export default {
 				},
 				body: JSON.stringify({
 					data: {
+						id_answer: answer.id,
 						text: answer.text,
 						correction: answer.correction,
 						score: answer.score,
@@ -190,6 +191,7 @@ export default {
 	async deleteQuestionInTest(ctx: Context) {
 		const body = ctx.request.body;
 		const documentId = body.documentId;
+		const testId = body.testId;
 
 		const host = process.env.HOST;
 		const port = process.env.PORT;
@@ -205,7 +207,7 @@ export default {
 		// Devo recupera il document id della riga di question in test, se faccio la delete specificando solo il documentId della relazione question
 		// viene eliminata solo la relazione e non tutta la riga
 		const testResponse = await fetch(
-			`http://${host}:${port}/api/question-in-tests?filters[question_id][documentId][$eq]=${documentId}&pLevel`,
+			`http://${host}:${port}/api/question-in-tests?filters[$and][0][question_id][documentId][$eq]=${documentId}&filters[$and][1][test_id][documentId][$eq]=${testId}&pLevel`,
 			{
 				method: "GET",
 				headers: {
@@ -294,7 +296,6 @@ export default {
 		console.log(testResponseData);
 
 		for (const questionIntest of testResponseData.data) {
-			
 			const questionId = questionIntest.documentId;
 			console.log("QUESTION IN TEST ID: ", questionId);
 
@@ -386,7 +387,6 @@ export default {
 		const question_id = body.question_id;
 		console.log("QUESTION ID: ", question_id);
 		const token = process.env.SERVICE_KEY;
-		//const medicJWT = body.medicJWT;
 
 		// Elimino prima tutte le risposte legate alla domanda
 		const response = await fetch(
