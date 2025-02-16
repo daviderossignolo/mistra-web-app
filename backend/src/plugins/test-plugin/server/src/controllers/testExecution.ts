@@ -402,6 +402,10 @@ export default {
 				continue;
 			}
 
+			if (row.createdAt > testExecutionData.data[0].createdAt) {
+				continue;
+			}
+
 			const question = row.question_id;
 
 			// Recupero le risposte dalla domanda

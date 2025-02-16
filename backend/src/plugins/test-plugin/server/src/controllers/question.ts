@@ -313,6 +313,7 @@ export default {
 		const question_id = body.question_id;
 		console.log("QUESTION ID: ", question_id);
 		const token = process.env.SERVICE_KEY;
+		const medicJWT = body.medicJWT;
 
 		// Elimino prima tutte le risposte legate alla domanda
 		const response = await fetch(
@@ -356,17 +357,16 @@ export default {
 		}
 
 		// Elimino le question in test dalla tabella
-
 		const reponse = await fetch(
 			"http://localhost:1337/api/test-plugin/delete-question-in-test",
 			{
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+					Authorization: `Bearer ${medicJWT}`,
 				},
 				body: JSON.stringify({
-					question_id: question_id,
+					documentId: question_id,
 				}),
 			},
 		);

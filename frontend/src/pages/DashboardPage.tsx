@@ -270,7 +270,6 @@ const DashboardPage: React.FC = () => {
 
 			const data = await response.json();
 
-			// TODO
 			// filtro via i test eseguiti a cui non è associato un test perchè è stato eliminato
 			data.data = data.data.filter(
 				(test: { id_test: null }) => test.id_test !== null,
@@ -409,6 +408,12 @@ const DashboardPage: React.FC = () => {
 				}
 
 				const data = await response.json();
+
+				// filtro via i test eseguiti a cui non è associato un test perchè è stato eliminato
+				data.data = data.data.filter(
+					(test: { id_test: null }) => test.id_test !== null,
+				);
+
 				setExecutedTests(data.data);
 			};
 
@@ -523,7 +528,7 @@ const DashboardPage: React.FC = () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ question_id: documentId }),
+				body: JSON.stringify({ question_id: documentId, medicJWT: token }),
 			},
 		);
 
