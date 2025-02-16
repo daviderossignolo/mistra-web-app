@@ -1,66 +1,58 @@
 export default [
-    {
-      	method: 'GET',
-      	path: '/display-answer', // Questa rotta genera un test casuale
-      	handler: 'answer.answerManagement', // Aggiungi il controller per ottenere il test
-      	config: {
-        	auth: false, // Nessuna autenticazione per il test
-      	},
-    },
-    {
-      	method: 'POST',
-      	path: '/create-answer', // Questa rotta genera un test casuale
-      	handler: 'answer.createAnswer', // Aggiungi il controller per ottenere il test
-      	config: {
-      	  	auth: false, // Nessuna autenticazione per il test
-      	},
-    },
 	{
-		method: 'GET',
-		path: '/modify-answer', // Questa rotta genera un test casuale
-		handler: 'answer.modifyAnswer', // Aggiungi il controller per ottenere il test
+		method: "POST",
+		path: "/create-answer", // Questa rotta permette di creare una risposta
+		handler: "answer.createAnswer", // Controller per creare una risposta
 		config: {
-			  auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
+		},
+	},
+	/*{
+		method: 'GET',
+		path: '/modify-answer', // Questa rotta permette di visualizzare una risposta
+		handler: 'answer.modifyAnswer', // Controller per visualizzare una risposta
+		config: {
+			  auth: { required: true },
 		},
   	},
 	{
 		method: 'POST',
-		path: '/submit-modify-answer',
-		handler: 'answer.submitModifyAnswer',
+		path: '/submit-modify-answer', // Questa rotta permette di modificare una risposta
+		handler: 'answer.submitModifyAnswer', // Controller per modificare una risposta
 		config: {
-			  auth: false, // Nessuna autenticazione per il test
+			  auth: { required: true },
 		},
-  	},
+  	}, 
   	{
 		method: 'GET',
-		path: '/delete-answer',
-		handler: 'answer.deleteAnswer',
+		path: '/delete-answer', // Questa rotta permette di eliminare una risposta
+		handler: 'answer.deleteAnswer', // Controller per eliminare una risposta
 		config: {
-			  auth: false, // Nessuna autenticazione per il test
+			  auth: { required: true},
 		},
-  	},
-    {
-        method: "GET",
-        path: "/",
-        handler: "controller.index",
-        config: {
-        	policies: [],
-        },
-    },
+  	},  
 	{
         method: 'GET',
-        path: '/get-answers', // Questa rotta genera un test casuale
-        handler: 'answer.getAnswers', // Aggiungi il controller per ottenere il test
+        path: '/get-free-answers', // Questa rotta permette di ottenere le risposte libere
+        handler: 'answer.getFreeAnswers', // Controller per ottenere le risposte libere
         config: {
-        	auth: false, // Nessuna autenticazione per il test
+        	auth: { required: true },
         },
-    },
+    },*/
 	{
-        method: 'GET',
-        path: '/get-free-answers', // Questa rotta genera un test casuale
-        handler: 'answer.getFreeAnswers', // Aggiungi il controller per ottenere il test
-        config: {
-        	auth: false, // Nessuna autenticazione per il test
-        },
-    },
-]
+		method: "POST",
+		path: "/get-question-answers", // Questa rotta permette di ottenere tutte le risposte
+		handler: "answer.getQuestionAnswers", // Controller per ottenere tutte le risposte
+		config: {
+			auth: { required: true },
+		},
+	},
+	{
+		method: "GET",
+		path: "/",
+		handler: "controller.index",
+		config: {
+			policies: [],
+		},
+	},
+];

@@ -1,8 +1,4 @@
 import type { Context } from "koa";
-const { v4: uuidv4 } = require("uuid");
-import questionService from "../services/question";
-import categoryService from "../services/category";
-import axios from "axios";
 
 export default {
 	/**
@@ -11,13 +7,28 @@ export default {
 	 * @returns
 	 */
 	async createQuestion(ctx: Context) {
-		const { id_question, name, text, category_id } = ctx.request.body;
+		const token = process.env.SERVICE_KEY;
+		const body = ctx.request.body;
+		console.log("BODY: ", body);
+
+		const id_question = body.id;
+		const name = body.name;
+		const text = body.text;
+		const category_id = body.category_id;
+		const answers = body.answers;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
 
 		// Faccio la chiamata API a Strapi per creare la Question
 		const response = await fetch("http://localhost:1337/api/questions", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -37,244 +48,522 @@ export default {
 
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const questionData: any = await response.json();
-		const id = questionData.data.documentId;
+		const documentId = questionData.data.documentId;
+
+		// Creo le risposte collegate alla domanda
+		for (const answer of answers) {
+			const answerResponse = await fetch("http://localhost:1337/api/answers", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					data: {
+						id_answer: answer.id,
+						text: answer.text,
+						correction: answer.correction,
+						score: answer.score,
+						question_id: documentId,
+					},
+				}),
+			});
+
+			if (!answerResponse.ok) {
+				ctx.status = answerResponse.status;
+				ctx.body = { error: "Errore nella creazione delle risposte" };
+				return ctx;
+			}
+		}
 
 		ctx.status = 200;
-		ctx.body = { question_id: id };
+		ctx.body = { documentId: documentId };
 
 		return ctx;
 	},
 
-	async questionManagement(ctx: Context) {
-		try {
-			const getQuestionsHTML = await questionService.getQuestionsHTML();
-			const getAnswersHTML = await questionService.getAnswersHTML();
-			const getCategoriesHTML = await categoryService.getCategoriesHTML();
-
-			ctx.body = `
-            <html>
-                <head>
-                    <title>Gestione Questions</title>
-                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                </head>
-                <body class="bg-gray-100 font-sans">
-                    <div class="max-w-3xl mx-auto p-8">
-                        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Creazione Question</h1>
-                        <h3 class="text-xl font-medium text-gray-700 mb-4">Answers disponibili</h3>
-                        <ul class="list-disc pl-8 mb-4">${getAnswersHTML}</ul>
-                        <h3 class="text-xl font-medium text-gray-700 mb-4">Categorie disponibili</h3>
-                        <ul class="list-disc pl-8 mb-4">${getCategoriesHTML}</ul>
-                        <h3 class="text-xl font-medium text-gray-700 mb-4">Question esistenti</h3>
-                        <ul class="list-disc pl-8 mb-4">${getQuestionsHTML}</ul>
-                        <form method="POST" action="http://localhost:1337/api/test-plugin/create-question" enctype="application/json" class="bg-white p-6 rounded-lg shadow-lg">
-                            <label for="name" class="block text-lg text-gray-800 mb-2">Name:</label>
-                            <input type="text" name="name" id="name" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <label for="text" class="block text-lg text-gray-800 mb-2">Text:</label>
-                            <input type="text" name="text" id="text" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <label for="id_category" class="block text-lg text-gray-800 mb-2">Category:</label>
-                            <input type="text" name="id_category" id="id_category" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <label for="answer" class="block text-lg text-gray-800 mb-2">Answer ids:</label>
-                            <input type="text" name="answer" id="answer" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                            <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Crea Question</button>
-                        </form>
-                        <a href="http://localhost:1337/api/test-plugin/display-answer" class="text-blue-500 hover:underline mt-4 inline-block">Creare una Answer</a>
-                        <br>
-                        <a href="http://localhost:1337/api/test-plugin/search-test-Execution" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla creazione del Test</a>
-                    </div>
-                </body>
-            </html>`;
-			ctx.type = "html";
-		} catch (error) {
-			ctx.body = { error: error.message };
-		}
-	},
-
-	// Endpoint per modificare una Question
+	/**
+	 * Endpoint per la visualizzazione di una domanda.
+	 * @param ctx
+	 * @returns filtredData
+	 */
 	async modifyQuestion(ctx: Context) {
-		try {
-			const { documentId } = ctx.query;
-			const response = await axios.get(
-				`http://localhost:1337/api/questions/${documentId}?populate=*`,
-			);
-			const data = response.data.data;
+		const token = process.env.SERVICE_KEY;
+		const body = ctx.request.body;
+		const questionDocumentId = body.documentId;
+		const name = body.name;
+		const text = body.text;
+		const category_id = body.category_id;
+		const answers = body.answers;
 
-			// Filtro i dati
-			const filteredData = {
-				id: data.id,
-				documentId: data.documentId,
-				id_question: data.id_question,
-				name: data.name,
-				text: data.text,
-				id_category: data.id_category
-					? {
-							id: data.id_category.id,
-							documentId: data.id_category.documentId,
-							id_category: data.id_category.id_category,
-							name: data.id_category.name,
-						}
-					: null,
-				answers: data.answers
-					? data.answers.map((answer) => ({
-							id: answer.id,
-							documentId: answer.documentId,
-							id_answer: answer.id_answer,
-							text: answer.text,
-							score: answer.score,
-							correction: answer.correction,
-						}))
-					: [],
-				question_in_tests: data.question_in_tests
-					? data.question_in_tests.map((test) => ({
-							id: test.id,
-							documentId: test.documentId,
-						}))
-					: [],
-			};
-
-			console.log(filteredData);
-
-			const answers = Array.isArray(data.answers) ? data.answers : [];
-
-			ctx.body = `
-			<html>
-				<head>
-					<title>Modifica Question</title>
-					<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-				</head>
-				<body class="bg-gray-100 font-sans">
-					<div class="max-w-3xl mx-auto p-8">
-						<h1 class="text-3xl font-semibold text-gray-800 mb-6">Modifica Question</h1>
-						<form action="http://localhost:1337/api/test-plugin/submit-modify-question/?documentId=${documentId}" method="POST" class="bg-white p-6 rounded-lg shadow-lg">
-							<label for="name" class="block text-lg text-gray-800 mb-2">Name:</label>
-							<input type="text" name="name" id="name" value="${data.name || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<label for="text" class="block text-lg text-gray-800 mb-2">Text:</label>
-							<input type="text" name="text" id="text" value="${data.text || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<label for="id_category" class="block text-lg text-gray-800 mb-2">Category:</label>
-							<input type="text" name="id_category" id="id_category" value="${data.id_category.documentId || ""}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<label for="answer" class="block text-lg text-gray-800 mb-2">Answer ids:</label>
-							<input type="text" name="answer" id="answer" value="${answers.map((answer) => answer.documentId).join(",")}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-							<button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Modifica Question</button>
-                            <a href="/api/test-plugin/display-question" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione delle Question</a>
-						</form>
-					</div>
-				</body>
-			</html>`;
-			ctx.type = "html";
-		} catch (error) {
-			ctx.body = { error: error.message };
-		}
-	},
-
-	// Endpoint per sottoporre la modifica di una Question
-	async submitModifyQuestion(ctx: Context) {
-		try {
-			const { documentId } = ctx.query;
-			const { name, text, id_category, answer } = ctx.request.body;
-			const answers = answer.split(",").map((answer) => answer.trim());
-			console.log(ctx.request.body);
-
-			const payload = {
-				data: {
-					name,
-					text,
-					id_category,
-					answers,
+		// Eseguo la chiamata PUT della domanda
+		const response = await fetch(
+			`http://localhost:1337/api/questions/${questionDocumentId}`,
+			{
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
 				},
-			};
+				body: JSON.stringify({
+					data: {
+						name: name,
+						text: text,
+						category_id: category_id,
+					},
+				}),
+			},
+		);
 
-			await axios.put(
-				`http://localhost:1337/api/questions/${documentId}`,
-				payload,
-			);
-
-			ctx.body = `
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-question">
-                    <title>Redirect</title>
-                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                </head>
-                <body class="bg-gray-100 text-center p-8">
-                    <h1 class="text-4xl font-bold text-green-600">Question modificata con successo</h1>
-                    <p class="text-xl mt-4">Stai per essere reindirizzato...</p>
-                </body>
-            </html>`;
-			ctx.type = "html";
-		} catch (error) {
-			ctx.body = { error: error.message };
+		if (!response.ok) {
+			ctx.status = response.status;
+			ctx.body = { error: "Errore nella modifica della domanda" };
+			return ctx;
 		}
+
+		// Devo modificare le risposte
+		for (const answer of answers) {
+			// se ha aggiunto una domanda la devo aggiungere
+			if (answer.documentId === "") {
+				const answerResponse = await fetch(
+					"http://localhost:1337/api/answers",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({
+							data: {
+								id_answer: answer.id,
+								text: answer.text,
+								correction: answer.correction,
+								score: answer.score,
+								question_id: questionDocumentId,
+							},
+						}),
+					},
+				);
+
+				if (!answerResponse.ok) {
+					ctx.status = answerResponse.status;
+					ctx.body = { error: "Errore nella modifica delle risposte" };
+					return ctx;
+				}
+			} else {
+				const answerResponse = await fetch(
+					`http://localhost:1337/api/answers/${answer.documentId}`,
+					{
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({
+							data: {
+								id_answer: answer.id,
+								text: answer.text,
+								correction: answer.correction,
+								score: answer.score,
+							},
+						}),
+					},
+				);
+
+				if (!answerResponse.ok) {
+					ctx.status = answerResponse.status;
+					ctx.body = { error: "Errore nella modifica delle risposte" };
+					return ctx;
+				}
+			}
+		}
+
+		ctx.status = 200;
+		ctx.body = {};
 	},
 
-	// Endpoint per eliminare una Question
-	async deleteQuestion(ctx: Context) {
-		try {
-			const { documentId } = ctx.query;
+	/**
+	 * Permette di eliminare una domanda presente in un test.
+	 * (Non elimina la domanda dal database, ma solo la relazione con il test)
+	 * @param ctx
+	 * @returns
+	 */
+	async deleteQuestionInTest(ctx: Context) {
+		const body = ctx.request.body;
+		const documentId = body.documentId;
+		const testId = body.testId;
 
-			await axios.delete(`http://localhost:1337/api/questions/${documentId}`);
+		const host = process.env.HOST;
+		const port = process.env.PORT;
 
-			ctx.body = `
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-question">
-                    <title>Redirect</title>
-                    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                </head>
-                <body class="bg-gray-100 text-center p-8">
-                    <h1 class="text-4xl font-bold text-red-600">Question eliminata con successo</h1>
-                    <p class="text-xl mt-4">Stai per essere reindirizzato...</p>
-                </body>
-            </html>`;
-			ctx.type = "html";
-		} catch (error) {
-			ctx.body = { error: error.message };
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Non autorizzato" };
+			return ctx;
 		}
+
+		// Devo recupera il document id della riga di question in test, se faccio la delete specificando solo il documentId della relazione question
+		// viene eliminata solo la relazione e non tutta la riga
+		const testResponse = await fetch(
+			`http://${host}:${port}/api/question-in-tests?filters[$and][0][question_id][documentId][$eq]=${documentId}&filters[$and][1][test_id][documentId][$eq]=${testId}&pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!testResponse.ok) {
+			ctx.status = testResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const testResponseData = (await testResponse.json()) as any;
+		console.log(testResponseData);
+		const questionIntest = testResponseData.data[0].documentId;
+
+		// Elimino la riga da question-in-tests
+		const deleteResponse = await fetch(
+			`http://localhost:1337/api/question-in-tests/${questionIntest}`,
+			{
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!deleteResponse.ok) {
+			ctx.status = deleteResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		ctx.status = 200;
+		ctx.body = { message: "Question deleted successfully" };
+		return ctx;
 	},
 
-	async getQuestions() {
-		try {
-			const response = await axios.get(
-				"http://localhost:1337/api/questions?populate=*",
+	/**
+	 * Permette di eliminare una domanda presente in un test.
+	 * (Non elimina la domanda dal database, ma solo la relazione con il test)
+	 * @param ctx
+	 * @returns
+	 */
+	async deleteAllQuestionInTest(ctx: Context) {
+		const body = ctx.request.body;
+		const documentId = body.documentId;
+
+		const host = process.env.HOST;
+		const port = process.env.PORT;
+
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Non autorizzato" };
+			return ctx;
+		}
+
+		// Devo recupera il document id della riga di question in test, se faccio la delete specificando solo il documentId della relazione question
+		// viene eliminata solo la relazione e non tutta la riga
+		const testResponse = await fetch(
+			`http://${host}:${port}/api/question-in-tests?filters[question_id][documentId][$eq]=${documentId}&pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!testResponse.ok) {
+			ctx.status = testResponse.status;
+			ctx.body = { error: "Errore nell'eliminazione della domanda" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const testResponseData = (await testResponse.json()) as any;
+		console.log(testResponseData);
+
+		for (const questionIntest of testResponseData.data) {
+			const questionId = questionIntest.documentId;
+			console.log("QUESTION IN TEST ID: ", questionId);
+
+			// Elimino la riga da question-in-tests
+			const deleteResponse = await fetch(
+				`http://localhost:1337/api/question-in-tests/${questionId}`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
 			);
-			const filteredAnswers = response.data.data.map((data) => ({
-				id: data.id ? data.id : null,
+
+			if (!deleteResponse.ok) {
+				ctx.status = deleteResponse.status;
+				ctx.body = { error: "Errore nell'eliminazione della domanda" };
+				return ctx;
+			}
+		}
+
+		ctx.status = 200;
+		ctx.body = { message: "Question deleted successfully" };
+		return ctx;
+	},
+
+	/**
+	 * Endpoint per ottenere le domande.
+	 * @param ctx
+	 * @returns
+	 */
+	async getQuestions(ctx) {
+		try {
+			const token = process.env.SERVICE_KEY;
+			const response = await fetch(
+				"http://localhost:1337/api/questions?pLevel",
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			);
+
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nel caricamento delle domande" };
+				return ctx;
+			}
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const responseData: any = await response.json();
+
+			const data = responseData.data;
+
+			const filteredAnswers = responseData.data.map((data) => ({
+				id: data.id_question,
 				documentId: data.documentId,
-				id_question: data.id_question,
 				name: data.name,
 				text: data.text,
-				id_category: data.id_category
+				category: data.category_id
 					? {
-							id: data.id_category.id ? data.id_category.id : null,
-							documentId: data.id_category.documentId,
-							id_category: data.id_category.id_category,
-							name: data.id_category.name,
+							documentId: data.category_id.documentId,
+							id_category: data.category_id.id_category,
+							name: data.category_id.name,
 						}
-					: null,
-				answers: data.answers
-					? data.answers.map((answer) => ({
-							id: answer.id ? answer.id : null,
-							documentId: answer.documentId,
-							id_answer: answer.id_answer,
-							text: answer.text,
-							score: answer.score,
-							correction: answer.correction,
-						}))
-					: [],
-				question_in_tests: data.question_in_tests
-					? data.question_in_tests.map((test) => ({
-							id: test.id ? test.id : null,
-							documentId: test.documentId,
-						}))
-					: [],
+					: {
+							documentId: "",
+							id_category: "",
+							name: "",
+						},
 			}));
 
-			console.log(filteredAnswers);
-			return response.data.data;
+			return filteredAnswers;
 		} catch (error) {
-			return `<li>Errore nel caricamento delle questions: ${error.message}</li>`;
+			ctx.body = { error: error.message };
 		}
+	},
+
+	/**
+	 * Endopoint che elimina una domanda in modo definitivo dal database.
+	 * @param ctx
+	 * @returns
+	 */
+	async deleteQuestionModel(ctx: Context) {
+		const body = ctx.request.body;
+		const question_id = body.question_id;
+		console.log("QUESTION ID: ", question_id);
+		const token = process.env.SERVICE_KEY;
+
+		// Elimino prima tutte le risposte legate alla domanda
+		const response = await fetch(
+			`http://localhost:1337/api/answers?filters[question_id][documentId][$eq]=${question_id}`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!response.ok) {
+			ctx.status = response.status;
+			ctx.body = { error: "Errore nella cancellazione delle risposte" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const responseData: any = await response.json();
+		const answers = responseData.data;
+
+		for (const answer of answers) {
+			const deleteResponse = await fetch(
+				`http://localhost:1337/api/answers/${answer.documentId}`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			);
+
+			if (!deleteResponse.ok) {
+				ctx.status = deleteResponse.status;
+				ctx.body = { error: "Errore nella cancellazione delle risposte" };
+				return ctx;
+			}
+		}
+
+		// Elimino le question in test dalla tabella
+		const reponse = await fetch(
+			"http://localhost:1337/api/test-plugin/delete-all-question-in-test",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					documentId: question_id,
+				}),
+			},
+		);
+
+		if (!reponse.ok) {
+			ctx.status = reponse.status;
+			ctx.body = { error: "Errore nella cancellazione delle domande in test" };
+			return ctx;
+		}
+
+		// Elimino la domanda
+		const deleteQuestionResponse = await fetch(
+			`http://localhost:1337/api/questions/${question_id}`,
+			{
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!deleteQuestionResponse.ok) {
+			ctx.status = deleteQuestionResponse.status;
+			ctx.body = { error: "Errore nella cancellazione della domanda" };
+			return ctx;
+		}
+
+		ctx.status = 200;
+		ctx.body = { message: "Question deleted successfully" };
+		return ctx;
+	},
+
+	/**
+	 * Endpoint per ottenere una domanda e le sue risposte.
+	 * @param ctx
+	 * @returns
+	 */
+	async getCompleteQuestion(ctx: Context) {
+		const body = ctx.request.body;
+		const question_id = body.question_id;
+		const token = process.env.SERVICE_KEY;
+
+		const toReturn = {
+			id: "",
+			documentId: "",
+			name: "",
+			text: "",
+			category: {
+				documentId: "",
+				id_category: "",
+				name: "",
+			},
+			answers: [],
+		};
+
+		// Recupero la domanda
+		const questionResponse = await fetch(
+			`http://localhost:1337/api/questions/${question_id}?pLevel`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!questionResponse.ok) {
+			ctx.status = questionResponse.status;
+			ctx.body = { error: "Errore nel recupero della domanda" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const questionData: any = await questionResponse.json();
+		const question = questionData.data;
+		console.log("PIPOLINO: ", question);
+
+		// Recupero le risposte legate alla domanda
+		const answersResponse = await fetch(
+			`http://localhost:1337/api/answers?filters[question_id][documentId][$eq]=${question_id}`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		);
+
+		if (!answersResponse.ok) {
+			ctx.status = answersResponse.status;
+			ctx.body = { error: "Errore nel recupero delle risposte" };
+			return ctx;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const answersData = (await answersResponse.json()) as any;
+		const answers = answersData.data;
+
+		for (const answer of answers) {
+			console.log("ANSWER: ", answer);
+			toReturn.answers.push({
+				id: answer.id_answer,
+				documentId: answer.documentId,
+				text: answer.text,
+				correction: answer.correction,
+				score: answer.score,
+			});
+		}
+
+		toReturn.id = question.id_question;
+		toReturn.documentId = question.documentId;
+		toReturn.name = question.name;
+		toReturn.text = question.text;
+		toReturn.category = {
+			documentId: question.category_id ? question.category_id.documentId : "",
+			id_category: question.category_id ? question.category_id.id_category : "",
+			name: question.category_id ? question.category_id.name : "",
+		};
+
+		ctx.status = 200;
+		ctx.body = toReturn;
+		return ctx;
 	},
 };

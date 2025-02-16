@@ -2,24 +2,15 @@ import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import TextBlock from "../components/textBlock";
 
-type NewsPageData = {
-	id: number;
-	documentId: string;
-	title: string;
-	slug: string;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	main_image: any;
-	section: sectionType[];
-	createdAt: string;
-	publishedAt: string;
-	updatedAt: string;
+type QrcodeType = {
+	url: string;
+	alternativeText: string;
 };
 
 type sectionType = {
 	id: number;
 	title: string;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	qrcode: any;
+	qrcode: QrcodeType | null;
 	content: {
 		type: string;
 		children: {
@@ -27,6 +18,20 @@ type sectionType = {
 			text: string;
 		}[];
 	}[];
+};
+
+type NewsPageData = {
+	id: number;
+	documentId: string;
+	title: string;
+	slug: string;
+	main_image: {
+		url: string;
+	} | null;
+	section: sectionType[];
+	createdAt: string;
+	publishedAt: string;
+	updatedAt: string;
 };
 
 const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
@@ -45,10 +50,8 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 				if (!response.ok) {
 					throw new Error("Errore durante il caricamento dei dati");
 				}
-
 				const data = await response.json();
-				console.log(data);
-				setPageData(data.data[0]);
+				setPageData(data.data[0] as NewsPageData);
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			} catch (err: any) {
 				setError(err.message);
@@ -68,67 +71,84 @@ const NewsPage: React.FC<{ slug: string }> = ({ slug }) => {
 		const mainImage = pageData.main_image;
 
 		return (
-			<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
-				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h2 className="text-white font-bold font-poppins m-0 text-center text-[42px]">
-						{title}
-					</h2>
+			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
+				{/* Area live per i messaggi di caricamento/errore */}
+				<div aria-live="polite" className="sr-only">
+					{loading && "Caricamento..."}
+					{error && `Errore: ${error}`}
+					{!pageData && !loading && !error && "Nessun dato trovato"}
 				</div>
-				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
+				{loading && (
+					<div className="min-h-screen flex items-center justify-center">
+						<p className="text-lg text-gray-600">Caricamento...</p>
+					</div>
+				)}
+				{error && (
+					<div className="min-h-screen flex items-center justify-center">
+						<p className="text-lg text-red-700" role="alert">
+							Errore: {error}
+						</p>
+					</div>
+				)}
+				{!pageData && !loading && !error && (
+					<div className="min-h-screen flex items-center justify-center">
+						<p className="text-lg text-gray-600">Nessun dato trovato</p>
+					</div>
+				)}
+				{/* Intestazione della pagina */}
+				<div className="w-full bg-navbar-hover px-4 py-4">
+					<h1 className="m-0 text-center text-[42px] font-bold font-accesible-font text-white">
+						{title}
+					</h1>
+				</div>
+				{/* Contenuto principale */}
+				<div className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover">
 					<div className="flex gap-4">
+						{/* Immagine principale */}
 						{mainImage && (
 							<div className="flex-shrink-0 w-20 h-20 md:w-28 md:h-28 flex items-start pt-1 pb-1">
 								<img
 									src={`http://localhost:1337${mainImage.url}`}
-									alt={`${mainImage.alternativeText} icon`}
+									alt={`Immagine principale della news ${title}`}
 									className="w-24 h-24 md:w-32 md:h-32 object-contain"
 								/>
 							</div>
 						)}
-						{section?.map((section: sectionType) => {
-							return (
-								<div
-									key={section.id}
-									className="flex-grow prose max-w-none text-navbar-hover font-poppins text-[17px] mt-4"
+						{/* Sezioni */}
+						{section?.map((section: sectionType) => (
+							<section
+								key={section.id}
+								aria-labelledby={`sectionTitle-${section.id}`}
+								className="flex-grow prose max-w-none text-navbar-hover font-accesible-font text-[17px] mt-4"
+							>
+								{/* Intestazione della sezione */}
+								<h2
+									id={`sectionTitle-${section.id}`}
+									className="text-[24px] font-bold"
 								>
-									<h3 className="text-[24px] font-bold">{section.title}</h3>
-									<TextBlock content={section.content} />
-									{section.qrcode && (
-										<img
-											src={`http://localhost:1337${section.qrcode.url}`}
-											alt={`${section.qrcode.alternativeText} icon`}
-											className="w-24 h-24 md:w-32 md:h-32 object-contain"
-										/>
-									)}
-								</div>
-							);
-						})}
+									{section.title}
+								</h2>
+								{/* Contenuto della sezione */}
+								<TextBlock content={section.content} />
+								{/* Immagine QR code */}
+								{section.qrcode && (
+									<img
+										src={`http://localhost:1337${section.qrcode.url}`}
+										alt={
+											section.qrcode.alternativeText
+												? section.qrcode.alternativeText
+												: "QR code della sezione"
+										}
+										className="w-24 h-24 md:w-32 md:h-32 object-contain"
+									/>
+								)}
+							</section>
+						))}
 					</div>
 				</div>
 			</div>
 		);
-	}, [pageData]);
-
-	if (loading)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-gray-600">Loading...</p>
-			</div>
-		);
-
-	if (error)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-red-500">Error: {error}</p>
-			</div>
-		);
-
-	if (!pageData)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-gray-600">No page data found</p>
-			</div>
-		);
+	}, [pageData, error, loading]);
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-8 md:py-12">{renderBlocks}</div>

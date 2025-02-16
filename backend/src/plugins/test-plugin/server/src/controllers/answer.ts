@@ -2,22 +2,52 @@ import type { Context } from "koa";
 import answerService from "../services/answer";
 const { v4: uuidv4 } = require("uuid");
 import axios from "axios";
+type CategoryResp = {
+	data: {
+		id: number;
+		documentId: string;
+		id_answer: string;
+		text: string;
+		score: number;
+		correction: string;
+		createdAt: string;
+		updatedAt: string;
+		publishedAt: string;
+	}[];
+	meta: {
+		pagination: {
+			page: number;
+			pageSize: number;
+			pageCount: number;
+			total: number;
+		};
+	};
+};
 
 export default {
 	/**
 	 * Endpoin per la creazione di una risposta.
 	 * @param ctx
-	 * @returns
+	 * @returns answer_id
 	 */
 	async createAnswer(ctx: Context) {
 		const { id_answer, text, correction, score, question_id } =
 			ctx.request.body;
+
+		const token = process.env.SERVICE_KEY;
+
+		if (!token) {
+			ctx.status = 401;
+			ctx.body = { error: "Unauthorized" };
+			return ctx;
+		}
 
 		// Faccio la chiamata API a Strapi per creare la Question
 		const response = await fetch("http://localhost:1337/api/answers", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				data: {
@@ -37,7 +67,10 @@ export default {
 		}
 
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		const answerData: any = await response.json();
+		const answerData: any = (await response.json()) as CategoryResp;
+
+		console.log(answerData);
+
 		const id = answerData.data.documentId;
 
 		ctx.status = 200;
@@ -46,56 +79,43 @@ export default {
 		return ctx;
 	},
 
-	async answerManagement(ctx) {
-		try {
-			const answersHTML = await answerService.getAnswersHTML();
-
-			ctx.body = `
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <title>Gestione Answers</title>
-                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-                    </head>
-                    <body class="bg-gray-100 font-sans">
-                        <div class="max-w-4xl mx-auto p-8">
-                            <h1 class="text-3xl font-semibold text-gray-800 mb-6">Gestione delle Answers</h1>
-                            <h3 class="text-xl font-medium text-gray-700 mb-4">Answers esistenti</h3>
-                            <ul class="mb-6">
-                                ${answersHTML}
-                            </ul>
-                            <form method="POST" action="/api/test-plugin/create-answer" class="bg-white p-6 rounded-lg shadow-lg">
-                                <label for="text" class="block text-lg text-gray-800">Text:</label>
-                                <input type="text" name="text" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                                <label for="score" class="block text-lg text-gray-800">Score:</label>
-                                <select name="score" required class="border border-gray-300 p-2 rounded-lg w-full mb-4">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                </select>
-                                <label for="correction" class="block text-lg text-gray-800">Correction:</label>
-                                <textarea name="correction" required class="border border-gray-300 p-2 rounded-lg w-full mb-4"></textarea>
-                                <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Crea Answer</button>
-                                <br>
-                                <a href="/api/test-plugin/display-category" class="text-blue-500 hover:underline mt-4 inline-block">Crea una nuova category</a>
-								<br>
-								<a href="/api/test-plugin/display-question" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla creazione delle question</a>
-                            </form>
-                        </div>
-                    </body>
-                </html>`;
-			ctx.type = "html";
-		} catch (error) {
-			ctx.body = { error: error.message };
-		}
-	},
-
-	async modifyAnswer(ctx: Context) {
+	/**
+	 * Endpoin per la visualizzazione di una risposta.
+	 * @param ctx
+	 * @returns filtredData
+	 */
+	/*async modifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
-			const response = await axios.get(
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
+			const response = await fetch(
 				`http://localhost:1337/api/answers/${documentId}?populate=*`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
+				},
 			);
-			const data = response.data.data;
+
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nel caricamento della risposta" };
+				return ctx;
+			}
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const answerData: any = await response.json();
+			const data = answerData.data;
 
 			const filteredData = {
 				id: data.id,
@@ -104,176 +124,227 @@ export default {
 				text: data.text,
 				score: data.score,
 				correction: data.correction,
-				id_question: data.id_question
+				id_question: data.question_id
 					? {
-							id: data.id_question.id,
-							documentId: data.id_question.documentId,
-							id_question: data.id_question.id_question,
-							name: data.id_question.name,
-							text: data.id_question.text,
+							id: data.question_id.id,
+							documentId: data.question_id.documentId,
+							id_question: data.question_id.id_question,
+							name: data.question_id.name,
+							text: data.question_id.text,
 						}
 					: null,
 			};
 
 			console.log(filteredData);
 
-			ctx.body = `
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <title>Modifica Answer</title>
-                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-                    </head>
-                    <body class="bg-gray-100 font-sans">
-                        <div class="max-w-3xl mx-auto p-8">
-                            <h1 class="text-3xl font-semibold text-gray-800 mb-6">Modifica Answer</h1>
-                            <form action="/api/test-plugin/submit-modify-answer?documentId=${documentId}" method="POST" class="bg-white p-6 rounded-lg shadow-lg">
-                                <label for="text" class="block text-lg text-gray-800">Text:</label>
-                                <input type="text" name="text" value="${data.text}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                                <label for="score" class="block text-lg text-gray-800">Score:</label>
-                                <input type="number" name="score" value="${data.score}" required class="border border-gray-300 p-2 rounded-lg w-full mb-4" />
-                                <label for="correction" class="block text-lg text-gray-800">Correction:</label>
-                                <textarea name="correction" required class="border border-gray-300 p-2 rounded-lg w-full mb-4">${data.correction}</textarea>
-                                <button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Salva Modifiche</button>
-								<br>
-								<a href="/api/test-plugin/display-answer" class="text-blue-500 hover:underline mt-4 inline-block">Torna alla visualizzazione delle answer</a>
-                            </form>
-                        </div>
-                    </body>
-                </html>`;
-			ctx.type = "html";
+			ctx.status = 200;
+			ctx.body = filteredData;
+
+			// return ctx;
+			return filteredData;
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
-	async submitModifyAnswer(ctx: Context) {
+	/**
+	 * Endpoin per la modifica di una risposta.
+	 * @param ctx
+	 * @returns
+	 */
+	/*async submitModifyAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 			const { text, score, correction } = ctx.request.body;
-			console.log(ctx.request.body);
-			await axios.put(`http://localhost:1337/api/answers/${documentId}`, {
-				data: {
-					text,
-					score,
-					correction,
-				},
-			});
 
-			ctx.body = `
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-answer">
-                        <title>Redirect</title>
-                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-                    </head>
-                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-                        <div class="bg-white p-8 rounded-lg shadow-lg text-center">
-                            <h1 class="text-2xl font-semibold text-green-600 mb-4">Answer Modificata con Successo!</h1>
-                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
-                        </div>
-                    </body>
-                </html>`;
-			ctx.type = "html";
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
+			console.log(ctx.request.body);
+			const response = await fetch(
+				`http://localhost:1337/api/answers/${documentId}`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						data: {
+							text,
+							score,
+							correction,
+						},
+					}),
+				},
+			);
+
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nella modifica della risposta" };
+				return ctx;
+			}
+
+			ctx.status = 200;
+			ctx.body = { message: "Risposta modificata con successo!" };
+
+			return ctx;
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
+	}, */
 
-	async deleteAnswer(ctx: Context) {
+	/**
+	 * Endpoin per la cancellazione di una risposta.
+	 * @param ctx
+	 * @returns
+	 */
+	/*async deleteAnswer(ctx: Context) {
 		try {
 			const { documentId } = ctx.query;
 
-			await axios.delete(`http://localhost:1337/api/answers/${documentId}`);
+			const token = process.env.SERVICE_KEY;
 
-			ctx.body = `
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta http-equiv="refresh" content="2;url=http://localhost:1337/api/test-plugin/display-answer">
-                        <title>Redirect</title>
-                        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-                    </head>
-                    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-                        <div class="bg-white p-8 rounded-lg shadow-lg text-center">
-                            <h1 class="text-2xl font-semibold text-red-600 mb-4">Answer Eliminata con Successo!</h1>
-                            <p class="text-lg text-gray-700">Stai per essere reindirizzato...</p>
-                        </div>
-                    </body>
-                </html>`;
-			ctx.type = "html";
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
+			const response = await fetch(
+				`http://localhost:1337/api/answers/${documentId}`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
+				},
+			);
+
+			if (!response.ok) {
+				ctx.status = response.status;
+				ctx.body = { error: "Errore nella cancellazione della risposta" };
+				return ctx;
+			}
+
+			ctx.status = 200;
+			ctx.body = { message: "Risposta eliminata con successo!" };
+			return ctx;
 		} catch (error) {
 			ctx.body = { error: error.message };
 		}
-	},
-
-	async getAnswers() {
+	},*/
+	/**
+	 * Endpoint per ottenere le risposte legate ad una domanda.
+	 * @param ctx
+	 * @returns filteredAnswers
+	 */
+	async getQuestionAnswers(ctx: Context) {
 		try {
-			const response = await axios.get(
-				"http://localhost:1337/api/answers?populate=*",
+			const token = process.env.SERVICE_KEY;
+			const documentId = ctx.query.documentId;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
+			const response = await fetch(
+				`http://localhost:1337/api/answers?filters[question_id][documentId]=${documentId}&pLevel`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
 			);
-			const filteredAnswers = response.data.data.map((answer) => ({
-				id: answer.id ? answer.id : null,
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			const responseData: any = await response.json(); // Converte la risposta in JSON
+
+			const filteredAnswers = responseData.data.map((answer) => ({
+				id: answer.id_answer,
 				documentId: answer.documentId,
-				id_answer: answer.id_answer,
 				text: answer.text,
 				score: answer.score,
 				correction: answer.correction,
-				id_question: answer.id_question
-					? {
-							id: answer.id_question.id,
-							documentId: answer.id_question.documentId,
-							id_question: answer.id_question.id_question,
-							name: answer.id_question.name,
-							text: answer.id_question.text,
-						}
-					: null,
 			}));
-			console.log(filteredAnswers);
+
+			ctx.status = 200;
+			ctx.body = filteredAnswers;
+
+			// return ctx;
 			return filteredAnswers;
 		} catch (error) {
 			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
 		}
 	},
 
-	async getFreeAnswers() {
+	/*async getFreeAnswers(ctx: Context) {
 		try {
-			const response = await axios.get(
+
+			const token = process.env.SERVICE_KEY;
+
+			if (!token) {
+				ctx.status = 401;
+				ctx.body = { error: "Unauthorized" };
+				return ctx;
+			}
+
+			const response = await fetch(
 				"http://localhost:1337/api/answers/?populate=*",
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
+				},
 			);
-			const answers = response.data.data;
+
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation
+			const responseData: any = await response.json();
+			const answers = responseData.data;
 
 			// Filtra le answers con id_question null
 			const FreeAnswers = answers.filter(
-				(answer) => answer.id_question === null,
+				(answer) => answer.question_id === null,
 			);
 
 			const filteredAnswers = FreeAnswers.map((answer) => ({
-				id: answer.id ? answer.id : null,
+				id: answer.id ?? null,
 				documentId: answer.documentId,
 				id_answer: answer.id_answer,
 				text: answer.text,
 				score: answer.score,
 				correction: answer.correction,
-				id_question: answer.id_question
+				id_question: answer.question_id
 					? {
-							id: answer.id_question.id,
-							documentId: answer.id_question.documentId,
-							id_question: answer.id_question.id_question,
-							name: answer.id_question.name,
-							text: answer.id_question.text,
+							id: answer.question_id.id,
+							documentId: answer.question_id.documentId,
+							id_question: answer.question_id.id_question,
+							name: answer.question_id.name,
+							text: answer.question_id.text,
 						}
-					: null, // Se id_question è null, assegni null
+					: null,
 			}));
 
-			console.log(filteredAnswers);
+			ctx.status = 200;
+			ctx.body = filteredAnswers;
+
+			//return ctx;
 			return filteredAnswers;
 		} catch (error) {
 			console.error(`Errore nel caricamento delle answers: ${error.message}`);
 			return `<li>Errore nel caricamento delle answers: ${error.message}</li>`;
 		}
-	},
+	}, */
 };

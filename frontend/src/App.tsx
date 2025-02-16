@@ -1,22 +1,22 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
-import MenuComponent from "./components/navbar";
-import Login from "./pages/Login";
-import PrivateRoute from "./components/PrivateRoute";
-import TestPage from "./pages/testPage";
-import Homepage from "./pages/Homepage";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Footer from "./components/footer";
 import Header from "./components/header";
+import MenuComponent from "./components/navbar";
 import About from "./pages/About";
-import InfectionPage from "./pages/InfectionPage";
+import EventsPage from "./pages/EventsPage";
+import Homepage from "./pages/Homepage";
 import InfectionList from "./pages/InfectionListPage";
+import InfectionPage from "./pages/InfectionPage";
+import Login from "./pages/Login";
+import NewsPage from "./pages/newsPage";
 import ServicePage from "./pages/ServicePage";
 import ServicesListPage from "./pages/ServicesListPage";
-import ContattiPage from "./pages/ContattiPage";
-import NewsPage from "./pages/newsPage";
 import UsefulLinksPage from "./pages/UsefulLinksPage";
-import EventsPage from "./pages/EventsPage";
-import TakeQuizSetup from "./components/TakeQuizSetup";
+import ContactPage from "./pages/ContactPage";
+import DashboardPage from "./pages/DashboardPage";
+import TakeQuizPage from "./pages/TakeQuizPage";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -76,10 +76,8 @@ function App() {
 				<MenuComponent />
 				<Routes>
 					<Route path="/login" element={<Login />} />{" "}
-					{/* Controllare la visualizzazione delle pagine protette dal login  */}
-					<Route path="/test" element={<PrivateRoute element={TestPage} />} />
-					<Route path="/taketest" element={<TakeQuizSetup />} />
-					<Route path="/contatti" element={<ContattiPage />} />
+					<Route path="/taketest" element={<TakeQuizPage />} />
+					<Route path="/contatti" element={<ContactPage />} />
 					<Route path="/" element={<Homepage />} />
 					<Route path="/home" element={<Homepage />} />
 					<Route path="/chi-siamo" element={<About />} />
@@ -87,6 +85,10 @@ function App() {
 					<Route path="/servizi" element={<ServicesListPage />} />
 					<Route path="/link-utili" element={<UsefulLinksPage />} />
 					<Route path="/eventi" element={<EventsPage />} />
+					<Route
+						path="/dashboard"
+						element={<PrivateRoute element={DashboardPage} />}
+					/>
 					{infectionSlugs.map((slug: string) => (
 						<Route
 							key={slug}

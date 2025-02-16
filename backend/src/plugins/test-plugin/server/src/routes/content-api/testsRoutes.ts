@@ -1,50 +1,34 @@
 export default [
 	{
-		method: "GET",
-		path: "/display-test", // Questa rotta genera un test casuale
-		handler: "tests.testManagement", // Aggiungi il controller per ottenere il test
+		method: "POST",
+		path: "/submit-modify-test", // Questa rotta permette di visualizzare un test
+		handler: "tests.submitModifyTest", // Controller per visualizzare un test
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{
 		method: "POST",
-		path: "/create-test", // Questa rotta genera un test casuale
-		handler: "tests.createTest", // Aggiungi il controller per ottenere il test
+		path: "/delete-test", // Questa rotta permette di eliminare un test
+		handler: "tests.deleteTest", // Controller per eliminare un test
 		config: {
-			auth: false, // Nessuna autenticazione per il test
-		},
-	},
-	{
-		method: "GET",
-		path: "/modify-Test", // Questa rotta genera un test casuale
-		handler: "tests.modifyTest", // Aggiungi il controller per ottenere il test
-		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{
 		method: "POST",
-		path: "/submit-modify-test",
-		handler: "tests.submitModifyTest",
+		path: "/get-complete-test", // Questa rotta permette di ottenere un test completo
+		handler: "tests.getCompleteTest", // Controller per ottenere un test completo
 		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 	{
-		method: "GET",
-		path: "/delete-test",
-		handler: "tests.deleteTest",
+		method: "POST",
+		path: "/create-test", // Questa rotta permette di creare un test
+		handler: "tests.createTest", // Controller per creare un test
 		config: {
-			auth: false, // Nessuna autenticazione per il test
-		},
-	},
-	{
-		method: "GET",
-		path: "/get-tests", // Questa rotta genera un test casuale
-		handler: "tests.getTests", // Aggiungi il controller per ottenere il test
-		config: {
-			auth: false, // Nessuna autenticazione per il test
+			auth: { required: true },
 		},
 	},
 ];

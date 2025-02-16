@@ -2,21 +2,24 @@ import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import TextBlock from "../components/textBlock";
 
+type Section = {
+	content: {
+		type: string;
+		children: {
+			type: string;
+			text: string;
+		}[];
+	};
+	icon: {
+		url: string;
+	} | null;
+	id: number;
+	title: string;
+};
+
 type PageData = {
 	title: string;
-	sections: Array<{
-		content: {
-			type: string;
-			children: {
-				type: string;
-				text: string;
-			}[];
-		};
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		icon: any;
-		id: number;
-		title: string;
-	}>;
+	sections: Section[];
 	id: number;
 	slug: string;
 	updatedAt: string;
@@ -43,8 +46,7 @@ const InfectionPage: React.FC<{ slug: string }> = ({ slug }) => {
 				}
 
 				const data = await response.json();
-				setPageData(data.data[0]);
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				setPageData(data.data[0] as PageData);
 			} catch (err: any) {
 				setError(err.message);
 			} finally {
@@ -61,62 +63,89 @@ const InfectionPage: React.FC<{ slug: string }> = ({ slug }) => {
 		const title = pageData.title;
 
 		return (
-			<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
-				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h2 className="text-white font-bold font-poppins m-0 text-center text-[42px]">
+			<div className="mx-auto w-full max-w-3xl flex flex-col gap-4">
+				<div
+					className="w-full bg-navbar-hover px-4 py-4"
+					aria-labelledby="pageTitle"
+				>
+					<h2
+						id="pageTitle"
+						className="m-0 text-center text-[42px] font-bold font-accesible-font text-white"
+					>
 						{title}
 					</h2>
 				</div>
-				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
-					{pageData.sections.map((section) => {
-						return (
-							<div key={section.id} className="w-full">
-								<div className="flex gap-4">
-									{section.icon && (
-										<div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 flex items-start pt-1">
-											<img
-												src={`http://localhost:1337${section.icon.url}`}
-												alt={`${section.icon.alternativeText} icon`}
-												className="w-8 h-8 md:w-10 md:h-10 object-contain"
-											/>
-										</div>
-									)}
-									<div className="flex-grow prose max-w-none text-navbar-hover font-poppins text-[17px]">
-										<h3 className="text-[24px] font-bold">{section.title}</h3>
-										<TextBlock content={section.content} />
+
+				<div
+					className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover"
+					role="group"
+					aria-labelledby="sectionsTitle"
+				>
+					<h3 id="sectionsTitle" className="sr-only">
+						Sezioni
+					</h3>
+					{pageData.sections.map((section) => (
+						<section
+							key={section.id}
+							className="w-full mb-4"
+							aria-labelledby={`sectionTitle-${section.id}`}
+						>
+							<div className="flex gap-4">
+								{section.icon && (
+									<div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 flex items-start pt-1">
+										<img
+											src={`http://localhost:1337${section.icon.url}`}
+											alt={"Icona sezione: " + section.title}
+											className="w-8 h-8 md:w-10 md:h-10 object-contain"
+											aria-hidden={true} // L'icona è puramente decorativa
+										/>
 									</div>
+								)}
+								<div className="flex-grow prose max-w-none text-navbar-hover font-accesible-font text-[17px]">
+									<h4
+										className="text-[24px] font-bold"
+										id={`sectionTitle-${section.id}`}
+									>
+										{section.title}
+									</h4>
+									<TextBlock content={section.content} />
 								</div>
 							</div>
-						);
-					})}
+						</section>
+					))}
 				</div>
 			</div>
 		);
 	}, [pageData]);
 
-	if (loading)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-gray-600">Loading...</p>
-			</div>
-		);
-
-	if (error)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-red-500">Error: {error}</p>
-			</div>
-		);
-
-	if (!pageData)
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-lg text-gray-600">No page data found</p>
-			</div>
-		);
-
 	return (
-		<div className="min-h-screen bg-gray-50 py-8 md:py-12">{renderBlocks}</div>
+		<div className="min-h-screen bg-gray-50 py-8 md:py-12">
+			{/* Area live per i messaggi di caricamento/errore */}
+			<div aria-live="polite" className="sr-only">
+				{loading && "Caricamento..."}
+				{error && `Errore: ${error}`}
+				{!pageData && !loading && !error && "Nessun dato trovato"}
+			</div>
+
+			{loading && (
+				<div className="min-h-screen flex items-center justify-center">
+					<p className="text-lg text-gray-600">Caricamento...</p>
+				</div>
+			)}
+			{error && (
+				<div className="min-h-screen flex items-center justify-center">
+					<p className="text-lg text-red-700" role="alert">
+						Errore: {error}
+					</p>
+				</div>
+			)}
+			{!pageData && !loading && !error && (
+				<div className="min-h-screen flex items-center justify-center">
+					<p className="text-lg text-gray-600">Nessun dato trovato</p>
+				</div>
+			)}
+			{renderBlocks}
+		</div>
 	);
 };
 

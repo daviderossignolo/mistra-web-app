@@ -30,7 +30,7 @@ const Header: React.FC = () => {
 
 	useEffect(() => {
 		const fetchHeaderData = async () => {
-			const url = `${host}:${port}/api/header?populate[0]=content.main_image&populate[1]=sx_logo&populate[2]=dx_logo`;
+			const url = `${host}:${port}/api/header?pLevel`;
 			try {
 				const response = await fetch(url);
 
@@ -79,7 +79,7 @@ const Header: React.FC = () => {
 		: "";
 
 	if (loading) return <div className="p-4 text-center">Caricamento...</div>;
-	if (error) return <div className="p-4 text-red-500">Errore: {error}</div>;
+	if (error) return <div className="p-4 text-red-700">Errore: {error}</div>;
 
 	return (
 		<header className="w-full bg-navbar shadow-md">
@@ -90,7 +90,7 @@ const Header: React.FC = () => {
 					className="h-12 w-12 md:h-16 md:w-16 object-contain rounded-full mx-2"
 				/>
 				{/* Titolo */}
-				<h1 className="text-center text-lg md:text-2xl font-poppins font-bold py-4 text-white px-2">
+				<h1 className="text-center text-lg md:text-2xl font-accessible-font font-bold py-4 text-white px-2">
 					{header_title}
 				</h1>
 				<img
@@ -111,20 +111,24 @@ const Header: React.FC = () => {
 					</div>
 
 					{/* Contenuto testuale */}
-					<div className="flex flex-col space-y-4 text-center md:text-left">
+					<section
+						className="flex flex-col space-y-4 text-center md:text-left"
+						aria-live="polite"
+						aria-label="Contenuto testuale principale"
+					>
 						<div className="space-y-2">
 							<ReactMarkdown
 								className="text-white prose prose-invert"
 								components={{
 									h2: ({ node, ...props }) => (
 										<h2
-											className="mb-4 text-4xl font-poppins font-extralight"
+											className="mb-4 text-4xl font-accessible-font font-extralight"
 											{...props}
 										/>
 									),
 									p: ({ node, ...props }) => (
 										<p
-											className="mb-2 text-3xl font-poppins font-extralight"
+											className="mb-2 text-3xl font-accessible-font font-extralight"
 											{...props}
 										/>
 									),
@@ -133,7 +137,7 @@ const Header: React.FC = () => {
 								{parsedMarkdown}
 							</ReactMarkdown>
 						</div>
-					</div>
+					</section>
 				</div>
 			</div>
 		</header>

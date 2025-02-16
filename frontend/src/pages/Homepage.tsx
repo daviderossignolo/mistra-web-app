@@ -48,26 +48,38 @@ const Homepage: React.FC = () => {
 		return (
 			<div className="w-full max-w-3xl mx-auto flex flex-col gap-4">
 				<div className="w-full bg-navbar-hover px-4 py-4">
-					<h2 className="text-white font-bold font-poppins m-0 text-left text-[42px]">
+					{/* Modifica 1: Utilizzo di <h1> per il titolo principale */}
+					<h2 className="text-white font-bold font-accesible-font m-0 text-left text-[42px]">
 						{title}
 					</h2>
 				</div>
-				<div className="w-full text-left text-lg font-poppins font-extralight text-navbar-hover">
+				<div className="w-full text-left text-lg font-accesible-font font-extralight text-navbar-hover">
 					<TextBlock content={content} />
 				</div>
 			</div>
 		);
 	}, [pageData]);
 
-	if (loading) return <p className="text-center p-4">Loading...</p>;
-	if (error)
-		return <p className="text-center p-4 text-red-500">Error: {error}</p>;
-	if (!pageData) return <p className="text-center p-4">No page data found</p>;
-
 	return (
-		<div className="min-h-screen flex items-center justify-center p-8">
+		<main className="min-h-screen flex items-center justify-center p-8">
+			<div aria-live="polite" className="sr-only">
+				{loading && "Loading..."}
+				{error && `Error: ${error}`}
+				{!pageData && !loading && !error && "No page data found"}
+			</div>
+
 			{renderBlocks}
-		</div>
+
+			{loading && <p className="text-center p-4">Loading...</p>}
+			{error && (
+				<p className="text-center p-4 text-red-700" role="alert">
+					Error: {error}
+				</p>
+			)}
+			{!pageData && !loading && !error && (
+				<p className="text-center p-4">No page data found</p>
+			)}
+		</main>
 	);
 };
 

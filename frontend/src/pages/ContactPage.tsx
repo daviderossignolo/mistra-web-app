@@ -65,7 +65,7 @@ type ContactPageData = {
 	updatedAt: string;
 };
 
-const ContattiPage: React.FC = () => {
+const ContactPage: React.FC = () => {
 	const [pageData, setPageData] = useState<ContactPageData | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -109,51 +109,66 @@ const ContattiPage: React.FC = () => {
 		return (
 			<div className="flex flex-col gap-12">
 				<div className="w-full bg-navbar-hover px-4 py-6">
-					<h1 className="text-white font-bold font-poppins m-0 text-left text-3xl md:text-4xl lg:text-5xl container mx-auto">
+					<h1 className="text-white font-bold font-accesible-font m-0 text-left text-3xl md:text-4xl lg:text-5xl container mx-auto">
 						{title}
 					</h1>
 				</div>
-				<div className="w-full bg-contact-bg py-5">
+				<div
+					className="w-full bg-contact-bg py-5"
+					aria-labelledby="introductionTitle"
+				>
 					<div className="container mx-auto max-w-5xl px-4">
-						<h2 className="text-center text-red-500 font-bold font-poppins text-[56px]">
+						<h2 className="text-center text-red-700 font-bold font-accesible-font text-[56px]">
 							{introduction.title}
 						</h2>
-						<div className="text-left font-poppins font-extralight text-navbar-hover text-[20px]">
+						<div className="text-left font-accesible-font font-extralight text-navbar-hover text-[20px]">
 							<TextBlock content={introduction.content} />
 						</div>
 					</div>
 				</div>
-				<div className="container mx-auto max-w-6xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+				<div
+					className="container mx-auto max-w-6xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+					aria-labelledby="mapSectionTitle"
+				>
 					<div className="flex flex-col gap-4">
-						<h2 className="font-poppins font-bold text-navbar-hover text-[35px]">
+						<h2 className="font-accesible-font font-bold text-navbar-hover text-[35px]">
 							{map.title}
 						</h2>
-						<div className="font-poppins text-navbar-hover">
+						<div className="font-accesible-font text-navbar-hover">
 							<TextBlock content={map.content} />
 						</div>
 					</div>
 					<div>
-						<div>
+						<div aria-label="Map">
 							<MapBlock latitude={map.latitude} longitude={map.longitude} />
 						</div>
 					</div>
 				</div>
-				<div className="w-full bg-contact-bg py-8">
+				<div
+					className="w-full bg-contact-bg py-8"
+					aria-labelledby="openingHoursTitle"
+				>
 					<div className="container mx-auto max-w-5xl px-4">
-						<h2 className="text-center text-[35px] font-poppins mb-4 text-navbar-hover">
+						<h2 className="text-center text-[35px] font-accesible-font mb-4 text-navbar-hover">
 							{openingHours.title}
 						</h2>
 						<hr className="border-2 border-navbar-hover mx-auto mb-4" />
-						<p className="text-base text-[20px] font-poppins font-extralight text-navbar-hover py-1 mb-4">
+						<p className="text-base text-[20px] font-accesible-font font-extralight text-navbar-hover py-1 mb-4">
 							{openingHours.description}
 						</p>
 						<div className="overflow-x-auto">
-							<table className="w-full text-center">
+							<table className="w-full text-center" summary="Orari di apertura">
 								<thead>
 									<tr>
-										<th className="py-2 px-2">Giorno</th>
-										<th className="py-2 px-2">Mattino</th>
-										<th className="py-2 px-2">Pomeriggio</th>
+										<th className="py-2 px-2" scope="col">
+											Giorno
+										</th>
+										<th className="py-2 px-2" scope="col">
+											Mattino
+										</th>
+										<th className="py-2 px-2" scope="col">
+											Pomeriggio
+										</th>
 										{/*<th className="py-2 px-4">Note</th>*/}
 									</tr>
 								</thead>
@@ -177,15 +192,18 @@ const ContattiPage: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="container mx-auto max-w-5xl px-4">
-					<h2 className="text-left text-[35px] font-poppins mb-4 text-navbar-hover">
+				<div
+					className="container mx-auto max-w-5xl px-4"
+					aria-labelledby="infoSectionTitle"
+				>
+					<h2 className="text-left text-[35px] font-accesible-font mb-4 text-navbar-hover">
 						{info.title}
 					</h2>
-					<div className="font-poppins font-extralight text-[20px] text-navbar-hover">
+					<div className="font-accesible-font font-extralight text-[20px] text-navbar-hover">
 						<TextBlock content={info.content} />
 					</div>
 				</div>
-				<div className="w-full">
+				<div className="w-full" aria-labelledby="actionSectionTitle">
 					<div className="container mx-auto max-w-4xl px-4 text-center text-navbar-hover">
 						<h2 className="text-2xl md:text-3xl lg:text-4xl font-bold">
 							{action.title}
@@ -196,6 +214,7 @@ const ContattiPage: React.FC = () => {
 						<a
 							href={"mailto:centro.mistra@aovr.veneto.it"}
 							className="inline-block mt-6 bg-navbar text-white font-bold px-6 py-3 rounded-md"
+							aria-label="Invia Email a centro.mistra@aovr.veneto.it"
 						>
 							Invia Email
 						</a>
@@ -207,14 +226,29 @@ const ContattiPage: React.FC = () => {
 
 	if (loading) return <p className="text-center p-4">Loading...</p>;
 	if (error)
-		return <p className="text-center p-4 text-red-500">Error: {error}</p>;
+		return <p className="text-center p-4 text-red-700">Error: {error}</p>;
 	if (!pageData) return <p className="text-center p-4">No page data found</p>;
 
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-start p-4 md:p-8">
+			<div aria-live="polite" className="sr-only">
+				{loading && "Caricamento..."}
+				{error && `Errore: ${error}`}
+				{!pageData && !loading && !error && "Nessun dato trovato"}
+			</div>
+
+			{loading && <p className="text-center p-4">Caricamento...</p>}
+			{error && (
+				<p className="text-center p-4 text-red-700" role="alert">
+					Errore: {error}
+				</p>
+			)}
+			{!pageData && !loading && !error && (
+				<p className="text-center p-4">Nessun dato trovato</p>
+			)}
 			{renderBlocks}
 		</div>
 	);
 };
 
-export default ContattiPage;
+export default ContactPage;
