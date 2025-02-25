@@ -17,6 +17,7 @@ import ContactPage from "./pages/ContactPage";
 import DashboardPage from "./pages/DashboardPage";
 import TakeQuizPage from "./pages/TakeQuizPage";
 import PrivateRoute from "./components/PrivateRoute";
+import ErrorPage from "./pages/ErrorPage";
 
 function App() {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -110,6 +111,7 @@ function App() {
 							element={<NewsPage slug={slug} />}
 						/>
 					))}
+					<Route path="*" element={<ErrorPage />} />
 				</Routes>
 				<Footer />
 			</div>

@@ -386,7 +386,12 @@ const TakeQuizPage: React.FC = () => {
 													)
 												}
 												className="form-radio text-navbar"
-												aria-label={answer.text} // Descrive l'opzione per gli screen reader
+												aria-label={
+													"domanda " +
+													question.text +
+													" risposta:" +
+													answer.text
+												} // Descrive l'opzione per gli screen reader
 											/>
 											<span className="text-navbar-hover">{answer.text}</span>
 										</label>
